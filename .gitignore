@@ -13,6 +13,7 @@ logs/
 .DS_Store
 Thumbs.db
 
+
 # Build / dist folders
 dist/
 build/
@@ -20,7 +21,9 @@ build/
 # IDE files
 .vscode/
 .idea/
-
+.claude/
+Config/
+Playwright/
 
 # Playwright
 node_modules/
