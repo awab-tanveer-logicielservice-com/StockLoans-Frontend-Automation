@@ -22,7 +22,6 @@ build/
 .vscode/
 .idea/
 .claude/
-Config/
 Playwright/
 
 # Playwright
