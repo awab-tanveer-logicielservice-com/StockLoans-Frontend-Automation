@@ -16,7 +16,10 @@
     "cmd-to-test": "yarn run run-and-test -- --spec cypress/e2e/test.cy.ts",
     "test": "jest",
     "jest": "jest --runInBand",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:serve": "allure serve allure-results"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",

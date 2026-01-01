@@ -30,3 +30,7 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Allure Reports
+allure-results/
+allure-report/
