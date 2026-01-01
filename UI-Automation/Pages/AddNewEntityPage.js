@@ -1,4 +1,4 @@
-import { LOCATORS } from '../Config/locators';
+import { LOCATORS } from '../utils/locators.js';
 
 export class AddNewEntityPage {
     constructor(page) {

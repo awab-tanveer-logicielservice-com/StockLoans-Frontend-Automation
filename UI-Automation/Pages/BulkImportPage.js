@@ -1,6 +1,6 @@
-import { LoginPage } from './LoginPage';
+import { LoginPage } from './LoginPage.js';
 import { expect } from '@playwright/test';
-import { LOCATORS } from '../Config/locators';
+import { LOCATORS } from '../utils/locators.js';
 
 export class BulkImportPage {
   page;

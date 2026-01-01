@@ -1,5 +1,5 @@
 import { Console, log } from "console";
-import { LOCATORS } from '../Config/locators';
+import { LOCATORS } from '../utils/locators.js';
 
 export class TradePage {
   page;

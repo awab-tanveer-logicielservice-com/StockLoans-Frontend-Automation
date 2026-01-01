@@ -1,5 +1,5 @@
 import { ENV } from '../Config/env';
-import { LOCATORS } from '../Config/locators';
+import { LOCATORS } from '../utils/locators.js';
 
 export class LoginPage {
   page;
