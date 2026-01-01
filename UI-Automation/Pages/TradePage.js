@@ -1,4 +1,3 @@
-import { Console, log } from "console";
 import { LOCATORS } from '../utils/locators.js';
 
 export class TradePage {

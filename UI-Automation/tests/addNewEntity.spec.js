@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../Pages/LoginPage.js';
 import { DashboardPage } from '../Pages/DashboardPage.js';
 import { AddNewEntityPage } from '../Pages/AddNewEntityPage.js';
-import { users } from '../utils/testdata';
+import { users } from '../utils/testdata.js';
 
 // Helper function to generate random name
 function generateRandomName() {

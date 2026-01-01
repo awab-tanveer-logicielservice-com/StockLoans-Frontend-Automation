@@ -1,4 +1,4 @@
-import { ENV } from '../Config/env';
+import { ENV } from '../Config/env.js';
 import { LOCATORS } from '../utils/locators.js';
 
 export class LoginPage {
