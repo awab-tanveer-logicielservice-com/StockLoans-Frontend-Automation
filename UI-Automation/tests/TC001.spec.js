@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { LoginPage } from '../Pages/LoginPage';
-import { users } from '../utils/testdata';
-import { DashboardPage } from '../Pages/DashboardPage';
+import { LoginPage } from '../Pages/LoginPage.js';
+import { users } from '../utils/testdata.js';
+import { DashboardPage } from '../Pages/DashboardPage.js';
 
 test.describe('Login and Dashboard TestCase', () => {
 

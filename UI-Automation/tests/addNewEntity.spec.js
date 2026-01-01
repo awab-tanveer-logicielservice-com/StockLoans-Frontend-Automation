@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../Pages/LoginPage';
-import { DashboardPage } from '../Pages/DashboardPage';
-import { AddNewEntityPage } from '../Pages/AddNewEntityPage';
+import { LoginPage } from '../Pages/LoginPage.js';
+import { DashboardPage } from '../Pages/DashboardPage.js';
+import { AddNewEntityPage } from '../Pages/AddNewEntityPage.js';
 import { users } from '../utils/testdata';
 
 // Helper function to generate random name

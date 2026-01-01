@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../Pages/LoginPage';
-import { DashboardPage } from '../Pages/DashboardPage';
-import { TradePage } from '../Pages/TradePage';
-import { users } from '../utils/testdata';
+import { LoginPage } from '../Pages/LoginPage.js';
+import { DashboardPage } from '../Pages/DashboardPage.js';
+import { TradePage } from '../Pages/TradePage.js';
+import { users } from '../utils/testdata.js';
 
 test.describe('Trade Tests', () => {
   let loginPage;

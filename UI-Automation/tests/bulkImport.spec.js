@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { LoginPage } from '../Pages/LoginPage';
-import { BulkImportPage } from '../Pages/BulkImportPage';
-import { users } from '../utils/testdata';
+import { LoginPage } from '../Pages/LoginPage.js';
+import { BulkImportPage } from '../Pages/BulkImportPage.js';
+import { users } from '../utils/testdata.js';
 
 test.describe('Bulk Import TestCase', () => {
 
