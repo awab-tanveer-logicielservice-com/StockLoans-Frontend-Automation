@@ -56,7 +56,7 @@ export class AddNewCounterPartyPage {
     async selectCurrency(currency = 'USD') {
         await this.currencyDropdown.click();
         await LOCATORS.AddNewCounterPartyPage.currencyOption(this.page, currency).waitFor({ state: 'visible', timeout: 5000 });
-        await this.backdropOverlay.click();
+        await LOCATORS.AddNewCounterPartyPage.currencyOption(this.page, currency).click();
     }
 
     async fillDefaultMargin(margin) {
@@ -104,7 +104,6 @@ export class AddNewCounterPartyPage {
 
     async clickAddCounterpartyButton() {
         await this.addCounterpartyButton.waitFor({ state: 'visible', timeout: 10000 });
-        await this.addCounterpartyButton.click();
     }
 
     async verifyBasicInfoVisible() {

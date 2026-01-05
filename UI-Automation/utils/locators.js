@@ -492,9 +492,9 @@ export const LOCATORS = {
 
     /**
      * Backdrop overlay for closing dropdowns
-     * Strategy: CSS selector
+     * Strategy: CSS selector - targets the active/showing backdrop
      */
-    backdropOverlay: (page) => page.locator('.cdk-overlay-backdrop'),
+    backdropOverlay: (page) => page.locator('.cdk-overlay-backdrop.cdk-overlay-backdrop-showing'),
   },
 
   // ============================================
