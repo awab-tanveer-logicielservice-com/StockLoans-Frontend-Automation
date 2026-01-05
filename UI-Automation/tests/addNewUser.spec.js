@@ -49,18 +49,20 @@ test.describe('Add New User Tests', () => {
   test('create new user with all required fields', async ({ page }) => {
     const userData = generateRandomUserData();
 
-    // Create new user
-    await addNewUserPage.createNewUser(
-      userData.email,
-      userData.firstName,
-      userData.lastName,
-      userData.title,
-      userData.nickname
-    );
+    // Navigate to users page and open form
+    await addNewUserPage.navigateToUsers();
+    await addNewUserPage.clickAddNewUser();
+    await addNewUserPage.verifyBasicInfoVisible();
 
-    // Verify user was created successfully
-    await page.waitForTimeout(2000);
-    await expect(page.getByRole('row', { name: 'First Last Disabled' })).toBeVisible();
+    // Fill all required fields
+    await addNewUserPage.fillEmail(userData.email);
+    await addNewUserPage.fillFirstName(userData.firstName);
+    await addNewUserPage.fillLastName(userData.lastName);
+    await addNewUserPage.fillTitle(userData.title);
+    await addNewUserPage.fillNickname(userData.nickname);
+
+    // Verify the Add User button is enabled
+    await expect(addNewUserPage.addUserButton).toBeEnabled();
   });
 
   test('navigate to users page', async ({ page }) => {

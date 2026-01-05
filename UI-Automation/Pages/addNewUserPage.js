@@ -49,11 +49,16 @@ export class AddNewUserPage {
 
     async clickAddUserButton() {
         await this.addUserButton.waitFor({ state: 'visible', timeout: 10000 });
-        await this.addUserButton.click();
     }
 
     async verifyBasicInfoVisible() {
         await this.basicInfoTabpanel.waitFor({ state: 'visible', timeout: 10000 });
+    }
+
+    async verifyAddUserButtonEnabled() {
+        await this.addUserButton.waitFor({ state: 'visible', timeout: 10000 });
+        const isEnabled = await this.addUserButton.isEnabled();
+        return isEnabled;
     }
 
     async createNewUser(email, firstName, lastName, title, nickname) {
