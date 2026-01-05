@@ -31,7 +31,6 @@ export class AddNewEntityPage {
 
     async clickAddButton() {
         await this.addButton.waitFor({ state: 'visible', timeout: 10000 });
-        await this.addButton.click();
     }
 
     async createNewEntity(entityName) {

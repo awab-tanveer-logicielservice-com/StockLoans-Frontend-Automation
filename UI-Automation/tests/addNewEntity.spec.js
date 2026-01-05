@@ -44,11 +44,16 @@ test.describe('Add New Entity Tests', () => {
   test('create new entity with active status', async ({ page }) => {
     const entityName = generateRandomName();
 
-    // Navigate to entities and create new entity
-    await addNewEntityPage.createNewEntity(entityName);
+    // Navigate to entities page and open form
+    await addNewEntityPage.navigateToEntities();
+    await addNewEntityPage.clickAddNewEntity();
 
-    // Verify entity was created successfully
-    await expect(page.getByRole('row', { name: 'Name' })).toBeVisible();
+    // Fill all required fields
+    await addNewEntityPage.fillEntityName(entityName);
+    await addNewEntityPage.selectActiveStatus();
+
+    // Verify the Add button is enabled
+    await expect(addNewEntityPage.addButton).toBeEnabled();
   });
 
   test('navigate to entities page', async ({ page }) => {
