@@ -138,6 +138,14 @@ export const LOCATORS = {
     counterpartyCombobox: (page) => page.locator("//*[@id='mat-input-9']"),
 
     /**
+     * Counterparty option from dropdown
+     * Strategy: Dynamic locator for selecting counterparty option
+     * @param {Page} page - The page object
+     * @param {string} counterpartyName - The counterparty name to select
+     */
+    getCounterpartyOption: (page, counterpartyName) => page.getByRole('option', { name: counterpartyName }),
+
+    /**
      * Quantity input field (spinbutton)
      * Strategy: Playwright's getByRole for spinbutton
      */
@@ -495,6 +503,113 @@ export const LOCATORS = {
      * Strategy: CSS selector - targets the active/showing backdrop
      */
     backdropOverlay: (page) => page.locator('.cdk-overlay-backdrop.cdk-overlay-backdrop-showing'),
+  },
+
+  // ============================================
+  // ADD NEW SECURITY PAGE LOCATORS
+  // ============================================
+  AddNewSecurityPage: {
+    /**
+     * Menu button for navigation
+     * Strategy: Chained getByRole with filter
+     */
+    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+
+    /**
+     * Security Master navigation link
+     * Strategy: Playwright's getByRole for link
+     */
+    securityMasterLink: (page) => page.getByRole('link', { name: 'Security Master' }),
+
+    /**
+     * Add New Security button
+     * Strategy: Playwright's getByRole for button
+     */
+    addNewSecurityButton: (page) => page.getByRole('button', { name: 'Add New Security' }),
+
+    /**
+     * Search input field
+     * Strategy: Playwright's getByRole for textbox
+     */
+    searchInput: (page) => page.getByRole('textbox', { name: 'Search' }),
+
+    /**
+     * Search button
+     * Strategy: Playwright's getByRole for button
+     */
+    searchButton: (page) => page.getByRole('button', { name: 'Search' }),
+
+    /**
+     * Update Contracts checkbox
+     * Strategy: Playwright's getByRole for checkbox
+     */
+    updateContractsCheckbox: (page) => page.getByRole('checkbox', { name: 'Update Contracts' }),
+
+    /**
+     * Symbol input field
+     * Strategy: Playwright's getByRole for textbox with exact match
+     */
+    symbolInput: (page) => page.getByRole('textbox', { name: 'Symbol', exact: true }),
+
+    /**
+     * CUSIP input field
+     * Strategy: Playwright's getByRole for textbox with exact match
+     */
+    cusipInput: (page) => page.getByRole('textbox', { name: 'CUSIP', exact: true }),
+
+    /**
+     * Description input field
+     * Strategy: Playwright's getByRole for textbox
+     */
+    descriptionInput: (page) => page.getByRole('textbox', { name: 'Description' }),
+
+    /**
+     * Exchange input field
+     * Strategy: Playwright's getByRole for textbox
+     */
+    exchangeInput: (page) => page.getByRole('textbox', { name: 'Exchange' }),
+
+    /**
+     * Volume input field
+     * Strategy: Playwright's getByRole for spinbutton
+     */
+    volumeInput: (page) => page.getByRole('spinbutton', { name: 'Volume' }),
+
+    /**
+     * Close Price input field
+     * Strategy: Playwright's getByRole for spinbutton
+     */
+    closePriceInput: (page) => page.getByRole('spinbutton', { name: 'Close Price' }),
+
+    /**
+     * Close Date input field
+     * Strategy: Playwright's getByRole for textbox
+     */
+    closeDateInput: (page) => page.getByRole('textbox', { name: 'Close Date' }),
+
+    /**
+     * Status input field
+     * Strategy: Playwright's getByRole for textbox
+     */
+    statusInput: (page) => page.getByRole('textbox', { name: 'Status' }),
+
+    /**
+     * Restrictions listbox
+     * Strategy: Playwright's getByRole for listbox
+     */
+    restrictionsListbox: (page) => page.getByRole('listbox', { name: 'Restrictions' }),
+
+    /**
+     * Add button in form
+     * Strategy: Playwright's getByRole for button with exact match
+     */
+    addButton: (page) => page.getByRole('button', { name: 'Add', exact: true }),
+
+    /**
+     * Slide toggle bar for update contracts
+     * Strategy: CSS selector
+     */
+    slideToggleBar: (page) => page.locator('.mat-slide-toggle-bar'),
   },
 
   // ============================================

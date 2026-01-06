@@ -42,17 +42,27 @@ export class TradePage {
   await LOCATORS.TradePage.loanCheckboxContainer(this.page).click();
   }
 
-  async searchCounterparty(counterpartyName) {
-    await this.page.waitForTimeout(2000);
+  async searchAndSelectCounterparty(counterpartyName) {
+    // Click the combobox to open the dropdown
     await this.counterpartyCombobox.click();
-    await this.counterpartyCombobox.fill(counterpartyName);
-    await this.page.waitForTimeout(2000);
-  }
 
-  async selectCounterparty(counterpartyFullName) {
-    await this.counterpartyCombobox.press('Tab');
-    await this.counterpartyCombobox.fill(counterpartyFullName);
-    await this.page.waitForTimeout(1500);
+    // Fill the search term
+    await this.counterpartyCombobox.fill(counterpartyName);
+
+    // Wait for autocomplete to filter results
+    await this.page.waitForTimeout(2000);
+
+    // Press ArrowDown to highlight the first option in the dropdown
+    await this.counterpartyCombobox.press('ArrowDown');
+
+    // Wait a moment for the option to be highlighted
+    await this.page.waitForTimeout(500);
+
+    // Press Enter to select the highlighted option
+    await this.counterpartyCombobox.press('Enter');
+
+    // Wait for selection to be processed
+    await this.page.waitForTimeout(1000);
   }
 
   async enterQuantity(quantity) {
@@ -78,24 +88,22 @@ export class TradePage {
     await this.saveButton.click();
   }
   
-  async createTradeBorrow({ counterpartyName, counterpartyFullName, quantity, symbol, rebateRate}) {
+  async createTradeBorrow({ counterpartyName, quantity, symbol, rebateRate}) {
     await this.clickTradeButton();
     await this.verifyBorrowCheckboxVisible();
     await this.selectBorrowCheckbox();
-    await this.searchCounterparty(counterpartyName);
-    await this.selectCounterparty(counterpartyFullName);
+    await this.searchAndSelectCounterparty(counterpartyName);
     await this.enterQuantity(quantity);
     await this.enterSymbol(symbol);
     await this.enterRebateRate(rebateRate);
     await this.clickSaveButton();
   }
 
-  async createTradeLoan({ counterpartyName, counterpartyFullName, quantity, symbol, rebateRate}) {
+  async createTradeLoan({ counterpartyName, quantity, symbol, rebateRate}) {
     await this.clickTradeButton();
     await this.verifyLoanCheckboxVisible();
     await this.selectLoanCheckbox();
-    await this.searchCounterparty(counterpartyName);
-    await this.selectCounterparty(counterpartyFullName);
+    await this.searchAndSelectCounterparty(counterpartyName);
     await this.enterQuantity(quantity);
     await this.enterSymbol(symbol);
     await this.enterRebateRate(rebateRate);

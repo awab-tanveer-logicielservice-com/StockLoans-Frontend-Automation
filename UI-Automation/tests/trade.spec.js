@@ -29,24 +29,20 @@ test.describe('Trade Tests', () => {
     // Create a new trade
     await tradePage.createTradeLoan({
       counterpartyName: '6019',
-      counterpartyCode: 'velcap',
-      counterpartyFullName: '6019',
       quantity: 100,
       symbol: 'AAPL',
       rebateRate: 1,
     });
   });
-  
+
   test('User can create a trade with Borrow Symbol and Counter party', async ({ page }) => {
     test.setTimeout(120000);
     // Verify dashboard is visible
     await dashboardPage.verifyTableHeaderVisible();
     // Create a simple trade
     await tradePage.createTradeBorrow({
-      counterpartyName: '4567',
-      counterpartyCode: 'TU',
-      counterpartyFullName: '4567',
-      quantity: 100,
+      counterpartyName: '6019',
+      quantity: 150,
       symbol: 'AAPL',
       rebateRate: 1,
     });
