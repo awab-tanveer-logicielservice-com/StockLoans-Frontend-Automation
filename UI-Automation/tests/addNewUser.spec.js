@@ -38,7 +38,7 @@ test.describe('Add New User Tests', () => {
     addNewUserPage = new AddNewUserPage(page);
 
     // Set viewport to full screen
-    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.setViewportSize({ width: 1900, height: 945 });
 
     // Login
     await loginPage.navigate();

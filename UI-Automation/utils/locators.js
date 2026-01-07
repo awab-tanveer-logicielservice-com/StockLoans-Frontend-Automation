@@ -613,6 +613,55 @@ export const LOCATORS = {
   },
 
   // ============================================
+  // LENDING PIT LOOKUP PAGE LOCATORS
+  // ============================================
+  LendingPitLookupPage: {
+    /**
+     * Menu button for navigation
+     * Strategy: Chained getByRole with filter
+     */
+    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+
+    /**
+     * Lending Pit Lookup navigation link
+     * Strategy: Playwright's getByRole for link
+     */
+    lendingPitLookupLink: (page) => page.getByRole('link', { name: 'Lending Pit Lookup' }),
+
+    /**
+     * Symbol or Cusip search input
+     * Strategy: Playwright's getByRole for textbox
+     */
+    symbolOrCusipInput: (page) => page.getByRole('textbox', { name: 'Symbol or Cusip' }),
+
+    /**
+     * Submit button
+     * Strategy: Playwright's getByRole for button
+     */
+    submitButton: (page) => page.getByRole('button', { name: 'Submit' }),
+
+    /**
+     * Header row for search results table
+     * Strategy: Playwright's getByRole for row
+     */
+    searchHeaderRow: (page) => page.getByRole('row', { name: 'Symbol Cusip Description' }),
+
+    /**
+     * Results header row
+     * Strategy: Playwright's getByRole for row
+     */
+    resultsHeaderRow: (page) => page.getByRole('row', { name: 'Cusip Description Rebate Avg' }),
+
+    /**
+     * Get gridcell by name - dynamic locator
+     * Strategy: Playwright's getByRole for gridcell
+     * @param {Page} page - The page object
+     * @param {string} cellName - The text content of the cell
+     */
+    getGridcell: (page, cellName) => page.getByRole('gridcell', { name: cellName }),
+  },
+
+  // ============================================
   // COMMON/SHARED LOCATORS
   // ============================================
   Common: {

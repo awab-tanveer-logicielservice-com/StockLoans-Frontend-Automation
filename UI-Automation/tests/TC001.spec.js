@@ -10,7 +10,7 @@ test.describe('Login and Dashboard TestCase', () => {
     const loginPage = new LoginPage(page);
     const dashboardPage = new DashboardPage(page);
      // Set viewport to full screen
-    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.setViewportSize({ width: 1900, height: 945 });
 
     // Login and verify successful login
     await loginPage.navigate();
