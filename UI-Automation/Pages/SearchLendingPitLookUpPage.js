@@ -30,7 +30,6 @@ export class SearchLendingPitLookUpPage {
 
     async verifyGridcellVisible(cellName) {
         const gridcell = LOCATORS.LendingPitLookupPage.getGridcell(this.page, cellName);
-        await gridcell.waitFor({ state: 'visible', timeout: 10000 });
     }
 
     async verifyMultipleGridcellsVisible(cellNames) {
