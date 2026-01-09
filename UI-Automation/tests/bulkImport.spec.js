@@ -68,7 +68,7 @@ test.describe('Bulk Import TestCase', () => {
     await bulkImportPage.navigateToBulkImport();
 
     // Complete bulk import for loan
-    await bulkImportPage.completeLoanImport('6019', 'AAPL 100 250');
+    await bulkImportPage.completeLoanImport('6019 ', 'AAPL 100 250');
 
     // Wait for import to process
     await page.waitForTimeout(3000);

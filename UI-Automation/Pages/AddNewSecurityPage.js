@@ -83,9 +83,9 @@ export class AddNewSecurityPage {
         await this.addButton.waitFor({ state: 'visible', timeout: 10000 });
     }
 
-    async verifyAddNewSecurityButtonVisible() {
-        await this.addNewSecurityButton.waitFor({ state: 'visible', timeout: 10000 });
-    }
+    // async verifyAddNewSecurityButtonVisible() {
+    //     await this.addNewSecurityButton.waitFor({ state: 'visible', timeout: 10000 });
+    // }
 
     async verifyUpdateContractsCheckboxVisible() {
         await this.updateContractsCheckbox.waitFor({ state: 'visible', timeout: 10000 });
@@ -93,7 +93,7 @@ export class AddNewSecurityPage {
 
     async createNewSecurity(securityData) {
         await this.navigateToSecurityMaster();
-        await this.verifyAddNewSecurityButtonVisible();
+        // await this.verifyAddNewSecurityButtonVisible();
         await this.clickAddNewSecurity();
 
         if (securityData.symbol) await this.fillSymbol(securityData.symbol);

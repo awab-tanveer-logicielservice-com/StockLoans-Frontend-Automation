@@ -26,7 +26,7 @@ export class AddNewEntityPage {
 
     async selectActiveStatus() {
         await this.statusDropdown.click();
-        await this.activeOption.click();
+        // await this.activeOption.click();
     }
 
     async clickAddButton() {

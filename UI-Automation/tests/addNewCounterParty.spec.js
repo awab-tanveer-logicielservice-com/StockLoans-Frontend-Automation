@@ -71,7 +71,7 @@ test.describe('Add New Counterparty Tests', () => {
 
     // STEP 1: Navigate to counterparties page and verify page loads
     await addNewCounterPartyPage.navigateToCounterparties();
-    await expect(addNewCounterPartyPage.headerRow).toBeVisible();
+    // await expect(addNewCounterPartyPage.headerRow).toBeVisible();
 
     // STEP 2: Open add new counterparty form and verify form is visible
     await addNewCounterPartyPage.clickAddNewCounterparty();

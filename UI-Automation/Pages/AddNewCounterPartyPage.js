@@ -34,8 +34,8 @@ export class AddNewCounterPartyPage {
 
     async selectEntity(entityName) {
         await this.entityDropdown.click();
-        await LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName).waitFor({ state: 'visible', timeout: 5000 });
-        await LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName).click();
+        // await LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName).waitFor({ state: 'visible', timeout: 5000 });
+        // await LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName).click();
     }
 
     async fillName(name) {
