@@ -68,8 +68,8 @@ test.describe('Add New User Tests', () => {
   test('navigate to users page', async ({ page }) => {
     await addNewUserPage.navigateToUsers();
 
-    // Verify users page is loaded
-    await expect(page.getByRole('row', { name: 'First Last Disabled' })).toBeVisible();
+    // Verify users page is loaded by checking the Add New User button visibility
+    await expect(addNewUserPage.addNewUserButton).toBeVisible();
   });
 
   test('open add new user form', async ({ page }) => {

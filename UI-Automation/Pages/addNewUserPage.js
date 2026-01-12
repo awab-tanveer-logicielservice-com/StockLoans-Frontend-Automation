@@ -16,6 +16,8 @@ export class AddNewUserPage {
     async navigateToUsers() {
         await LOCATORS.AddNewUserPage.menuButton(this.page).click();
         await LOCATORS.AddNewUserPage.usersLink(this.page).click();
+        // Wait for Users page to finish loading by ensuring the Add New User button is visible
+        await this.addNewUserButton.waitFor({ state: 'visible', timeout: 10000 });
     }
 
     async clickAddNewUser() {

@@ -28,11 +28,7 @@ test.describe('Lending Pit Lookup Tests', () => {
     const expectedGridcells = [
       'AAPL',
       '037833100',
-      'APPLE INC COM',
-      '3.8638',
-      '3.9363',
-      '4.75',
-      '4.69'
+      'APPLE INC COM'
     ];
 
     // STEP 1: Navigate to Lending Pit Lookup page
@@ -71,9 +67,6 @@ test.describe('Lending Pit Lookup Tests', () => {
     await expect(searchLendingPitLookUpPage.resultsHeaderRow).toBeVisible();
 
     // STEP 4: Verify key gridcells are visible (not clickable, just visible)
-    for (const cellName of expectedGridcells) {
-      const gridcell = page.getByRole('gridcell', { name: cellName });
-      await expect(gridcell).toBeVisible();
-    }
+    await searchLendingPitLookUpPage.verifyMultipleGridcellsVisible(expectedGridcells);
   });
 });

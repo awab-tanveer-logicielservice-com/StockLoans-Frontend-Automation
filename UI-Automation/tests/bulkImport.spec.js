@@ -22,7 +22,7 @@ test.describe('Bulk Import TestCase', () => {
     await bulkImportPage.navigateToBulkImport();
 
     // Complete bulk import for borrow
-    await bulkImportPage.completeBorrowImport('6019 ', 'AAPL 100 250');
+    await bulkImportPage.completeBorrowImport('6019', 'AAPL 100 250');
 
     // Wait for import to process
     await page.waitForTimeout(3000);
@@ -45,7 +45,7 @@ test.describe('Bulk Import TestCase', () => {
     await bulkImportPage.navigateToBulkImport();
 
     // Fill borrow details
-    await bulkImportPage.fillBorrowDetails('6019 ', 'AAPL 100 250');
+    await bulkImportPage.fillBorrowDetails('6019', 'AAPL 100 250');
 
     // Verify import button is visible
     await expect(bulkImportPage.importButton).toBeVisible();
@@ -68,7 +68,7 @@ test.describe('Bulk Import TestCase', () => {
     await bulkImportPage.navigateToBulkImport();
 
     // Complete bulk import for loan
-    await bulkImportPage.completeLoanImport('6019 ', 'AAPL 100 250');
+    await bulkImportPage.completeLoanImport('6019', 'AAPL 100 250');
 
     // Wait for import to process
     await page.waitForTimeout(3000);

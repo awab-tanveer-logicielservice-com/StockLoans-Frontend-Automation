@@ -201,9 +201,9 @@ export const LOCATORS = {
 
     /**
      * Status dropdown trigger
-     * Strategy: Playwright's getByText
+     * Strategy: Playwright's getByRole for textbox (clickable trigger)
      */
-    statusDropdown: (page) => page.getByText('Status'),
+    statusDropdown: (page) => page.getByRole('textbox', { name: 'Status' }),
 
     /**
      * Active option in status dropdown

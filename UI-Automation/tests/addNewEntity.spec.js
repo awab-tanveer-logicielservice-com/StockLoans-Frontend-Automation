@@ -75,7 +75,7 @@ test.describe('Add New Entity Tests', () => {
     await addNewEntityPage.fillEntityName(entityName);
     await addNewEntityPage.selectActiveStatus();
 
-    // Verify option was selected
-    await expect(page.getByRole('option', { name: 'Active', exact: true })).toBeVisible();
+    // Verify the Add button is enabled after selecting status
+    await expect(addNewEntityPage.addButton).toBeEnabled();
   });
 });

@@ -34,12 +34,14 @@ export class AddNewCounterPartyPage {
 
     async selectEntity(entityName) {
         await this.entityDropdown.click();
-        // await LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName).waitFor({ state: 'visible', timeout: 5000 });
-        // await LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName).click();
+        const option = LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName);
+        await option.waitFor({ state: 'visible', timeout: 5000 });
+        await option.click();
+        // Ensure any overlay/backdrop is gone before proceeding
+        await this.backdropOverlay.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
     }
 
     async fillName(name) {
-        await this.nameInput.click();
         await this.nameInput.fill(name);
     }
 
@@ -104,6 +106,7 @@ export class AddNewCounterPartyPage {
 
     async clickAddCounterpartyButton() {
         await this.addCounterpartyButton.waitFor({ state: 'visible', timeout: 10000 });
+        await this.addCounterpartyButton.click();
     }
 
     async verifyBasicInfoVisible() {
