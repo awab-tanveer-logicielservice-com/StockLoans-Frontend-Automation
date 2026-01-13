@@ -109,6 +109,20 @@ export const LOCATORS = {
   },
 
   // ============================================
+  // FPL ACCOUNT PAGE LOCATORS
+  // ============================================
+  FPLAccountPage: {
+    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    fplAccountsLink: (page) => page.getByRole('link', { name: 'FPL Accounts' }),
+    accountRow: (page) => page.getByRole('row', { name: 'Account Number Office Corr' }),
+    centerColsViewport: (page) => page.locator('.ag-center-cols-viewport'),
+    gtnRow: (page) => page.getByRole('row', { name: 'GTN GTNA M A' }),
+    omnihkText: (page) => page.getByText('OMNIHK').first(),
+    gtnFplTestRow: (page) => page.getByRole('row', { name: 'GTN GTNA M A 0.5 FPL Test' }),
+    filterInput: (page) => page.locator('.ag-floating-filter-input').first(),
+  },
+
+  // ============================================
   // TRADE PAGE LOCATORS
   // ============================================
   TradePage: {

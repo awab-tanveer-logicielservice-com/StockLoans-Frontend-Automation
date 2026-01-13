@@ -46,86 +46,35 @@ test.describe('Add New User Tests', () => {
     await page.waitForTimeout(5000);
   });
 
-  test('create new user with all required fields', async ({ page }) => {
+  test('All add new user scenarios in one test', async ({ page }) => {
     const userData = generateRandomUserData();
 
-    // Navigate to users page and open form
+    // SCENARIO 1: Navigate to Users page and open Add New User form
     await addNewUserPage.navigateToUsers();
-    await addNewUserPage.clickAddNewUser();
-    await addNewUserPage.verifyBasicInfoVisible();
-
-    // Fill all required fields
-    await addNewUserPage.fillEmail(userData.email);
-    await addNewUserPage.fillFirstName(userData.firstName);
-    await addNewUserPage.fillLastName(userData.lastName);
-    await addNewUserPage.fillTitle(userData.title);
-    await addNewUserPage.fillNickname(userData.nickname);
-
-    // Verify the Add User button is enabled
-    await expect(addNewUserPage.addUserButton).toBeEnabled();
-  });
-
-  test('navigate to users page', async ({ page }) => {
-    await addNewUserPage.navigateToUsers();
-
-    // Verify users page is loaded by checking the Add New User button visibility
     await expect(addNewUserPage.addNewUserButton).toBeVisible();
-  });
-
-  test('open add new user form', async ({ page }) => {
-    await addNewUserPage.navigateToUsers();
     await addNewUserPage.clickAddNewUser();
-
-    // Verify form is visible
     await expect(addNewUserPage.basicInfoTabpanel).toBeVisible();
     await expect(addNewUserPage.addUserButton).toBeVisible();
-  });
 
-  test('fill user form and verify button is enabled', async ({ page }) => {
-    const userData = generateRandomUserData();
-
-    await addNewUserPage.navigateToUsers();
-    await addNewUserPage.clickAddNewUser();
-
-    // Verify form is visible
-    await addNewUserPage.verifyBasicInfoVisible();
-
-    // Fill all fields
+    // SCENARIO 2: Fill all required fields and verify Add button becomes enabled
     await addNewUserPage.fillEmail(userData.email);
     await addNewUserPage.fillFirstName(userData.firstName);
     await addNewUserPage.fillLastName(userData.lastName);
     await addNewUserPage.fillTitle(userData.title);
     await addNewUserPage.fillNickname(userData.nickname);
+    await expect(addNewUserPage.addUserButton).toBeEnabled();
 
-    // Verify button is visible and enabled
-    await expect(addNewUserPage.addUserButton).toBeVisible();
-  });
-
-  test('fill individual form fields', async ({ page }) => {
-    const userData = generateRandomUserData();
-
-    await addNewUserPage.navigateToUsers();
-    await addNewUserPage.clickAddNewUser();
-    await addNewUserPage.verifyBasicInfoVisible();
-
-    // Test email field
-    await addNewUserPage.fillEmail(userData.email);
+    // SCENARIO 3: Verify individual fields keep their values
     await expect(addNewUserPage.emailInput).toHaveValue(userData.email);
-
-    // Test first name field
-    await addNewUserPage.fillFirstName(userData.firstName);
     await expect(addNewUserPage.firstNameInput).toHaveValue(userData.firstName);
-
-    // Test last name field
-    await addNewUserPage.fillLastName(userData.lastName);
     await expect(addNewUserPage.lastNameInput).toHaveValue(userData.lastName);
-
-    // Test title field
-    await addNewUserPage.fillTitle(userData.title);
     await expect(addNewUserPage.titleInput).toHaveValue(userData.title);
-
-    // Test nickname field
-    await addNewUserPage.fillNickname(userData.nickname);
     await expect(addNewUserPage.nicknameInput).toHaveValue(userData.nickname);
+
+    // SCENARIO 4: Close form and re-open to ensure page stability
+    await page.keyboard.press('Escape');
+    await addNewUserPage.navigateToUsers();
+    await addNewUserPage.clickAddNewUser();
+    await expect(addNewUserPage.basicInfoTabpanel).toBeVisible();
   });
 });
