@@ -19,22 +19,20 @@ test.describe('Login and Dashboard TestCase', () => {
     await page.waitForURL(/\/combined-contracts;id=/, { timeout: 30000 });
     await expect(page).toHaveURL(/\/combined-contracts;id=/);
 
-    await dashboardPage.searchAndApply('AAPR');
+    await dashboardPage.searchAndApply('AAPL');
 
-    await dashboardPage.searchAndApply();
-
-    await dashboardPage.doubleClickSymbol('AAPR');
+    await dashboardPage.doubleClickSymbol('AAPL');
 
     await dashboardPage.expandFirstGroup();
 
-    await dashboardPage.clickSymbolByIndex('AAPR', 3);
+    await dashboardPage.clickSymbolByIndex('AAPL', 3);
 
-    await dashboardPage.doubleClickSymbol('AAPR');
+    await dashboardPage.doubleClickSymbol('AAPL');
     await dashboardPage.verifyBrokerDetailsHeader();
 
     await dashboardPage.expandFirstGroup();
 
-    await dashboardPage.clickSymbolByIndex('AAPR', 3);
+    await dashboardPage.clickSymbolByIndex('AAPL', 3);
     await dashboardPage.verifyBrokerDetailsHeader();
   });
 

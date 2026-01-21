@@ -34,6 +34,8 @@ export class DashboardPage {
   async searchAndApply(symbol) {
     await this.searchSymbol(symbol);
     await this.clickApply();
+    // Wait for AG-Grid to finish filtering and rendering
+    await this.page.waitForTimeout(1000);
   }
 
   async verifyRowVisible(rowName) {
@@ -41,7 +43,7 @@ export class DashboardPage {
   }
 
   async doubleClickSymbol(symbol) {
-    await LOCATORS.DashboardPage.getSymbolLocator(this.page, symbol).first().dblclick();
+    const symbolLocator = LOCATORS.DashboardPage.getSymbolLocator(this.page, symbol).first().dblclick();
   }
 
   async clickSymbolByIndex(symbol, index) {

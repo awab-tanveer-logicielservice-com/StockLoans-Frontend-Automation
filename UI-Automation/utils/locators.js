@@ -68,7 +68,7 @@ export const LOCATORS = {
      * Strategy: XPath with role and text content
      * Note: This is specific to AAPL - consider parameterizing in future
      */
-    firstExpandIcon: (page) => page.locator("(//div[@role='gridcell' and contains(., 'AAPR')])[1]"),
+    firstExpandIcon: (page) => page.locator('span').filter({ hasText: 'AAPL' }).first(),
 
     /**
      * Expanded row icon indicator
@@ -86,11 +86,11 @@ export const LOCATORS = {
 
     /**
      * Filter symbol locator by text
-     * Strategy: Chained locator with filter
+     * Strategy: More robust locator that finds symbol in AG-Grid row group
      * @param {Page} page - The page object
      * @param {string} symbol - The symbol text to filter
      */
-    getSymbolLocator: (page, symbol) => page.locator("//span[@class='ag-group-value'][normalize-space()='AAPR']").filter({ hasText: symbol }),
+    getSymbolLocator: (page, symbol) => page.locator('span.ag-cell-wrapper.ag-row-group.ag-row-group-indent-0').locator(`span:has-text("${symbol}")`),
 
     /**
      * Get symbol by text with index

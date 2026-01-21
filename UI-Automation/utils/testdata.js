@@ -1,4 +1,4 @@
 export const users = {
-  username: process.env.E2E_USER || 'awab.tanveer@logicielservice.com',
-  password: process.env.E2E_PWD || 'Testing@1234'
+  username: process.env.E2E_USER || 'huss.raza97@gmail.com',
+  password: process.env.E2E_PWD || 'Rhussain123$1'
 };

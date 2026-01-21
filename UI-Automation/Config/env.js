@@ -1,4 +1,4 @@
 export const ENV = {
-  baseURL: 'https://vcl-stockloan-dev.firebaseapp.com',
-  dashboardURL:'https://vcl-stockloan-dev.firebaseapp.com/combined-contracts;id=116953a0-43f0-4777-a7c7-67d64a77643d'
+  baseURL: 'http://10.0.31.72:4200/',
+  dashboardURL:'http://10.0.31.72:4200/combined-contracts;id=a912706d-238f-4c96-93e3-ae2d29fb0225'
 };
