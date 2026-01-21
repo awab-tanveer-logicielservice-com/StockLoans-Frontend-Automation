@@ -33,9 +33,21 @@ export class AddNewCounterPartyPage {
     }
 
     async selectEntity(entityName) {
+        // Click the dropdown
         await this.entityDropdown.click();
+        await this.page.waitForTimeout(1000);
+
+        // Check if dropdown opened by looking for any role=option
+        const optionsVisible = await this.page.getByRole('option').first().isVisible().catch(() => false);
+        if (!optionsVisible) {
+            // Try clicking again if options didn't appear
+            await this.entityDropdown.click();
+            await this.page.waitForTimeout(1000);
+        }
+
+        // Find and click the specified entity option
         const option = LOCATORS.AddNewCounterPartyPage.getEntityOption(this.page, entityName);
-        await option.waitFor({ state: 'visible', timeout: 5000 });
+        await option.waitFor({ state: 'visible', timeout: 15000 });
         await option.click();
         // Ensure any overlay/backdrop is gone before proceeding
         await this.backdropOverlay.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
@@ -57,7 +69,8 @@ export class AddNewCounterPartyPage {
 
     async selectCurrency(currency = 'USD') {
         await this.currencyDropdown.click();
-        await LOCATORS.AddNewCounterPartyPage.currencyOption(this.page, currency).waitFor({ state: 'visible', timeout: 5000 });
+        await this.page.waitForTimeout(1000);
+        await LOCATORS.AddNewCounterPartyPage.currencyOption(this.page, currency).waitFor({ state: 'visible', timeout: 10000 });
         await LOCATORS.AddNewCounterPartyPage.currencyOption(this.page, currency).click();
     }
 
@@ -78,19 +91,22 @@ export class AddNewCounterPartyPage {
 
     async selectType(type = 'Regular') {
         await this.typeDropdown.click();
-        await LOCATORS.AddNewCounterPartyPage.typeOption(this.page, type).waitFor({ state: 'visible', timeout: 5000 });
+        await this.page.waitForTimeout(1000);
+        await LOCATORS.AddNewCounterPartyPage.typeOption(this.page, type).waitFor({ state: 'visible', timeout: 10000 });
         await LOCATORS.AddNewCounterPartyPage.typeOption(this.page, type).click();
     }
 
     async selectStatus(status = 'Active') {
         await this.statusDropdown.click();
-        await LOCATORS.AddNewCounterPartyPage.statusOption(this.page, status).waitFor({ state: 'visible', timeout: 5000 });
+        await this.page.waitForTimeout(1000);
+        await LOCATORS.AddNewCounterPartyPage.statusOption(this.page, status).waitFor({ state: 'visible', timeout: 10000 });
         await LOCATORS.AddNewCounterPartyPage.statusOption(this.page, status).click();
     }
 
     async selectRounding(rounding = 'No rounding') {
         await this.roundingDropdown.click();
-        await LOCATORS.AddNewCounterPartyPage.roundingOption(this.page, rounding).waitFor({ state: 'visible', timeout: 5000 });
+        await this.page.waitForTimeout(1000);
+        await LOCATORS.AddNewCounterPartyPage.roundingOption(this.page, rounding).waitFor({ state: 'visible', timeout: 10000 });
         await LOCATORS.AddNewCounterPartyPage.roundingOption(this.page, rounding).click();
     }
 
