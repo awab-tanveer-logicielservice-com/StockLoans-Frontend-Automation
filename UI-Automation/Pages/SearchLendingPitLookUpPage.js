@@ -28,12 +28,22 @@ export class SearchLendingPitLookUpPage {
         await this.submitButton.click();
     }
 
+    async waitForGridToLoad() {
+        // Wait for AG-Grid viewport to be populated with data
+        await this.page.locator('.ag-center-cols-viewport').waitFor({ state: 'visible', timeout: 15000 });
+        // Small wait for grid to finish rendering
+        await this.page.waitForTimeout(1000);
+    }
+
     async verifyGridcellVisible(cellName) {
-        const gridcell = LOCATORS.LendingPitLookupPage.getGridcell(this.page, cellName);
+        const gridcell = LOCATORS.LendingPitLookupPage.getGridcell(this.page, cellName).first();
         await gridcell.waitFor({ state: 'visible', timeout: 10000 });
     }
 
     async verifyMultipleGridcellsVisible(cellNames) {
+        // Wait for grid to load first
+        await this.waitForGridToLoad();
+
         for (const cellName of cellNames) {
             await this.verifyGridcellVisible(cellName);
         }
