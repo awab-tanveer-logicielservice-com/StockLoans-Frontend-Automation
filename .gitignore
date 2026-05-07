@@ -22,6 +22,7 @@ build/
 .vscode/
 .idea/
 .claude/
+.claude/Tools/
 Playwright/
 
 # Playwright
@@ -30,6 +31,7 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+VansahConfig.json
 
 # Allure Reports
 allure-results/

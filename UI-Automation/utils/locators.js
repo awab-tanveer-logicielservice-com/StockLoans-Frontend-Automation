@@ -26,19 +26,76 @@ export const LOCATORS = {
      * Username input field
      * Strategy: XPath with ID selector
      */
-    usernameInput: (page) => page.locator('//input[@id="mat-input-1"]'),
+    usernameInput: (page) => page.locator('#email'),
 
     /**
      * Password input field
-     * Strategy: XPath with ID selector
      */
-    passwordInput: (page) => page.locator('//input[@id="mat-input-2"]'),
+    passwordInput: (page) => page.locator('#password'),
 
     /**
      * Login button
-     * Strategy: XPath with aria-label
      */
-    loginButton: (page) => page.locator('//button[@aria-label="LOG IN"]'),
+    loginButton: (page) => page.locator('button.login-btn'),
+
+    /**
+     * Application logo on login page
+     */
+    logoElement: (page) => page.locator('div.logo-container'),
+
+    /**
+     * Password visibility toggle button
+     */
+    passwordToggleButton: (page) => page.locator('button[aria-label="Toggle password visibility"]'),
+
+    /**
+     * Firebase authentication error message
+     */
+    errorMessage: (page) => page.locator('p.error-text'),
+
+    /**
+     * Validation error for the email field — email input in Angular invalid state
+     */
+    emailValidationError: (page) => page.locator('#email.ng-invalid'),
+
+    /**
+     * Validation error for the password field — password input in Angular invalid state
+     */
+    passwordValidationError: (page) => page.locator('#password.ng-invalid'),
+  },
+
+  // ============================================
+  // REMEMBER ME PAGE LOCATORS
+  // ============================================
+  RememberMePage: {
+    rememberMeCheckbox: (page) => page.locator('input[name="rememberMe"]'),
+    rememberMeLabel: (page) => page.locator('label.remember-label span'),
+    userMenuButton: (page) => page.locator('button.user-btn'),
+    logoutButton: (page) => page.locator('button.drawer-item.logout'),
+  },
+
+  // ============================================
+  // CONTRACT SUMMARY PAGE LOCATORS
+  // ============================================
+  ContractSummaryPage: {
+    grid:                (page) => page.locator('ag-grid-angular').first(),
+    detailGrid:          (page) => page.locator('ag-grid-angular').nth(1),
+    gridRow:             (page) => page.locator('.ag-center-cols-container .ag-row'),
+    pinnedRow:           (page) => page.locator('.ag-floating-bottom .ag-row'),
+    emptyStateOverlay:   (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    columnHeader:        (page, text) => page.locator('.ag-header-cell-text').filter({ hasText: text }),
+    columnGroupHeader:   (page, text) => page.locator('.ag-header-group-cell-label, .ag-column-group-header-name').filter({ hasText: text }),
+    symbolCusipFilter:   (page) => page.locator('input[placeholder="Symbol / CUSIP"]'),
+    dtcFilter:           (page) => page.locator('mat-form-field').filter({ hasText: 'DTC' }).locator('input'),
+    loanetIdFilter:      (page) => page.locator('mat-form-field').filter({ hasText: 'LoanetId' }).locator('input'),
+    contractNoFilter:    (page) => page.locator('mat-form-field').filter({ hasText: 'Contract No' }).locator('input'),
+    profitCenterFilter:  (page) => page.locator('mat-form-field').filter({ hasText: 'PRC' }).locator('mat-select'),
+    effectiveDateInput:  (page) => page.locator('mat-form-field').filter({ hasText: 'Effective Date' }).locator('input'),
+    applyButton:         (page) => page.locator('button.mat-mdc-button').filter({ hasText: 'Apply' }),
+    clearButton:         (page) => page.locator('button.mat-mdc-button').filter({ hasText: 'Clear' }).first(),
+    detailsToggle:       (page) => page.locator('mat-slide-toggle.details-toggle'),
+    depositoryButtons:   (page) => page.locator('button.mat-button-toggle-button'),
+    getDepositoryButton: (page, code) => page.locator(`button.mat-button-toggle-button:has-text("${code}")`),
   },
 
   // ============================================
@@ -112,14 +169,114 @@ export const LOCATORS = {
   // FPL ACCOUNT PAGE LOCATORS
   // ============================================
   FPLAccountPage: {
+    /**
+     * Menu button for navigation
+     * Strategy: Chained getByRole with filter
+     */
     menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+
+    /**
+     * FPL Accounts navigation link
+     * Strategy: Playwright's getByRole for link
+     */
     fplAccountsLink: (page) => page.getByRole('link', { name: 'FPL Accounts' }),
+
+    /**
+     * Main account table header row
+     * Strategy: Playwright's getByRole for row
+     */
     accountRow: (page) => page.getByRole('row', { name: 'Account Number Office Corr' }),
+
+    /**
+     * Sidebar overlay element
+     * Strategy: CSS selector for fuse sidebar overlay
+     */
+    fuseSidebarOverlay: (page) => page.locator('.fuse-sidebar-overlay'),
+
+    /**
+     * AG-Grid center columns viewport
+     * Strategy: CSS selector for grid viewport
+     */
     centerColsViewport: (page) => page.locator('.ag-center-cols-viewport'),
+
+    /**
+     * GTN account row
+     * Strategy: Playwright's getByRole for row
+     */
     gtnRow: (page) => page.getByRole('row', { name: 'GTN GTNA M A' }),
+
+    /**
+     * OMNIHK text element (first occurrence)
+     * Strategy: Playwright's getByText with first()
+     */
     omnihkText: (page) => page.getByText('OMNIHK').first(),
+
+    /**
+     * OMNIHK text element (second occurrence)
+     * Strategy: Playwright's getByText with nth(1)
+     */
+    omnihkTextSecond: (page) => page.getByText('OMNIHK').nth(1),
+
+    /**
+     * GTN FPL Test account row
+     * Strategy: Playwright's getByRole for row
+     */
     gtnFplTestRow: (page) => page.getByRole('row', { name: 'GTN GTNA M A 0.5 FPL Test' }),
+
+    /**
+     * AG-Grid floating filter input field
+     * Strategy: CSS selector for filter input
+     */
     filterInput: (page) => page.locator('.ag-floating-filter-input').first(),
+
+    /**
+     * Get gridcell by name - dynamic locator
+     * Strategy: Playwright's getByRole for gridcell
+     * @param {Page} page - The page object
+     * @param {string} cellName - The text content of the cell
+     * @param {boolean} exact - Whether to match exactly (default: false)
+     */
+    getGridcell: (page, cellName, exact = false) => page.getByRole('gridcell', { name: cellName, exact }),
+
+    /**
+     * Specific row for FPL VCSO account
+     * Strategy: Playwright's getByRole for row
+     */
+    fplVcsoRow: (page) => page.getByRole('row', { name: 'FPL VCSO L A 0.5 SOFI FPL' }),
+
+    /**
+     * Paragraph within specific row
+     * Strategy: Combined locator for row with paragraph
+     */
+    fplVcsoRowParagraph: (page) => page.getByRole('row', { name: 'FPL VCSO L A 0.5 SOFI FPL' }).getByRole('paragraph'),
+
+    /**
+     * FPL VCSO verification row
+     * Strategy: Playwright's getByRole for row
+     */
+    fplVcsoVerifyRow: (page) => page.getByRole('row', { name: 'FPL VCSO L A' }),
+
+    /**
+     * Get option from dropdown by name
+     * Strategy: Playwright's getByRole for option
+     * @param {Page} page - The page object
+     * @param {string} optionName - The option name to select
+     */
+    getDropdownOption: (page, optionName) => page.getByRole('option', { name: optionName }),
+
+    /**
+     * Mat-select dropdown by ID
+     * Strategy: CSS selector with ID
+     * @param {Page} page - The page object
+     * @param {number} selectId - The select ID number
+     */
+    getMatSelect: (page, selectId) => page.locator(`#mat-select-${selectId}`),
+
+    /**
+     * Focused AG-Grid cell
+     * Strategy: CSS selector for cell with focus
+     */
+    focusedGridCell: (page) => page.locator('.ag-cell.ag-cell-with-height.ag-cell-value.ag-cell-range-right.ag-cell-focus'),
   },
 
   // ============================================
@@ -624,6 +781,50 @@ export const LOCATORS = {
      * Strategy: CSS selector
      */
     slideToggleBar: (page) => page.locator('.mat-slide-toggle-bar'),
+
+    /**
+     * Security Master page header/title
+     * Strategy: getByRole heading — confirms the page has loaded
+     */
+    securityMasterHeader: (page) => page.getByRole('heading', { name: 'Security Master' }),
+
+    /**
+     * AG-Grid root wrapper — present once search results are rendered
+     * Strategy: CSS selector for AG-Grid container
+     */
+    searchResultsGrid: (page) => page.locator('.ag-root-wrapper'),
+
+    /**
+     * Dynamic locator — result row matching a given symbol text
+     * Strategy: getByRole row with the symbol name
+     * @param {Page} page
+     * @param {string} symbol - the symbol text to locate
+     */
+    getResultRowBySymbol: (page, symbol) => page.getByRole('row', { name: symbol }),
+
+    /**
+     * No-results overlay shown by AG-Grid when a search returns nothing
+     * Strategy: CSS selector for AG-Grid empty overlay
+     */
+    noResultsMessage: (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+
+    /**
+     * Validation error displayed below the Symbol field when it is left blank
+     * Strategy: mat-error element filtered by text content
+     */
+    symbolValidationError: (page) => page.locator('mat-error').filter({ hasText: /symbol/i }).first(),
+
+    /**
+     * Validation error displayed below the CUSIP field when it is left blank
+     * Strategy: mat-error element filtered by text content
+     */
+    cusipValidationError: (page) => page.locator('mat-error').filter({ hasText: /cusip/i }).first(),
+
+    /**
+     * Slide toggle in its checked/active state — confirms Update Contracts is enabled
+     * Strategy: CSS selector combining the toggle component with the checked modifier class
+     */
+    updateContractsToggleActive: (page) => page.locator('.mat-slide-toggle.mat-checked'),
   },
 
   // ============================================
@@ -673,6 +874,45 @@ export const LOCATORS = {
      * @param {string} cellName - The text content of the cell
      */
     getGridcell: (page, cellName) => page.getByRole('gridcell', { name: cellName }),
+  },
+
+  // ============================================
+  // MEMO SEG PAGE LOCATORS
+  // ============================================
+  MemoSegPage: {
+    memoSegLink: (page) => page.getByRole('link', { name: 'Memo Seg' }),
+    textInput: (page) => page.getByRole('textbox', { name: 'TODO: add selector — Memo Seg Symbol Quantity text input area' }),
+    submitButton: (page) => page.getByRole('button', { name: 'TODO: add selector — Submit/Process button for memo seg batch' }),
+    summaryGrid: (page) => page.locator('TODO: add selector — Summary grid container (first AG-Grid on Memo Seg page)'),
+    detailGrid: (page) => page.locator('TODO: add selector — Detail grid container (second AG-Grid on Memo Seg page)'),
+    unSegButton: (page) => page.getByRole('button', { name: 'UN-SEG' }),
+    validationError: (page) => page.locator('mat-error').first(),
+    emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    detailGridHeaders: (page) => page.locator('TODO: add selector — Detail grid header row with column names'),
+    firstGroupedRow: (page) => page.locator('.ag-row-group').first(),
+    quantityValidationError: (page) => page.locator('mat-error').filter({ hasText: /quantity/i }).first(),
+    symbolValidationError: (page) => page.locator('mat-error').filter({ hasText: /symbol/i }).first(),
+    getSummaryGridCellBySymbol: (page, symbol) => page.getByRole('gridcell', { name: symbol }).first(),
+    getDetailGridCellBySymbol: (page, symbol) => page.getByRole('gridcell', { name: symbol }).first(),
+  },
+
+  // ============================================
+  // SHORT INTEREST RATE ADJUSTMENT PAGE LOCATORS
+  // ============================================
+  ShortInterestRateAdjustmentPage: {
+    rateAdjustmentLink: (page) => page.getByRole('link', { name: 'Short Interest Rate Adjustment' }),
+    rateGrid: (page) => page.locator('TODO: add selector — Ag-Grid root container for rate adjustment grid'),
+    gridHeaderRow: (page) => page.locator('TODO: add selector — Ag-Grid header row with rate adjustment column names'),
+    rateInputField: (page) => page.getByRole('spinbutton', { name: 'TODO: add selector — Rate input field label' }),
+    saveButton: (page) => page.getByRole('button', { name: 'TODO: add selector — Save/Apply button for rate adjustment' }),
+    successMessage: (page) => page.locator('TODO: add selector — Success toast/notification after rate save'),
+    validationError: (page) => page.locator('mat-error').first(),
+    rowSelectionWarning: (page) => page.locator('TODO: add selector — Warning message when save is attempted without row selection'),
+    emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    dataLoadError: (page) => page.locator('TODO: add selector — Error message shown when V1 endpoint fails'),
+    pageContainer: (page) => page.locator('TODO: add selector — Main page container with V2 theme class'),
+    agGridRoot: (page) => page.locator('.ag-root-wrapper'),
+    accessRestrictionMessage: (page) => page.locator('TODO: add selector — Access restriction/read-only message for unauthorized users'),
   },
 
   // ============================================
