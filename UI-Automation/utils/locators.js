@@ -717,16 +717,16 @@ export const LOCATORS = {
     updateContractsCheckbox: (page) => page.getByRole('checkbox', { name: 'Update Contracts' }),
 
     /**
-     * Symbol input field
-     * Strategy: Playwright's getByRole for textbox with exact match
+     * Symbol input field — accessible name is "Symbol *" in the Add New Security dialog
+     * Strategy: exact match on the required-field label to avoid ambiguity with header/Trade panel "Symbol" inputs
      */
-    symbolInput: (page) => page.getByRole('textbox', { name: 'Symbol', exact: true }),
+    symbolInput: (page) => page.getByRole('textbox', { name: 'Symbol *', exact: true }),
 
     /**
-     * CUSIP input field
-     * Strategy: Playwright's getByRole for textbox with exact match
+     * CUSIP input field — accessible name is "CUSIP *" in the Add New Security dialog
+     * Strategy: exact match on the required-field label
      */
-    cusipInput: (page) => page.getByRole('textbox', { name: 'CUSIP', exact: true }),
+    cusipInput: (page) => page.getByRole('textbox', { name: 'CUSIP *', exact: true }),
 
     /**
      * Description input field
@@ -771,10 +771,10 @@ export const LOCATORS = {
     restrictionsListbox: (page) => page.getByRole('listbox', { name: 'Restrictions' }),
 
     /**
-     * Add button in form
-     * Strategy: Playwright's getByRole for button with exact match
+     * Save/Add button in the Add New Security dialog
+     * Strategy: matches "Save Security" button rendered in the modal
      */
-    addButton: (page) => page.getByRole('button', { name: 'Add', exact: true }),
+    addButton: (page) => page.getByRole('button', { name: 'Save Security' }),
 
     /**
      * Slide toggle bar for update contracts
@@ -825,6 +825,42 @@ export const LOCATORS = {
      * Strategy: CSS selector combining the toggle component with the checked modifier class
      */
     updateContractsToggleActive: (page) => page.locator('.mat-slide-toggle.mat-checked'),
+
+    /**
+     * First row in the Ag-Grid search results — used to select a security record
+     * Strategy: CSS selector targeting center-cols container rows
+     */
+    firstSearchResultRow: (page) => page.locator('.ag-center-cols-container .ag-row').first(),
+
+    /**
+     * Second row in the Ag-Grid search results — used to select a different security
+     * Strategy: nth selector
+     */
+    secondSearchResultRow: (page) => page.locator('.ag-center-cols-container .ag-row').nth(1),
+
+    /**
+     * Existing Symbol input in the contract update sub-view
+     * Strategy: getByRole textbox with accessible name
+     */
+    existingSymbolInput: (page) => page.getByRole('textbox', { name: /existing.*symbol/i }),
+
+    /**
+     * Existing CUSIP input in the contract update sub-view
+     * Strategy: getByRole textbox with accessible name
+     */
+    existingCusipInput: (page) => page.getByRole('textbox', { name: /existing.*cusip/i }),
+
+    /**
+     * Update button in the contract update sub-view
+     * Strategy: getByRole button with exact name
+     */
+    updateButton: (page) => page.getByRole('button', { name: /^update$/i }),
+
+    /**
+     * Modal/dialog container — present when Add New Security modal is open
+     * Strategy: Angular Material dialog container
+     */
+    modalContainer: (page) => page.locator('mat-dialog-container'),
   },
 
   // ============================================
@@ -841,7 +877,7 @@ export const LOCATORS = {
      * Lending Pit Lookup navigation link
      * Strategy: Playwright's getByRole for link
      */
-    lendingPitLookupLink: (page) => page.getByRole('link', { name: 'Lending Pit Lookup' }),
+    lendingPitLookupLink: (page) => page.getByRole('link', { name: 'Lending Pit' }),
 
     /**
      * Symbol or Cusip search input
@@ -850,22 +886,46 @@ export const LOCATORS = {
     symbolOrCusipInput: (page) => page.getByRole('textbox', { name: 'Symbol or Cusip' }),
 
     /**
-     * Submit button
+     * Fetch Rates / submit button for the Lending Pit form
      * Strategy: Playwright's getByRole for button
      */
-    submitButton: (page) => page.getByRole('button', { name: 'Submit' }),
+    submitButton: (page) => page.getByRole('button', { name: 'Fetch Rates' }),
 
     /**
-     * Header row for search results table
+     * Clear button on the Lending Pit search form
+     * Strategy: Playwright's getByRole for button within the form area
+     */
+    clearButton: (page) => page.locator('aside, [role="complementary"]').getByRole('button', { name: 'Clear' }),
+
+    /**
+     * Header row for search results table (legacy / ag-grid column header)
      * Strategy: Playwright's getByRole for row
      */
     searchHeaderRow: (page) => page.getByRole('row', { name: 'Symbol Cusip Description' }),
 
     /**
-     * Results header row
+     * Results header row (legacy)
      * Strategy: Playwright's getByRole for row
      */
     resultsHeaderRow: (page) => page.getByRole('row', { name: 'Cusip Description Rebate Avg' }),
+
+    /**
+     * "No Data Available" custom empty-state heading shown before any search
+     * Strategy: CSS heading selector
+     */
+    emptyStateHeading: (page) => page.getByRole('heading', { name: 'No Data Available' }),
+
+    /**
+     * "Start Searching" prompt button inside the custom empty state
+     * Strategy: Playwright's getByRole for button
+     */
+    startSearchingButton: (page) => page.getByRole('button', { name: 'Start Searching' }),
+
+    /**
+     * Page heading for the Lending Pit page
+     * Strategy: h2 heading with text "Lending Pit"
+     */
+    pageHeading: (page) => page.getByRole('heading', { name: 'Lending Pit' }),
 
     /**
      * Get gridcell by name - dynamic locator
@@ -913,6 +973,36 @@ export const LOCATORS = {
     pageContainer: (page) => page.locator('TODO: add selector — Main page container with V2 theme class'),
     agGridRoot: (page) => page.locator('.ag-root-wrapper'),
     accessRestrictionMessage: (page) => page.locator('TODO: add selector — Access restriction/read-only message for unauthorized users'),
+  },
+
+  // ============================================
+  // CONTRACT DETAILS PAGE LOCATORS
+  // ============================================
+  ContractDetailsPage: {
+    grid:                 (page) => page.locator('ag-grid-angular').first(),
+    gridRow:              (page) => page.locator('.ag-center-cols-container .ag-row'),
+    pinnedRow:            (page) => page.locator('.ag-floating-bottom .ag-row'),
+    emptyStateOverlay:    (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    columnHeader:         (page, text) => page.locator('.ag-header-cell-text').filter({ hasText: text }),
+    symbolCusipFilter:    (page) => page.locator('input[placeholder="Symbol / CUSIP"], input[placeholder="Symbol or Cusip"], input[placeholder="Symbol or CUSIP"]').first(),
+    dtcFilter:            (page) => page.locator('mat-form-field').filter({ hasText: 'DTC' }).locator('input'),
+    loanetIdFilter:       (page) => page.locator('mat-form-field').filter({ hasText: 'LoanetId' }).locator('input'),
+    contractNoFilter:     (page) => page.locator('mat-form-field').filter({ hasText: 'Contract No' }).locator('input'),
+    profitCenterFilter:   (page) => page.locator('mat-form-field').filter({ hasText: 'PRC' }).locator('mat-select'),
+    effectiveDateInput:   (page) => page.locator('mat-form-field').filter({ hasText: 'Effective Date' }).locator('input'),
+    applyButton:          (page) => page.locator('button').filter({ hasText: 'Apply' }).first(),
+    clearButton:          (page) => page.locator('button').filter({ hasText: 'Clear' }).first(),
+    depositoryButtons:    (page) => page.locator('mat-radio-button, [role="radio"]'),
+    tradeButton:          (page) => page.locator('button').filter({ hasText: 'Trade' }).first(),
+    rerateButton:         (page) => page.locator('button').filter({ hasText: 'ReRate' }).first(),
+    recallButton:         (page) => page.locator('button').filter({ hasText: 'Recall' }).first(),
+    returnButton:         (page) => page.locator('button').filter({ hasText: 'Return' }).first(),
+    liveQuoteBanner:      (page) => page.locator('text=Snapshot:').first(),
+    historyDetailGrid:    (page) => page.locator('.ag-details-row'),
+    rerateDialog:         (page) => page.locator('mat-dialog-container').filter({ hasText: 'ReRate' }),
+    recallDialog:         (page) => page.locator('mat-dialog-container').filter({ hasText: 'Recall' }),
+    returnDialog:         (page) => page.locator('mat-dialog-container').filter({ hasText: 'Return' }),
+    tradePanel:           (page) => page.locator('mat-sidenav, mat-drawer, [class*="trade-panel"]').first(),
   },
 
   // ============================================
