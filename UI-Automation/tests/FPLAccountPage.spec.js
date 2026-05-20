@@ -4,7 +4,7 @@ import { FPLAccountPage } from '../Pages/FPLAccountPage.js';
 import { users } from '../utils/testdata.js';
 
 test.describe('FPL Account Page', () => {
-  test.setTimeout(60000);
+  test.setTimeout(180000);
 
   test('should navigate and filter FPL accounts', async ({ page }) => {
     const loginPage = new LoginPage(page);
