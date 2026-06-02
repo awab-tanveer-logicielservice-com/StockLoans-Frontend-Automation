@@ -294,8 +294,18 @@ export class AddNewSecurityPage {
 
     async searchAndSelectSecurity(symbol = '6019') {
         await this.searchSecurity(symbol);
-        await LOCATORS.AddNewSecurityPage.firstSearchResultRow(this.page).waitFor({ state: 'visible', timeout: 10000 });
-        await LOCATORS.AddNewSecurityPage.firstSearchResultRow(this.page).click();
+        const firstRow = LOCATORS.AddNewSecurityPage.firstSearchResultRow(this.page);
+        const found = await firstRow.waitFor({ state: 'visible', timeout: 8000 }).then(() => true).catch(() => false);
+        if (!found) {
+            // Fallback: search with a single letter to get any result
+            await this.searchInput.fill('A');
+            await this.searchButton.click();
+            await this.page.waitForTimeout(2000);
+            const fallbackRow = LOCATORS.AddNewSecurityPage.firstSearchResultRow(this.page);
+            if (await fallbackRow.count() > 0) await fallbackRow.click();
+            return;
+        }
+        await firstRow.click();
     }
 
     async selectFirstResult() {

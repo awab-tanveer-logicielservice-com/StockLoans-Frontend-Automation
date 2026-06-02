@@ -30,7 +30,7 @@ export default defineConfig({
   expect: { timeout: 10000 },
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? '50%' : 1,
+  workers: 1,
   reporter: [['list'], ['allure-playwright']],
   use: {
     baseURL: process.env.BASE_URL || 'https://qa-sls-v2.web.app/login',
