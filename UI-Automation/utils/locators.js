@@ -436,22 +436,66 @@ export const LOCATORS = {
     loanButton: (page) => page.getByRole('button', { name: 'Loan' }),
 
     /**
-     * Counterparty combobox field
-     * Strategy: Playwright's getByRole for combobox
-     */
-    counterpartyCombobox: (page) => page.getByRole('combobox', { name: 'Counterparty' }),
-
-    /**
-     * Symbol/CUSIP Quantity Rate text input
+     * Counterparty text input — role is textbox, not combobox; first() skips the Trade-panel copy
      * Strategy: Playwright's getByRole for textbox
      */
-    symbolCusipQtyRateTextbox: (page) => page.getByRole('textbox', { name: 'Symbol/Cusip Qty Rate' }),
+    counterpartyCombobox: (page) => page.getByRole('textbox', { name: 'Counterparty' }).first(),
 
     /**
-     * Import button with count indicator
-     * Strategy: Playwright's getByRole for button
+     * Combined Symbol/CUSIP Qty Rate text input (accessible name is all-caps in the app)
+     * Strategy: Playwright's getByRole for textbox (case-insensitive match)
      */
-    importButton: (page) => page.getByRole('button', { name: 'Import (1)' }),
+    symbolCusipQtyRateTextbox: (page) => page.getByRole('textbox', { name: /symbol.cusip.qty.rate/i }),
+
+    /**
+     * Import button — caption may be "Import" or "Import (N)" depending on state
+     * Strategy: regex match so it works in both states
+     */
+    importButton: (page) => page.getByRole('button', { name: /^import/i }).first(),
+
+    /** Submit selected rows from Grid 1 to Grid 2 — first() skips the Trade-panel copy */
+    submitButton: (page) => page.getByRole('button', { name: /^submit$/i }).first(),
+
+    /** First AG-Grid on page — import staging area (Grid 1) */
+    grid1: (page) => page.locator('ag-grid-angular').first(),
+
+    /** Second AG-Grid on page — submission history (Grid 2) */
+    grid2: (page) => page.locator('ag-grid-angular').nth(1),
+
+    /** Data rows inside Grid 1 */
+    grid1Row: (page) => page.locator('ag-grid-angular').first().locator('.ag-center-cols-container .ag-row'),
+
+    /** Data rows inside Grid 2 */
+    grid2Row: (page) => page.locator('ag-grid-angular').nth(1).locator('.ag-center-cols-container .ag-row'),
+
+    /** Select-all checkbox in Grid 1 header */
+    grid1SelectAll: (page) => page.locator('ag-grid-angular').first()
+      .getByRole('checkbox', { name: /Column with Header Selection/ }).first(),
+
+    /** Checkbox on the first data row of Grid 1 — ag-grid renders as role=checkbox with space-to-toggle label */
+    grid1FirstRowCheckbox: (page) => page.locator('ag-grid-angular').first()
+      .getByRole('checkbox', { name: /Press Space to toggle row selection/ }).first(),
+
+    /** Empty-state overlay in Grid 1 */
+    grid1EmptyOverlay: (page) => page.locator('ag-grid-angular').first().locator('.ag-overlay-no-rows-wrapper'),
+
+    /** Empty-state overlay in Grid 2 */
+    grid2EmptyOverlay: (page) => page.locator('ag-grid-angular').nth(1).locator('.ag-overlay-no-rows-wrapper'),
+
+    /** Column header cell in Grid 2 by text */
+    grid2ColumnHeader: (page, colName) =>
+      page.locator('ag-grid-angular').nth(1).locator('.ag-header-cell-text').filter({ hasText: colName }),
+
+    /** First mat-error on the page (covers all field validations) */
+    validationError: (page) => page.locator('mat-error').first(),
+
+    /** Warning shown when submit is attempted without row selection */
+    rowSelectionWarning: (page) =>
+      page.locator('mat-snack-bar-container, [class*="snack"], [role="alert"], .toast-message').first(),
+
+    /** Message shown when a read-only user attempts a restricted action */
+    accessRestrictionMessage: (page) =>
+      page.locator('[class*="restrict"], [class*="forbidden"], mat-snack-bar-container, [role="alert"]').first(),
   },
 
   // ============================================
@@ -498,7 +542,7 @@ export const LOCATORS = {
      * Add User button in form
      * Strategy: Playwright's getByRole for button
      */
-    addUserButton: (page) => page.getByRole('button', { name: 'ADD USER' }),
+    addUserButton: (page) => page.getByRole('button', { name: 'Save User' }),
 
     /**
      * Menu button for navigation
@@ -940,20 +984,45 @@ export const LOCATORS = {
   // MEMO SEG PAGE LOCATORS
   // ============================================
   MemoSegPage: {
-    memoSegLink: (page) => page.getByRole('link', { name: 'Memo Seg' }),
-    textInput: (page) => page.getByRole('textbox', { name: 'TODO: add selector — Memo Seg Symbol Quantity text input area' }),
-    submitButton: (page) => page.getByRole('button', { name: 'TODO: add selector — Submit/Process button for memo seg batch' }),
-    summaryGrid: (page) => page.locator('TODO: add selector — Summary grid container (first AG-Grid on Memo Seg page)'),
-    detailGrid: (page) => page.locator('TODO: add selector — Detail grid container (second AG-Grid on Memo Seg page)'),
-    unSegButton: (page) => page.getByRole('button', { name: 'UN-SEG' }),
+    /** Sidebar nav link — actual text is "MemoSeg" (no space) */
+    memoSegLink: (page) => page.getByRole('link', { name: /memoseg/i }),
+    /** Batch input textarea — placeholder "e.g. AAPL 100\nMSFT 200" */
+    textInput: (page) => page.getByPlaceholder('e.g. AAPL 100'),
+    /** SEG button — triggers the batch segmentation (disabled until input is valid) */
+    submitButton: (page) => page.getByRole('button', { name: /^seg$/i }),
+    /** Summary grid — first AG-Grid; aggregates records by symbol */
+    summaryGrid: (page) => page.locator('ag-grid-angular').first(),
+    /** Detail grid — second AG-Grid; shows individual allocation records */
+    detailGrid: (page) => page.locator('ag-grid-angular').nth(1),
+    unSegButton: (page) => page.getByRole('button', { name: /un-?seg/i }),
     validationError: (page) => page.locator('mat-error').first(),
-    emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper'),
-    detailGridHeaders: (page) => page.locator('TODO: add selector — Detail grid header row with column names'),
-    firstGroupedRow: (page) => page.locator('.ag-row-group').first(),
+    emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper').first(),
+    /** Header row inside the detail grid */
+    detailGridHeaders: (page) => page.locator('ag-grid-angular').nth(1).locator('.ag-header-row').first(),
+    /** First data row in the summary grid — the grid uses flat rows, not AG row-groups */
+    firstGroupedRow: (page) => page.locator('ag-grid-angular').first().locator('.ag-center-cols-container .ag-row').first(),
     quantityValidationError: (page) => page.locator('mat-error').filter({ hasText: /quantity/i }).first(),
     symbolValidationError: (page) => page.locator('mat-error').filter({ hasText: /symbol/i }).first(),
-    getSummaryGridCellBySymbol: (page, symbol) => page.getByRole('gridcell', { name: symbol }).first(),
-    getDetailGridCellBySymbol: (page, symbol) => page.getByRole('gridcell', { name: symbol }).first(),
+    getSummaryGridCellBySymbol: (page, symbol) =>
+      page.locator('ag-grid-angular').first().getByRole('gridcell', { name: symbol }).first(),
+    getDetailGridCellBySymbol: (page, symbol) =>
+      page.locator('ag-grid-angular').nth(1).getByRole('gridcell', { name: symbol }).first(),
+    snackbar: (page) => page.locator('mat-snack-bar-container'),
+  },
+
+  // ============================================
+  // FPL POSITIONS PAGE LOCATORS
+  // ============================================
+  FPLPositionsPage: {
+    headerRow: (page) => page.getByRole('row', { name: 'IClear Account SLS Account Split Symbol Cusip Qty' }),
+    grid: (page) => page.locator('ag-grid-angular, [role="treegrid"]').first(),
+    loadingOverlay: (page) => page.locator('.ag-loading, .ag-overlay-loading-wrapper'),
+    groupRow: (page, groupName) => page.getByRole('row', { name: groupName }),
+    positionRow: (page, symbol) => page.getByRole('row', { name: new RegExp(symbol) }).first(),
+    gridCell: (page, text) => page.getByRole('gridcell', { name: text }).first(),
+    centerColsViewport: (page) => page.locator('.ag-center-cols-viewport').first(),
+    noRowsOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    allDataRows: (page) => page.locator('[role="treegrid"] [role="rowgroup"]').nth(1).locator('[role="row"]'),
   },
 
   // ============================================
@@ -961,18 +1030,18 @@ export const LOCATORS = {
   // ============================================
   ShortInterestRateAdjustmentPage: {
     rateAdjustmentLink: (page) => page.getByRole('link', { name: 'Short Interest Rate Adjustment' }),
-    rateGrid: (page) => page.locator('TODO: add selector — Ag-Grid root container for rate adjustment grid'),
-    gridHeaderRow: (page) => page.locator('TODO: add selector — Ag-Grid header row with rate adjustment column names'),
-    rateInputField: (page) => page.getByRole('spinbutton', { name: 'TODO: add selector — Rate input field label' }),
-    saveButton: (page) => page.getByRole('button', { name: 'TODO: add selector — Save/Apply button for rate adjustment' }),
-    successMessage: (page) => page.locator('TODO: add selector — Success toast/notification after rate save'),
+    rateGrid: (page) => page.locator('ag-grid-angular').first(),
+    gridHeaderRow: (page) => page.locator('.ag-header-row').first(),
+    rateInputField: (page) => page.locator('xpath=//h2[contains(normalize-space(.),"Short Interest Rate")]/ancestor::*[2]//input[@type="number"]').first(),
+    saveButton: (page) => page.getByRole('button', { name: 'Save changes' }),
+    successMessage: (page) => page.locator('mat-snack-bar-container'),
     validationError: (page) => page.locator('mat-error').first(),
-    rowSelectionWarning: (page) => page.locator('TODO: add selector — Warning message when save is attempted without row selection'),
+    rowSelectionWarning: (page) => page.locator('mat-snack-bar-container, [role="alert"]').first(),
     emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper'),
-    dataLoadError: (page) => page.locator('TODO: add selector — Error message shown when V1 endpoint fails'),
-    pageContainer: (page) => page.locator('TODO: add selector — Main page container with V2 theme class'),
+    dataLoadError: (page) => page.locator('mat-snack-bar-container, [role="alert"], .ag-overlay-loading-wrapper').first(),
+    pageContainer: (page) => page.getByRole('heading', { name: 'Short Interest Rate Adjustment', level: 2 }),
     agGridRoot: (page) => page.locator('.ag-root-wrapper'),
-    accessRestrictionMessage: (page) => page.locator('TODO: add selector — Access restriction/read-only message for unauthorized users'),
+    accessRestrictionMessage: (page) => page.locator('[class*="restrict"], [class*="read-only"], mat-snack-bar-container, [role="alert"]').first(),
   },
 
   // ============================================
@@ -1006,6 +1075,116 @@ export const LOCATORS = {
   },
 
   // ============================================
+  // CONTRACT MANAGEMENT PAGE LOCATORS
+  // ============================================
+  ContractManagementPage: {
+    grid:               (page) => page.locator('ag-grid-angular').first(),
+    gridRow:            (page) => page.locator('.ag-center-cols-container .ag-row'),
+    emptyStateOverlay:  (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    depositoryButtons:  (page) => page.locator('mat-button-toggle-group button.mat-button-toggle-button'),
+    viewAllButton:      (page) => page.locator('mat-button-toggle-button, button').filter({ hasText: /^All$/ }).first(),
+    viewPendsButton:    (page) => page.locator('mat-button-toggle-button, button').filter({ hasText: /^Pends$/ }).first(),
+    viewMadeButton:     (page) => page.locator('mat-button-toggle-button, button').filter({ hasText: /^Made$/ }).first(),
+    approveButton:      (page) => page.locator('button').filter({ hasText: /Approve/i }).first(),
+    denyButton:         (page) => page.locator('button').filter({ hasText: /Deny/i }).first(),
+    dtcMadeToggle:      (page) => page.locator('button, mat-slide-toggle').filter({ hasText: /Made/i }).first(),
+    dtcPendingToggle:   (page) => page.locator('button, mat-slide-toggle').filter({ hasText: /Pending/i }).first(),
+    notesCell:          (page) => page.locator('.ag-cell[col-id="notes"], .ag-cell[col-id="privateComment"], .ag-cell[col-id="comment"]').first(),
+  },
+
+  // ============================================
+  // CONTRACT REVIEW PAGE LOCATORS
+  // ============================================
+  ContractReviewPage: {
+    grid:                   (page) => page.locator('ag-grid-angular').first(),
+    gridRow:                (page) => page.locator('.ag-center-cols-container .ag-row'),
+    emptyStateOverlay:      (page) => page.locator('.ag-overlay-no-rows-wrapper, .ag-overlay-wrapper').first(),
+    unreviewedDaysCombobox: (page) => page.getByRole('combobox', { name: 'Unreviewed Days' }),
+    unreviewedDayOption:    (page) => page.locator('mat-option'),
+    dateInput:              (page) => page.getByRole('textbox', { name: 'Choose a date' }),
+    commentInput:           (page) => page.locator('textarea, input[placeholder*="comment" i], input[placeholder*="note" i]').first(),
+    submitButton:           (page) => page.locator('button').filter({ hasText: /submit review/i }).first(),
+  },
+
+  // ============================================
+  // LCOR PAGE LOCATORS
+  // ============================================
+  LCORPage: {
+    grid:                      (page) => page.locator('ag-grid-angular').first(),
+    gridRow:                   (page) => page.locator('.ag-center-cols-container .ag-row'),
+    pinnedRow:                 (page) => page.locator('.ag-floating-bottom .ag-row'),
+    emptyStateOverlay:         (page) => page.locator('.ag-overlay-no-rows-wrapper').first(),
+    depositoryButtons:         (page) => page.locator('mat-button-toggle-group button.mat-button-toggle-button'),
+    contraLoanetIdInput:       (page) => page.locator('mat-form-field').filter({ hasText: 'Contra Loanet ID' }).locator('input'),
+    symbolAndQuantityTextarea: (page) => page.locator('mat-form-field').filter({ hasText: 'Symbol & Quantity' }).locator('textarea'),
+    profitCenterInput:         (page) => page.locator('mat-form-field').filter({ hasText: 'Profit Center' }).locator('input'),
+    timeLimitInput:            (page) => page.locator('mat-form-field').filter({ hasText: 'Time Limit' }).locator('input'),
+    publicCommentInput:        (page) => page.locator('mat-form-field').filter({ hasText: 'Public Comment' }).locator('input'),
+    minQuantityInput:          (page) => page.locator('mat-form-field').filter({ hasText: 'Min Quantity' }).locator('input'),
+    minRebateInput:            (page) => page.locator('mat-form-field').filter({ hasText: 'Min Rebate' }).locator('input'),
+    maxPriceInput:             (page) => page.locator('mat-form-field').filter({ hasText: 'Max Price' }).locator('input'),
+    divRateInput:              (page) => page.locator('mat-form-field').filter({ hasText: 'Div Rate' }).locator('input').first(),
+    submitButton:              (page) => page.locator('button').filter({ hasText: /^Submit$/ }).first(),
+    resetButton:               (page) => page.locator('button').filter({ hasText: /^Reset$/ }).first(),
+  },
+
+  // ============================================
+  // REPORT PAGE LOCATORS
+  // ============================================
+  ReportPage: {
+    reportLink:          (page) => page.getByRole('link', { name: 'Reports' }),
+    fromDateInput:       (page) => page.getByRole('textbox', { name: 'From Date' }),
+    toDateInput:         (page) => page.getByRole('textbox', { name: 'To Date' }),
+    reportTypeDropdown:  (page) => page.getByRole('combobox', { name: 'Select Report' }),
+    groupingSelector:    (page) => page.getByRole('combobox', { name: 'Select Grouping' }),
+    generateButton:      (page) => page.getByRole('button', { name: 'Load Report' }),
+    grid:                (page) => page.locator('ag-grid-angular').first(),
+    gridRow:             (page) => page.locator('.ag-center-cols-container .ag-row'),
+    groupRow:            (page) => page.locator('.ag-row-group'),
+    groupExpandIcon:     (page) => page.locator('.ag-group-expanded, .ag-icon-expanded').first(),
+    groupCollapseIcon:   (page) => page.locator('.ag-group-contracted, .ag-icon-contracted').first(),
+    emptyStateOverlay:   (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    loadingOverlay:      (page) => page.locator('.ag-overlay-loading-wrapper'),
+    validationError:     (page) => page.locator('mat-error, [class*="error"]').first(),
+    fromDateError:       (page) => page.locator('mat-error').first(),
+    toDateError:         (page) => page.locator('mat-error').first(),
+    pageHeading:         (page) => page.locator('h1, h2').filter({ hasText: /report/i }).first(),
+    getGroupRowByText:   (page, text) => page.locator('.ag-row-group').filter({ hasText: text }).first(),
+    getOptionByText:     (page, text) => page.getByRole('option', { name: text }),
+  },
+
+  // ============================================
+  // USER ROLES PAGE LOCATORS
+  // ============================================
+  UserRolesPage: {
+    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    usersLink: (page) => page.getByRole('link', { name: 'Users' }),
+    addNewUserButton: (page) => page.getByRole('button', { name: 'ADD NEW USER' }),
+
+    // First data row in the Users AG-Grid
+    firstUserRow: (page) => page.locator('ag-grid-angular .ag-row[row-index="0"]'),
+
+    // User Details tabs — the tab label in the side panel is "Roles" (not "User Roles")
+    userRolesTab: (page) => page.getByRole('tab', { name: 'Roles' }),
+
+    // Role toggle — Angular Material mat-checkbox or mat-list-option
+    roleCheckbox: (page, roleName) =>
+      page.locator('mat-checkbox').filter({ hasText: roleName }).first(),
+    roleListOption: (page, roleName) =>
+      page.locator('mat-list-option').filter({ hasText: roleName }).first(),
+
+    // Action buttons inside User Roles sub-page
+    saveButton: (page) => page.getByRole('button', { name: 'Save Roles' }),
+
+    // Success / error snack bar
+    snackBar: (page) => page.locator('mat-snack-bar-container'),
+
+    // User Roles sub-page container (used to assert visibility)
+    userRolesContainer: (page) =>
+      page.locator('app-user-roles, [class*="user-roles"]').first(),
+  },
+
+  // ============================================
   // COMMON/SHARED LOCATORS
   // ============================================
   Common: {
@@ -1022,5 +1201,28 @@ export const LOCATORS = {
      * Strategy: Chained getByRole with filter
      */
     menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+  },
+
+  // ============================================
+  // SHORT RATE ADJUSTMENT PAGE LOCATORS
+  // ============================================
+  ShortRateAdjustmentPage: {
+    grid:               (page) => page.locator('ag-grid-angular').first(),
+    gridHeaderRow:      (page) => page.locator('.ag-header-row').first(),
+    gridRows:           (page) => page.locator('.ag-center-cols-container .ag-row'),
+    firstRow:           (page) => page.locator('.ag-center-cols-container .ag-row').first(),
+    firstCell:          (page) => page.locator('.ag-center-cols-container .ag-row .ag-cell').first(),
+    // Rate is the 3rd column (index 2); inline-edit input appears inside the cell on dblclick
+    rateCellFirst:      (page) => page.locator('.ag-center-cols-container .ag-row').first().locator('.ag-cell').nth(2),
+    inlineEditInput:    (page) => page.locator('.ag-cell-edit-wrapper input, .ag-cell-editor input, .ag-popup-editor input, input.ag-input-field-input').first(),
+    successMessage:     (page) => page.locator('mat-snack-bar-container'),
+    validationError:    (page) => page.locator('mat-error').first(),
+    emptyGridOverlay:   (page) => page.locator('.ag-overlay-no-rows-wrapper'),
+    agGridRoot:         (page) => page.locator('.ag-root-wrapper'),
+    tradePanelClose:    (page) => page.getByRole('button', { name: 'Close' }).first(),
+    symbolColumnHeader: (page) => page.locator('.ag-header-cell').filter({ hasText: 'Symbol' }).first(),
+    cusipColumnHeader:  (page) => page.locator('.ag-header-cell').filter({ hasText: 'Cusip' }).first(),
+    rateColumnHeader:   (page) => page.locator('.ag-header-cell').filter({ hasText: 'Rate' }).first(),
+    sourceColumnHeader: (page) => page.locator('.ag-header-cell').filter({ hasText: 'Source' }).first(),
   },
 };

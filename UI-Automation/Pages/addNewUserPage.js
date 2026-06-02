@@ -14,36 +14,9 @@ export class AddNewUserPage {
     }
 
     async navigateToUsers() {
-        const menuBtn = LOCATORS.AddNewUserPage.menuButton(this.page);
-        const usersLink = LOCATORS.AddNewUserPage.usersLink(this.page);
-
-        await menuBtn.waitFor({ state: 'visible', timeout: 10000 });
-        try {
-            await menuBtn.click();
-        } catch (e) {
-            await menuBtn.click({ force: true });
-        }
-
-        await usersLink.waitFor({ state: 'visible', timeout: 10000 });
-        try {
-            await usersLink.click();
-        } catch (e) {
-            await usersLink.click({ force: true });
-        }
-
-        // Wait for Users page to finish loading by ensuring the Add New User button or the Users header is visible
-        const timeout = 10000;
-        const start = Date.now();
-        while (Date.now() - start < timeout) {
-            try {
-                if (await this.addNewUserButton.isVisible()) return;
-            } catch (e) {}
-            try {
-                if (await this.page.getByRole('row', { name: 'Name' }).isVisible()) return;
-            } catch (e) {}
-            await this.page.waitForTimeout(200);
-        }
-        throw new Error('Users page did not finish loading within timeout');
+        const origin = new URL(this.page.url()).origin;
+        await this.page.goto(`${origin}/users`);
+        await this.addNewUserButton.waitFor({ state: 'visible', timeout: 30000 });
     }
 
     async clickAddNewUser() {
@@ -77,10 +50,11 @@ export class AddNewUserPage {
 
     async clickAddUserButton() {
         await this.addUserButton.waitFor({ state: 'visible', timeout: 10000 });
+        await this.addUserButton.click();
     }
 
     async verifyBasicInfoVisible() {
-        await this.basicInfoTabpanel.waitFor({ state: 'visible', timeout: 10000 });
+        await this.page.locator('mat-dialog-container').waitFor({ state: 'visible', timeout: 10000 });
     }
 
     async verifyAddUserButtonEnabled() {

@@ -188,7 +188,7 @@ test.describe('Contract Details Component (SLL-192)', () => {
     await And('the user navigates to the Contract Details page', null, { contractDetailsPage }); 
     await When('the user enters "ZZZZINVALID" in the Symbol/CUSIP filter', null, { contractDetailsPage, contractSummaryPage, page }); 
     await Then('the grid should show no matching rows', null, { contractDetailsPage, contractSummaryPage, page }); 
-    await And('the pinned total row should display zero values', null, { contractSummaryPage }); 
+    await And('the pinned total row should display zero values', null, { contractDetailsPage, contractSummaryPage, page }); 
   });
 
   test('Profit Center field is editable when Effective Date is today', { tag: ['@smokeBDD', '@Smoke', '@Regression', '@SLL-192'] }, async ({ Given, Then, And, contractDetailsPage, loginPage, page, testUsers }) => { 
@@ -505,7 +505,7 @@ test.describe('Contract Details Component (SLL-192)', () => {
     await And('the user navigates to the Contract Details page', null, { contractDetailsPage }); 
     await And('the selected depository has no contracts', null, { contractDetailsPage, contractSummaryPage, page }); 
     await Then('the grid should display the empty state overlay', null, { contractDetailsPage, contractSummaryPage, page }); 
-    await And('the pinned total row should display zero values', null, { contractSummaryPage }); 
+    await And('the pinned total row should display zero values', null, { contractDetailsPage, contractSummaryPage, page }); 
   });
 
   test('Filtering by a Symbol with no matching contracts shows empty grid and zeroed pinned totals', { tag: ['@smokeBDD', '@Regression', '@SLL-192'] }, async ({ Given, When, Then, And, contractDetailsPage, contractSummaryPage, loginPage, page, testUsers }) => { 
@@ -513,7 +513,7 @@ test.describe('Contract Details Component (SLL-192)', () => {
     await And('the user navigates to the Contract Details page', null, { contractDetailsPage }); 
     await When('the user enters "ZZZZINVALID" in the Symbol/CUSIP filter', null, { contractDetailsPage, contractSummaryPage, page }); 
     await Then('the grid should show no matching rows', null, { contractDetailsPage, contractSummaryPage, page }); 
-    await And('the pinned total row should display zero values', null, { contractSummaryPage }); 
+    await And('the pinned total row should display zero values', null, { contractDetailsPage, contractSummaryPage, page }); 
   });
 
   test.describe('Multiple filter combinations with valid, partial, and no-match inputs', () => {

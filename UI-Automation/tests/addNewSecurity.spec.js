@@ -19,8 +19,8 @@ function generateRandomSecurityData() {
     description: `Test Security ${timestamp}`,
     exchange: exchanges[Math.floor(Math.random() * exchanges.length)],
     volume: Math.floor(10000 + Math.random() * 90000).toString(),
-    closePrice: (Math.random() * 1000 + 50).toFixed(2),
-    closeDate: '12/31/2026',
+    closePrice: Math.floor(Math.random() * 1000 + 50).toString(),
+    closeDate: '2026-12-31',
     status: statuses[Math.floor(Math.random() * statuses.length)]
   };
 }
@@ -35,13 +35,10 @@ test.describe('Add New Security Tests', () => {
     dashboardPage = new DashboardPage(page);
     addNewSecurityPage = new AddNewSecurityPage(page);
 
-    // Set viewport to full screen
     await page.setViewportSize({ width: 1900, height: 945 });
-
-    // Login
     await loginPage.navigate();
     await loginPage.login(users.username, users.password);
-    await page.waitForTimeout(5000);
+    await page.waitForURL(/\/contract-summary/, { timeout: 30000 });
   });
 
   test('complete security form workflow - all scenarios in one test', async ({ page }) => {
@@ -49,52 +46,76 @@ test.describe('Add New Security Tests', () => {
 
     // STEP 1: Navigate to Security Master page and verify page loads
     await addNewSecurityPage.navigateToSecurityMaster();
-    // await addNewSecurityPage.verifyAddNewSecurityButtonVisible();
 
-    // STEP 2: Test search functionality
+    // STEP 2: Search '6019' and wait for results or no-results message
     await addNewSecurityPage.searchSecurity('6019');
-    await addNewSecurityPage.verifyUpdateContractsCheckboxVisible();
+    await addNewSecurityPage.waitForSearchResults();
 
-    // STEP 3: Toggle update contracts and search again
-    await addNewSecurityPage.toggleUpdateContracts();
+    if (await addNewSecurityPage.hasSearchResults()) {
+      // STEP 3: Normal update — select first result, edit a field, click Update
+      await addNewSecurityPage.selectFirstResult();
+      await addNewSecurityPage.verifyDetailViewVisible();
+      await addNewSecurityPage.modifyDescriptionField();
+      await addNewSecurityPage.clickUpdateButton();
+
+      // STEP 4: Enable Update Contracts toggle and verify the sub-view appears
+      await addNewSecurityPage.toggleUpdateContracts();
+      await addNewSecurityPage.verifyUpdateContractsCheckboxVisible();
+
+      // STEP 5: Update contracts by existing symbol then submit
+      await addNewSecurityPage.fillExistingSymbol('6019');
+      await addNewSecurityPage.clickUpdateButton();
+
+      // STEP 6: Disable Update Contracts toggle
+      await addNewSecurityPage.toggleUpdateContracts();
+    }
+
+    // STEP 7: Search again with a different term and wait for results or no-results
     await addNewSecurityPage.searchSecurity('Tester');
+    await addNewSecurityPage.waitForSearchResults();
 
-    // STEP 4: Open add new security form
+    // STEP 8: Navigate fresh to Security Master to reset any search state, then open modal
+    await addNewSecurityPage.navigateToSecurityMaster();
     await addNewSecurityPage.clickAddNewSecurity();
+    await addNewSecurityPage.verifyNewSecurityFormVisible();
 
-    // STEP 5: Fill and verify symbol field
+    // STEP 9: Fill and verify symbol field
     await addNewSecurityPage.fillSymbol(securityData.symbol);
     await expect(addNewSecurityPage.symbolInput).toHaveValue(securityData.symbol);
 
-    // STEP 6: Fill and verify CUSIP field
+    // STEP 10: Fill and verify CUSIP field
     await addNewSecurityPage.fillCusip(securityData.cusip);
     await expect(addNewSecurityPage.cusipInput).toHaveValue(securityData.cusip);
 
-    // STEP 7: Fill and verify description field
+    // STEP 11: Fill and verify description field
     await addNewSecurityPage.fillDescription(securityData.description);
     await expect(addNewSecurityPage.descriptionInput).toHaveValue(securityData.description);
 
-    // STEP 8: Fill and verify exchange field
+    // STEP 12: Fill and verify exchange field
     await addNewSecurityPage.fillExchange(securityData.exchange);
     await expect(addNewSecurityPage.exchangeInput).toHaveValue(securityData.exchange);
 
-    // STEP 9: Fill and verify volume field
+    // STEP 13: Fill and verify volume field
     await addNewSecurityPage.fillVolume(securityData.volume);
     await expect(addNewSecurityPage.volumeInput).toHaveValue(securityData.volume);
 
-    // STEP 10: Fill and verify close price field
+    // STEP 14: Fill and verify close price field
     await addNewSecurityPage.fillClosePrice(securityData.closePrice);
     await expect(addNewSecurityPage.closePriceInput).toHaveValue(securityData.closePrice);
 
-    // STEP 11: Fill and verify close date field
+    // STEP 15: Fill and verify close date field
     await addNewSecurityPage.fillCloseDate(securityData.closeDate);
     await expect(addNewSecurityPage.closeDateInput).toHaveValue(securityData.closeDate);
 
-    // STEP 12: Fill and verify status field
+    // STEP 16: Fill and verify status field
     await addNewSecurityPage.fillStatus(securityData.status);
     await expect(addNewSecurityPage.statusInput).toHaveValue(securityData.status);
 
-    // STEP 13: Verify Add button is enabled after all fields are filled
+    // STEP 17: Verify Add button is enabled then submit the form
     await expect(addNewSecurityPage.addButton).toBeEnabled();
+    await addNewSecurityPage.submitNewSecurity();
+
+    // STEP 18: Verify the security was successfully added
+    await addNewSecurityPage.verifySecurityAdded();
   });
 });
