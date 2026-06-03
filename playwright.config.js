@@ -35,7 +35,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL || 'https://qa-sls-v2.web.app/login',
     headless: true,
-    viewport: { width: 1920, height: 945 },
+    viewport: { width: 1366, height: 768 },
     actionTimeout: 10_000,
     ignoreHTTPSErrors: true,
     trace: 'on-first-retry'
@@ -52,7 +52,7 @@ export default defineConfig({
       name: 'bdd',
       testDir: bddConfig,
       use: {
-        headless: true,
+        headless: false,
         slowMo: 500,
         viewport: null,
         deviceScaleFactor: undefined,
@@ -60,7 +60,7 @@ export default defineConfig({
           args: [
             '--start-maximized',
             '--window-position=0,0',
-            '--window-size=1920,1080',
+            '--window-size=1366,768',
             // Prevent Chrome from throttling requestAnimationFrame in headless mode.
             // Angular schedules change detection via rAF; without these flags the
             // entity dropdown options never flush to the DOM in headless runs.
