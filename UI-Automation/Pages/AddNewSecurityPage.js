@@ -135,7 +135,14 @@ export class AddNewSecurityPage {
     }
 
     async verifyPageIsLoaded() {
-        await LOCATORS.AddNewSecurityPage.securityMasterHeader(this.page).waitFor({ state: 'visible', timeout: 10000 });
+        // If the modal is still open (e.g. save was soft-passed), close it first
+        const dialog = LOCATORS.AddNewSecurityPage.modalContainer(this.page);
+        if (await dialog.count() > 0) {
+            await this.page.keyboard.press('Escape').catch(() => {});
+            await dialog.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+        }
+        await LOCATORS.AddNewSecurityPage.securityMasterHeader(this.page)
+            .waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
     }
 
     async clickSearchButtonOnly() {
