@@ -53,7 +53,7 @@ export default defineConfig({
       testDir: bddConfig,
       use: {
         headless: true,
-        slowMo: 500,
+        slowMo: 0,
         viewport: null,
         deviceScaleFactor: undefined,
         launchOptions: {
