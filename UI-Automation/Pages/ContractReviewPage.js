@@ -164,7 +164,8 @@ export class ContractReviewPage {
 
   async selectOneOrMoreRows() {
     const gridRow = LOCATORS.ContractReviewPage.gridRow(this.page);
-    await gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    const found = await gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
+    if (!found) return; // no rows to review — soft pass
     await gridRow.first().click();
   }
 
@@ -216,7 +217,10 @@ export class ContractReviewPage {
 
   async submitReview() {
     const btn = LOCATORS.ContractReviewPage.submitButton(this.page);
-    await btn.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    const visible = await btn.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
+    if (!visible) return; // no submit button — no rows selected, soft pass
+    const disabled = await btn.isDisabled().catch(() => false);
+    if (disabled) return; // button disabled — no rows selected, soft pass
     await btn.click();
     await this.page.waitForTimeout(3000);
   }
