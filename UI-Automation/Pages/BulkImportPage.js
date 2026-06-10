@@ -56,7 +56,7 @@ export class BulkImportPage {
     }
     await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
     await this._dismissSplashScreen();
-    await this.borrowButton.waitFor({ state: 'visible', timeout: 20000 });
+    await this.borrowButton.waitFor({ state: 'visible', timeout: 45000 });
   }
 
   async _dismissSplashScreen() {

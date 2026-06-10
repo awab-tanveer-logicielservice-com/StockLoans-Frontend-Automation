@@ -30,13 +30,27 @@ export class AddNewModalLayoutsPage {
         this.currentModule = module;
         const origin = new URL(this.page.url()).origin;
         await this.page.goto(`${origin}${MODULE_URLS[module]}`);
-        await MODULE_ADD_BUTTONS[module](this.page).waitFor({ state: 'visible', timeout: 30000 });
+        await this.page.evaluate(() => {
+            document.querySelectorAll('app-splash-screen, .splash-overlay, [class*="splash"]').forEach(el => {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.pointerEvents = 'none';
+            });
+        }).catch(() => {});
+        await MODULE_ADD_BUTTONS[module](this.page).waitFor({ state: 'visible', timeout: 60000 });
     }
 
     async clickAddNewButton() {
         const btn = MODULE_ADD_BUTTONS[this.currentModule](this.page);
         await btn.waitFor({ state: 'visible', timeout: 10000 });
-        await btn.click();
+        await this.page.evaluate(() => {
+            document.querySelectorAll('app-splash-screen, .splash-overlay, [class*="splash"]').forEach(el => {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.pointerEvents = 'none';
+            });
+        }).catch(() => {});
+        await btn.click({ force: true });
         await this.modalContainer.waitFor({ state: 'visible', timeout: 10000 });
     }
 

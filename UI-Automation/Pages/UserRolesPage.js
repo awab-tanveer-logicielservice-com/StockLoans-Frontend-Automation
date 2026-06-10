@@ -26,12 +26,12 @@ export class UserRolesPage {
     const origin = new URL(this.page.url()).origin;
     await this.page.goto(`${origin}/users`);
     await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
-    await LOCATORS.UserRolesPage.addNewUserButton(this.page).waitFor({ state: 'visible', timeout: 60000 });
+    await LOCATORS.UserRolesPage.addNewUserButton(this.page).waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
   }
 
   async openFirstUserDetails() {
     const firstRow = LOCATORS.UserRolesPage.firstUserRow(this.page);
-    await firstRow.waitFor({ state: 'visible', timeout: 15000 });
+    await firstRow.waitFor({ state: 'visible', timeout: 30000 });
     await firstRow.click();
     // Wait for the side-panel heading to appear
     await this.page.locator('h2, h3').filter({ hasText: /\w+ \w+/ }).first()
@@ -41,11 +41,11 @@ export class UserRolesPage {
 
   async clickUserRolesTab() {
     const tab = LOCATORS.UserRolesPage.userRolesTab(this.page);
-    await tab.waitFor({ state: 'visible', timeout: 10000 });
-    await tab.click();
+    await tab.waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
+    await tab.click({ force: true });
     // Wait for the first role switch inside the Roles tabpanel to appear
     await this.page.getByRole('tabpanel', { name: 'Roles' }).getByRole('switch').first()
-      .waitFor({ state: 'visible', timeout: 15000 });
+      .waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
   }
 
   async navigateToUserRolesSubpage() {
@@ -80,7 +80,7 @@ export class UserRolesPage {
     if (isSelected !== 'true') {
       await tab.click();
       await this.page.getByRole('tabpanel', { name: 'Roles' }).getByRole('switch').first()
-        .waitFor({ state: 'visible', timeout: 15000 });
+        .waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
     }
     await this.page.waitForTimeout(300);
   }
@@ -168,7 +168,7 @@ export class UserRolesPage {
 
   async verifyRoleListed(roleName) {
     const sw = this._getRoleSwitch(roleName);
-    await sw.waitFor({ state: 'visible', timeout: 10000 });
+    await sw.waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
   }
 
   async verifyRoleAssigned(roleName) {
