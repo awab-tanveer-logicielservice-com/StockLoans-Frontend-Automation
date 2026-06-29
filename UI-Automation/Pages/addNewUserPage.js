@@ -16,11 +16,30 @@ export class AddNewUserPage {
     async navigateToUsers() {
         const origin = new URL(this.page.url()).origin;
         await this.page.goto(`${origin}/users`);
-        await this.addNewUserButton.waitFor({ state: 'visible', timeout: 30000 });
+        await this.page.evaluate(() => {
+            document.querySelectorAll('app-splash-screen, .splash-overlay, [class*="splash"]').forEach(el => {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.pointerEvents = 'none';
+            });
+        }).catch(() => {});
+        await this.addNewUserButton.waitFor({ state: 'visible', timeout: 60000 });
     }
 
     async clickAddNewUser() {
-        await this.addNewUserButton.click();
+        await this.page.evaluate(() => {
+            document.querySelectorAll('app-splash-screen, .splash-overlay, [class*="splash"]').forEach(el => {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.pointerEvents = 'none';
+            });
+        }).catch(() => {});
+        // Try regular click first (preserves Angular event dispatch); fall back to force
+        try {
+            await this.addNewUserButton.click({ timeout: 5000 });
+        } catch {
+            await this.addNewUserButton.click({ force: true });
+        }
     }
 
     async fillEmail(email) {

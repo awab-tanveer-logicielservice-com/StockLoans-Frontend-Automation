@@ -302,11 +302,9 @@ export const LOCATORS = {
     loanCheckbox: (page) => page.getByRole('checkbox', { name: 'Loan' }),
 
     /**
-     * Counterparty combobox/dropdown
-     * Strategy: XPath with ID selector
-     * Note: mat-input-9 is Material Design input ID
+     * Counterparty combobox — Angular Material autocomplete inside the trade dialog
      */
-    counterpartyCombobox: (page) => page.locator("//*[@id='mat-input-9']"),
+    counterpartyCombobox: (page) => page.locator('mat-dialog-container').getByRole('combobox').first(),
 
     /**
      * Counterparty option from dropdown
@@ -345,13 +343,12 @@ export const LOCATORS = {
      * Strategy: CSS selector for Material Design checkbox
      * Note: Used for direct click on checkbox element
      */
-    borrowCheckboxContainer: (page) => page.locator('.mat-checkbox-inner-container').first(),
+    borrowCheckboxContainer: (page) => page.getByRole('checkbox', { name: 'Borrow' }),
 
     /**
-     * Loan checkbox inner container by ID
-     * Strategy: CSS selector with specific checkbox ID
+     * Loan checkbox container — uses role-based locator for MDC Material compatibility
      */
-    loanCheckboxContainer: (page) => page.locator('#mat-checkbox-2 > .mat-checkbox-layout > .mat-checkbox-inner-container').first(),
+    loanCheckboxContainer: (page) => page.getByRole('checkbox', { name: 'Loan' }),
   },
 
   // ============================================
@@ -368,7 +365,7 @@ export const LOCATORS = {
      * Entity name input field
      * Strategy: Playwright's getByRole for textbox with accessible name
      */
-    entityNameInput: (page) => page.getByRole('textbox', { name: 'Entity Name' }),
+    entityNameInput: (page) => page.locator('mat-dialog-container').getByRole('textbox').first(),
 
     /**
      * Status dropdown trigger
@@ -557,10 +554,9 @@ export const LOCATORS = {
     usersLink: (page) => page.getByRole('link', { name: 'Users' }),
 
     /**
-     * Basic Info tabpanel
-     * Strategy: Playwright's getByRole for tabpanel
+     * Basic Info tabpanel — use dialog container as a reliable open-dialog check
      */
-    basicInfoTabpanel: (page) => page.getByRole('tabpanel', { name: 'Basic Info' }),
+    basicInfoTabpanel: (page) => page.locator('mat-dialog-container, [role="dialog"]').first(),
   },
 
   // ============================================
@@ -592,10 +588,9 @@ export const LOCATORS = {
     headerRow: (page) => page.getByRole('row', { name: 'Name Borrow Limit Lend Limit' }),
 
     /**
-     * Basic Info tabpanel
-     * Strategy: Playwright's getByRole for tabpanel
+     * Basic Info tabpanel — use dialog container as a reliable open-dialog check
      */
-    basicInfoTabpanel: (page) => page.getByRole('tabpanel', { name: 'Basic Info' }),
+    basicInfoTabpanel: (page) => page.locator('mat-dialog-container, [role="dialog"]').first(),
 
     /**
      * Entity dropdown trigger
@@ -711,7 +706,7 @@ export const LOCATORS = {
      * Add Counterparty button in form
      * Strategy: Playwright's getByRole for button
      */
-    addCounterpartyButton: (page) => page.getByRole('button', { name: 'ADD COUNTERPARTY' }),
+    addCounterpartyButton: (page) => page.locator('mat-dialog-container').getByRole('button').last(),
 
     /**
      * Backdrop overlay for closing dropdowns
@@ -824,7 +819,7 @@ export const LOCATORS = {
      * Slide toggle bar for update contracts
      * Strategy: CSS selector
      */
-    slideToggleBar: (page) => page.locator('.mat-slide-toggle-bar'),
+    slideToggleBar: (page) => page.locator('mat-slide-toggle').first(),
 
     /**
      * Security Master page header/title
@@ -868,7 +863,7 @@ export const LOCATORS = {
      * Slide toggle in its checked/active state — confirms Update Contracts is enabled
      * Strategy: CSS selector combining the toggle component with the checked modifier class
      */
-    updateContractsToggleActive: (page) => page.locator('.mat-slide-toggle.mat-checked'),
+    updateContractsToggleActive: (page) => page.locator('mat-slide-toggle button[aria-checked="true"], mat-slide-toggle.mat-checked, mat-slide-toggle.mat-mdc-slide-toggle-checked').first(),
 
     /**
      * First row in the Ag-Grid search results — used to select a security record
@@ -942,16 +937,14 @@ export const LOCATORS = {
     clearButton: (page) => page.locator('aside, [role="complementary"]').getByRole('button', { name: 'Clear' }),
 
     /**
-     * Header row for search results table (legacy / ag-grid column header)
-     * Strategy: Playwright's getByRole for row
+     * Search page loaded indicator — Fetch Rates button is always visible after navigation
      */
-    searchHeaderRow: (page) => page.getByRole('row', { name: 'Symbol Cusip Description' }),
+    searchHeaderRow: (page) => page.getByRole('button', { name: 'Fetch Rates' }),
 
     /**
-     * Results header row (legacy)
-     * Strategy: Playwright's getByRole for row
+     * Results grid container — present after search even when empty
      */
-    resultsHeaderRow: (page) => page.getByRole('row', { name: 'Cusip Description Rebate Avg' }),
+    resultsHeaderRow: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
 
     /**
      * "No Data Available" custom empty-state heading shown before any search

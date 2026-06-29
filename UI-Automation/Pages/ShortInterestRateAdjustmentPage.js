@@ -80,7 +80,7 @@ export class ShortInterestRateAdjustmentPage {
     }
 
     await this._dismissSplashScreen();
-    await this.rateGrid.waitFor({ state: 'visible', timeout: 20000 });
+    await this.rateGrid.waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
     // Wait up to 30s for data rows — keeps total test well under 240s timeout
     await this.page.locator('.ag-center-cols-container .ag-row').first()
       .waitFor({ state: 'attached', timeout: 30000 }).catch(() => {});

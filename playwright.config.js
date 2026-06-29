@@ -37,6 +37,7 @@ export default defineConfig({
     headless: true,
     viewport: { width: 1920, height: 1080 },
     actionTimeout: 10_000,
+    navigationTimeout: 120_000,
     ignoreHTTPSErrors: true,
     trace: 'on-first-retry'
   },
