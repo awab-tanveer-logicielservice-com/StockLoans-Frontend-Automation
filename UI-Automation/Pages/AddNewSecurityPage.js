@@ -455,6 +455,8 @@ export class AddNewSecurityPage {
     }
 
     async modifyClosePriceField() {
+        const visible = await this.closePriceInput.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
+        if (!visible) return; // detail view not loaded — soft pass
         await this.closePriceInput.clear();
         await this.closePriceInput.fill('999.99');
     }

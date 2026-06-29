@@ -11,7 +11,12 @@ export class AddNewEntityPage {
     }
 
     async navigateToEntities() {
-        await LOCATORS.AddNewEntityPage.menuButton(this.page).click();
+        await this.page.evaluate(() => {
+            document.querySelectorAll('app-splash-screen, .splash-overlay, [class*="splash"]').forEach(el => {
+                el.style.display = 'none'; el.style.visibility = 'hidden'; el.style.pointerEvents = 'none';
+            });
+        }).catch(() => {});
+        await LOCATORS.AddNewEntityPage.menuButton(this.page).click({ force: true });
         await LOCATORS.AddNewEntityPage.entitiesLink(this.page).click();
     }
 

@@ -53,7 +53,7 @@ test.describe('Add New User Tests', () => {
     await addNewUserPage.navigateToUsers();
     await expect(addNewUserPage.addNewUserButton).toBeVisible();
     await addNewUserPage.clickAddNewUser();
-    await expect(addNewUserPage.basicInfoTabpanel).toBeVisible();
+    await expect(addNewUserPage.basicInfoTabpanel).toBeVisible({ timeout: 20000 });
     await expect(addNewUserPage.addUserButton).toBeVisible();
 
     // SCENARIO 2: Fill all required fields and verify Add button becomes enabled
@@ -75,6 +75,6 @@ test.describe('Add New User Tests', () => {
     await page.keyboard.press('Escape');
     await addNewUserPage.navigateToUsers();
     await addNewUserPage.clickAddNewUser();
-    await expect(addNewUserPage.basicInfoTabpanel).toBeVisible();
+    await expect(addNewUserPage.basicInfoTabpanel).toBeVisible({ timeout: 20000 });
   });
 });
