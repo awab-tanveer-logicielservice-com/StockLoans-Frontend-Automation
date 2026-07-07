@@ -277,6 +277,11 @@ export const LOCATORS = {
      * Strategy: CSS selector for cell with focus
      */
     focusedGridCell: (page) => page.locator('.ag-cell.ag-cell-with-height.ag-cell-value.ag-cell-range-right.ag-cell-focus'),
+
+    slsAccountColumnHeader: (page) => page.getByRole('columnheader', { name: 'SLS Account' }),
+    slsAccountCell: (page) => page.locator('TODO: add selector — SLS Account gridcell in AG Grid (col-id="slsAccount")'),
+    slsAccountDropdown: (page) => page.locator('mat-select').first(),
+    slsAccountDropdownOption: (page) => page.locator('mat-option'),
   },
 
   // ============================================
@@ -493,6 +498,16 @@ export const LOCATORS = {
     /** Message shown when a read-only user attempts a restricted action */
     accessRestrictionMessage: (page) =>
       page.locator('[class*="restrict"], [class*="forbidden"], mat-snack-bar-container, [role="alert"]').first(),
+
+    /** "FPL" button in the Import mode toggle group (Standard / FPL) */
+    fplModeButton: (page) => page.getByRole('button', { name: 'FPL' }).first(),
+
+    /** "Standard" button in the Import mode toggle group (Standard / FPL) */
+    standardModeButton: (page) => page.getByRole('button', { name: 'Standard' }).first(),
+
+    /** Status column header in Grid 1 — visible in FPL Mode for allocation status tracking */
+    fplStatusColumnHeader: (page) =>
+      page.locator('ag-grid-angular').first().locator('.ag-header-cell-text').filter({ hasText: /status/i }).first(),
   },
 
   // ============================================
@@ -974,6 +989,29 @@ export const LOCATORS = {
   },
 
   // ============================================
+  // BULK SNAPSHOT PAGE LOCATORS
+  // ============================================
+  BulkSnapshotPage: {
+    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    bulkSnapshotLink: (page) => page.getByRole('link', { name: 'Bulk Snapshot' }),
+    /** Multi-line textarea — one symbol/CUSIP per line */
+    symbolOrCusipInput: (page) => page.getByLabel(/symbol or cusip/i).first(),
+    /** Blue "FETCH RATES" submit button below the textarea */
+    submitButton: (page) => page.getByRole('button', { name: /fetch rates/i }).first(),
+    /** "CLEAR" button — resets the textarea */
+    clearButton: (page) => page.getByRole('button', { name: /^clear$/i }),
+    /** "Use cached rates" checkbox — checked by default */
+    useCachedRatesCheckbox: (page) => page.getByRole('checkbox', { name: /use cached rates/i }),
+    /** "Start Searching" button inside the empty state panel */
+    startSearchingButton: (page) => page.getByRole('button', { name: 'Start Searching' }),
+    pageHeading: (page) => page.getByRole('heading', { name: /bulk snapshot/i }),
+    /** "No Data Available" empty state heading */
+    emptyStateHeading: (page) => page.getByRole('heading', { name: 'No Data Available' }),
+    resultsGrid: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
+    getGridcell: (page, cellName) => page.getByRole('gridcell', { name: cellName }),
+  },
+
+  // ============================================
   // MEMO SEG PAGE LOCATORS
   // ============================================
   MemoSegPage: {
@@ -1022,17 +1060,17 @@ export const LOCATORS = {
   // SHORT INTEREST RATE ADJUSTMENT PAGE LOCATORS
   // ============================================
   ShortInterestRateAdjustmentPage: {
-    rateAdjustmentLink: (page) => page.getByRole('link', { name: 'Short Interest Rate Adjustment' }),
+    rateAdjustmentLink: (page) => page.getByRole('link', { name: 'Client Short Interest' }),
     rateGrid: (page) => page.locator('ag-grid-angular').first(),
     gridHeaderRow: (page) => page.locator('.ag-header-row').first(),
-    rateInputField: (page) => page.locator('xpath=//h2[contains(normalize-space(.),"Short Interest Rate")]/ancestor::*[2]//input[@type="number"]').first(),
+    rateInputField: (page) => page.locator('xpath=//h2[contains(normalize-space(.),"Client Short Interest")]/ancestor::*[2]//input[@type="number"]').first(),
     saveButton: (page) => page.getByRole('button', { name: 'Save changes' }),
     successMessage: (page) => page.locator('mat-snack-bar-container'),
     validationError: (page) => page.locator('mat-error').first(),
     rowSelectionWarning: (page) => page.locator('mat-snack-bar-container, [role="alert"]').first(),
     emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper'),
     dataLoadError: (page) => page.locator('mat-snack-bar-container, [role="alert"], .ag-overlay-loading-wrapper').first(),
-    pageContainer: (page) => page.getByRole('heading', { name: 'Short Interest Rate Adjustment', level: 2 }),
+    pageContainer: (page) => page.getByRole('heading', { name: 'Client Short Interest', level: 2 }),
     agGridRoot: (page) => page.locator('.ag-root-wrapper'),
     accessRestrictionMessage: (page) => page.locator('[class*="restrict"], [class*="read-only"], mat-snack-bar-container, [role="alert"]').first(),
   },

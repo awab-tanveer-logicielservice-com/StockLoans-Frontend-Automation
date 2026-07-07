@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
+import { ENV } from './UI-Automation/Config/env.js';
 
 const bddConfig = defineBddConfig({
   features: [
@@ -19,6 +20,9 @@ const bddConfig = defineBddConfig({
     'UI-Automation/features/ReportDateFiltersGrouping.feature',
     'UI-Automation/features/AddNewUser.feature',
     'UI-Automation/features/UserRoles.feature',
+    'UI-Automation/features/BulkImportFPLMode.feature',
+    'UI-Automation/features/BulkSnapshot.feature',
+    'UI-Automation/features/FplAccount.feature',
   ],
   steps: 'UI-Automation/step-definitions/**/*.js',
   outputDir: 'UI-Automation/.features-gen',
@@ -33,7 +37,7 @@ export default defineConfig({
   workers: 1,
   reporter: [['list'], ['allure-playwright']],
   use: {
-    baseURL: process.env.BASE_URL || 'https://qa-sls-v2.web.app/login',
+    baseURL: ENV.baseURL,
     headless: true,
     viewport: { width: 1920, height: 1080 },
     actionTimeout: 10_000,

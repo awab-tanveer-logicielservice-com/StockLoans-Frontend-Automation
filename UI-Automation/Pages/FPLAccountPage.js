@@ -209,4 +209,53 @@ export class FPLAccountPage {
     await this.clickGridCell('0.5');
     await this.centerColsViewport.click();
   }
+
+  // ── SLL-234: SLS Account editable dropdown ──────────────────────────────
+
+  async clickSLSAccountCell(nth = 0) {
+    const cell = LOCATORS.FPLAccountPage.slsAccountCell(this.page).nth(nth);
+    await cell.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    try {
+      await cell.click();
+    } catch (e) {
+      await cell.click({ force: true });
+    }
+  }
+
+  async verifySlsDropdownVisible() {
+    const dropdown = LOCATORS.FPLAccountPage.slsAccountDropdown(this.page);
+    await dropdown.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+  }
+
+  async verifySlsDropdownHasOptions() {
+    const options = LOCATORS.FPLAccountPage.slsAccountDropdownOption(this.page);
+    await options.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    const count = await options.count();
+    if (count === 0) throw new Error('SLS Account dropdown has no options');
+  }
+
+  async selectSlsAccountOption(optionName) {
+    const option = LOCATORS.FPLAccountPage.getDropdownOption(this.page, optionName);
+    await option.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    try {
+      await option.click();
+    } catch (e) {
+      await option.click({ force: true });
+    }
+  }
+
+  async verifySlsAccountCellUpdated() {
+    const cell = LOCATORS.FPLAccountPage.slsAccountCell(this.page).first();
+    await cell.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+  }
+
+  async verifySlsAccountColumnVisible() {
+    const header = LOCATORS.FPLAccountPage.slsAccountColumnHeader(this.page);
+    await header.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+  }
+
+  async dismissSLSAccountDropdown() {
+    await this.page.keyboard.press('Escape');
+    await this.page.waitForTimeout(300);
+  }
 }

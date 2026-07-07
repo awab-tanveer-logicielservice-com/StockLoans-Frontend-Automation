@@ -18,8 +18,10 @@ import { LCORPage } from '../Pages/LCORPage.js';
 import { RememberMePage } from '../Pages/RememberMePage.js';
 import { SearchLendingPitLookUpPage } from '../Pages/SearchLendingPitLookUpPage.js';
 import { BulkImportPage } from '../Pages/BulkImportPage.js';
+import { BulkSnapshotPage } from '../Pages/BulkSnapshotPage.js';
 import { ReportPage } from '../Pages/ReportPage.js';
 import { users, devUsers } from '../utils/testdata.js';
+import { ENV } from '../Config/env.js';
 
 export const test = base.extend({
   loginPage: async ({ page }, use) => {
@@ -79,11 +81,13 @@ export const test = base.extend({
   bulkImportPage: async ({ page }, use) => {
     await use(new BulkImportPage(page));
   },
+  bulkSnapshotPage: async ({ page }, use) => {
+    await use(new BulkSnapshotPage(page));
+  },
   reportPage: async ({ page }, use) => {
     await use(new ReportPage(page));
   },
   testUsers: async ({}, use) => {
-    const baseURL = process.env.BASE_URL || '';
-    await use(baseURL.includes('dev') ? devUsers : users);
+    await use(ENV.baseURL.includes('dev') ? devUsers : users);
   },
 });

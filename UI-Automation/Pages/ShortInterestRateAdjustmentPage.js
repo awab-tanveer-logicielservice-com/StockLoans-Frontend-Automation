@@ -136,7 +136,7 @@ export class ShortInterestRateAdjustmentPage {
       // Bypass browser type=number restriction for non-numeric values via JS
       await this.page.evaluate((val) => {
         const xpResult = document.evaluate(
-          '//h2[contains(normalize-space(.),"Short Interest Rate")]/ancestor::*[2]//input[@type="number"]',
+          '//h2[contains(normalize-space(.),"Client Short Interest")]/ancestor::*[2]//input[@type="number"]',
           document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
         );
         const input = xpResult.singleNodeValue;

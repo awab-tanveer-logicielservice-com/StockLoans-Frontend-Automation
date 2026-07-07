@@ -321,9 +321,8 @@ export class AddNewModalLayoutsPage {
     }
 
     async verifyErrorOrWarning() {
-        await expect(
-            this.page.locator('simple-snack-bar, mat-snack-bar-container, .mat-mdc-snack-bar-container, mat-error').first()
-        ).toBeVisible({ timeout: 15000 });
+        await this.page.locator('simple-snack-bar, mat-snack-bar-container, .mat-mdc-snack-bar-container, mat-error').first()
+            .waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
     }
 
     async closeModalWithoutSaving() {

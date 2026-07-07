@@ -40,3 +40,33 @@ When('the user interacts with the account grid cells', async ({ fplAccountPage }
 Then('the center cols viewport should be clickable', async ({ fplAccountPage }) => {
   await fplAccountPage.centerColsViewport.click();
 });
+
+// ── SLL-234: SLS Account editable dropdown ────────────────────────────────
+
+When('the user clicks the SLS Account cell for a row', async ({ fplAccountPage }) => {
+  await fplAccountPage.clickSLSAccountCell();
+});
+
+Then('the SLS Account dropdown should be visible with available options', async ({ fplAccountPage }) => {
+  await fplAccountPage.verifySlsDropdownVisible();
+});
+
+Then('the SLS Account dropdown should contain at least one account option', async ({ fplAccountPage }) => {
+  await fplAccountPage.verifySlsDropdownHasOptions();
+});
+
+When('the user selects the SLS account option {string}', async ({ fplAccountPage }, optionName) => {
+  await fplAccountPage.selectSlsAccountOption(optionName);
+});
+
+Then('the record should reflect the selected SLS account', async ({ fplAccountPage }) => {
+  await fplAccountPage.verifySlsAccountCellUpdated();
+});
+
+Then('the SLS Account column should be visible in the table', async ({ fplAccountPage }) => {
+  await fplAccountPage.verifySlsAccountColumnVisible();
+});
+
+When('the user dismisses the SLS Account dropdown', async ({ fplAccountPage }) => {
+  await fplAccountPage.dismissSLSAccountDropdown();
+});
