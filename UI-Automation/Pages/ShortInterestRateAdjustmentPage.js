@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 import { LOCATORS } from '../utils/locators.js';
 import { ENV } from '../Config/env.js';
 import { devUsers } from '../utils/testdata.js';
+import { waitForRouteSettled } from '../utils/waits.js';
 
 export class ShortInterestRateAdjustmentPage {
   constructor(page) {
@@ -54,12 +55,13 @@ export class ShortInterestRateAdjustmentPage {
 
   async navigate() {
     await this.page.goto(ENV.devDashboardURL);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
+    await this._dismissSplashScreen();
   }
 
   async _loginToDev() {
     await this.page.goto(ENV.devBaseURL);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     const user = process.env.E2E_DEV_USER || devUsers.username;
     const pwd = process.env.E2E_DEV_PWD || devUsers.password;
     await LOCATORS.LoginPage.usernameInput(this.page).click();
@@ -71,12 +73,14 @@ export class ShortInterestRateAdjustmentPage {
 
   async navigateToPage() {
     await this.page.goto(ENV.devShortInterestRatesURL);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    // Settle the route before checking for the auth bounce: resolves as soon as
+    // either the rate grid renders or the guard redirects to /login.
+    await waitForRouteSettled(this.page, this.rateGrid);
 
     if (this.page.url().includes('/login')) {
       await this._loginToDev();
       await this.page.goto(ENV.devShortInterestRatesURL);
-      await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+      await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     }
 
     await this._dismissSplashScreen();

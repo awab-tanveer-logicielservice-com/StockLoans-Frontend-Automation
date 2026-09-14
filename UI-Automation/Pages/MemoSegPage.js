@@ -58,7 +58,7 @@ export class MemoSegPage {
   }
 
   async navigateToMemoSeg() {
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await this._dismissSplashScreen();
 
     const memoLink = LOCATORS.MemoSegPage.memoSegLink(this.page);
@@ -71,7 +71,7 @@ export class MemoSegPage {
     }
     const linkHandle = await memoLink.elementHandle();
     await this.page.evaluate(el => el.click(), linkHandle);
-    await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await this._dismissSplashScreen();
     await this.textInput.waitFor({ state: 'visible', timeout: 20000 });
   }
@@ -96,7 +96,7 @@ export class MemoSegPage {
     const isEnabled = await this.submitButton.isEnabled();
     if (!isEnabled) return; // disabled = client-side validation blocked submit
     await this.submitButton.click();
-    await this.page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await this.page.waitForTimeout(1000);
     const firstRow = LOCATORS.MemoSegPage.firstGroupedRow(this.page);
     await firstRow.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
@@ -138,17 +138,42 @@ export class MemoSegPage {
     await expect(this.summaryGrid).toBeVisible();
   }
 
+  /**
+   * Waits for a grid to stop loading and settle on a real outcome — data rows or
+   * the no-rows overlay — and reports whether it ended up with rows.
+   *
+   * Both checks below previously went straight to the cell lookup while the grid
+   * was still rendering its "Loading..." state, so they spent their whole budget
+   * against a grid that had not populated yet.
+   */
+  async _waitForGridSettled(grid, timeout = 45000) {
+    await grid.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    const rows = grid.locator('.ag-center-cols-container .ag-row');
+    const noRows = grid.locator('.ag-overlay-no-rows-wrapper');
+    await Promise.race([
+      rows.first().waitFor({ state: 'visible', timeout }).catch(() => {}),
+      noRows.first().waitFor({ state: 'visible', timeout }).catch(() => {}),
+    ]);
+    return (await rows.count()) > 0;
+  }
+
   async verifySummaryGridHasSymbol(symbol) {
-    await this.summaryGrid.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    // This used to soft-pass when the symbol was absent, so a batch submission
+    // that never landed reported success here and blew up at the detail-grid
+    // check instead — pointing at the wrong step entirely. Assert it properly.
+    const hasRows = await this._waitForGridSettled(this.summaryGrid);
     const cell = LOCATORS.MemoSegPage.getSummaryGridCellBySymbol(this.page, symbol);
-    const visible = await cell.isVisible({ timeout: 30000 }).catch(() => false);
-    if (!visible) return; // QA env may not have this symbol in the grid — soft pass
+    await expect(
+      cell,
+      `summary grid has no batch row for "${symbol}" — the grid ${hasRows ? 'holds other rows' : 'is empty'}, ` +
+      'so the memo seg batch submission did not land'
+    ).toBeVisible({ timeout: 15000 });
   }
 
   async verifyDetailGridHasSymbol(symbol) {
-    await this.detailGrid.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._waitForGridSettled(this.detailGrid);
     const cell = LOCATORS.MemoSegPage.getDetailGridCellBySymbol(this.page, symbol);
-    await expect(cell).toBeVisible({ timeout: 30000 });
+    await expect(cell).toBeVisible({ timeout: 15000 });
   }
 
   async verifyUnSegButtonDisabled() {
@@ -163,7 +188,7 @@ export class MemoSegPage {
 
   async verifyUnSegSuccess() {
     // UN-SEG doesn't show a snackbar; wait for API to complete then verify page is operational
-    await this.page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await this.summaryGrid.waitFor({ state: 'visible', timeout: this.defaultTimeout });
     await expect(this.summaryGrid).toBeVisible();
   }

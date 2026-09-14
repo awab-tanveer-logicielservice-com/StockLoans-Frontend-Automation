@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 import { LOCATORS } from '../utils/locators.js';
 import { ENV } from '../Config/env.js';
 import { devUsers } from '../utils/testdata.js';
+import { waitForRouteSettled } from '../utils/waits.js';
 
 export class ReportPage {
   constructor(page) {
@@ -66,7 +67,7 @@ export class ReportPage {
 
   async _loginToDev() {
     await this.page.goto(ENV.devBaseURL);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await LOCATORS.LoginPage.usernameInput(this.page).click();
     await LOCATORS.LoginPage.usernameInput(this.page).fill(devUsers.username);
     await LOCATORS.LoginPage.passwordInput(this.page).fill(devUsers.password);
@@ -76,12 +77,14 @@ export class ReportPage {
 
   async navigateToPage() {
     await this.page.goto(ENV.devReportsURL);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    // Settle the route before checking for the auth bounce: resolves as soon as
+    // either the report page renders or the guard redirects to /login.
+    await waitForRouteSettled(this.page, this.pageHeading);
 
     if (this.page.url().includes('/login')) {
       await this._loginToDev();
       await this.page.goto(ENV.devReportsURL);
-      await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+      await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     }
 
     await this._dismissSplashScreen();
@@ -222,7 +225,7 @@ export class ReportPage {
     await this.generateButton.waitFor({ state: 'visible', timeout: this.defaultTimeout });
     await this.generateButton.click();
     // Wait for the loading overlay to appear and then disappear
-    await this.loadingOverlay.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+    await this.loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
     await this.loadingOverlay.waitFor({ state: 'hidden', timeout: 30000 }).catch(() => {});
     await this.page.waitForTimeout(500);
   }

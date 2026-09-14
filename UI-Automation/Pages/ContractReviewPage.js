@@ -36,7 +36,7 @@ export class ContractReviewPage {
 
   async waitForGridLoad() {
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
     await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
     await this.page.waitForTimeout(1000);
   }

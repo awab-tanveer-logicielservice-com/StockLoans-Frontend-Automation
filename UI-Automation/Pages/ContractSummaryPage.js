@@ -40,8 +40,10 @@ export class ContractSummaryPage {
     }
     await this.grid.waitFor({ state: 'visible', timeout: 30000 });
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    // Wait for loading to start (Firestore subscription kicks in), then wait for it to finish
-    await loadingOverlay.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
+    // Wait for loading to start (Firestore subscription kicks in), then wait for it to finish.
+    // Grace period is short on purpose — when the grid loads fast the overlay never
+    // appears, and a long timeout here is spent waiting for something that won't happen.
+    await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
     await loadingOverlay.waitFor({ state: 'hidden', timeout: 120000 });
   }
 
@@ -52,8 +54,27 @@ export class ContractSummaryPage {
 
   async hasGridRows() {
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: 30000 });
+    // The overlay clearing doesn't mean rows have rendered — AG Grid hides it
+    // as soon as the Firestore subscription responds, and the first page of
+    // rows can land noticeably later. So wait for the overlay, then wait
+    // separately (and generously) for an actual row.
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 90000 }).catch(() => {});
+    try {
+      await this.gridRow.first().waitFor({ state: 'visible', timeout: 90000 });
+    } catch {
+      // A bare locator timeout looks identical whether the backend returned
+      // nothing or is still spinning. Say which, so a demo/CI failure is
+      // diagnosable without reopening the trace.
+      const stillLoading = await loadingOverlay.isVisible().catch(() => false);
+      const noRowsShown = await this.emptyStateOverlay.isVisible().catch(() => false);
+      const effectiveDate = await this.effectiveDateInput.inputValue().catch(() => 'unknown');
+      throw new Error(
+        `Contract Summary grid rendered no rows within 90s. ` +
+          `Loading overlay: ${stillLoading ? 'STILL VISIBLE (data never arrived)' : 'cleared'}. ` +
+          `"No rows" overlay: ${noRowsShown ? 'visible (backend returned an empty set)' : 'absent'}. ` +
+          `Effective date: ${effectiveDate}.`
+      );
+    }
     expect(await this.gridRow.count()).toBeGreaterThan(0);
   }
 
@@ -70,6 +91,9 @@ export class ContractSummaryPage {
   }
 
   async isPinnedRowVisible() {
+    // The pinned total row only renders once the grid has data, so wait for the
+    // grid to settle first rather than timing out against a still-loading grid.
+    await this._waitForGridSettled();
     await this.pinnedRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
     await expect(this.pinnedRow.first()).toBeVisible();
   }
@@ -110,18 +134,71 @@ export class ContractSummaryPage {
     await expect(this.detailGrid).not.toBeVisible();
   }
 
+  /**
+   * Waits for the grid to finish loading; resolves true when it has data rows.
+   * Settling on the first real outcome — rows, or the no-rows overlay — keeps a
+   * slow fetch from being reported the same way as a genuinely empty grid.
+   */
+  async _waitForGridSettled(timeout = 90000) {
+    // Do NOT race data rows against the no-rows overlay. ag-Grid displays that
+    // overlay while a fetch is still in flight, so the race resolved the moment
+    // the overlay appeared and reported an empty grid before the data had any
+    // chance to arrive — turning "still loading" into a false "0 rows".
+    //
+    // Instead: let the loading indicators clear, then give the rows the whole
+    // budget. Only a grid that produces no row in 90s is treated as empty.
+    const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
+    await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
+
+    // The app also renders its own "Loading..." element outside the ag-Grid
+    // overlay, so wait that out too before concluding anything.
+    await this.page
+      .getByText(/^\s*Loading\.\.\.\s*$/)
+      .first()
+      .waitFor({ state: 'hidden', timeout: 60000 })
+      .catch(() => {});
+
+    const appeared = await this.gridRow
+      .first()
+      .waitFor({ state: 'visible', timeout })
+      .then(() => true)
+      .catch(() => false);
+    return appeared && (await this.gridRow.count()) > 0;
+  }
+
+  /** Settles the grid, failing with a data-specific message when it is empty. */
+  async _requireGridRows(minimum = 1) {
+    await this._waitForGridSettled();
+    // Settling only guarantees the first row. When a scenario needs more than
+    // one, wait for that row specifically instead of counting straight away —
+    // rows stream in and an immediate count can catch the grid mid-render.
+    if (minimum > 1) {
+      await this.gridRow
+        .nth(minimum - 1)
+        .waitFor({ state: 'visible', timeout: 30000 })
+        .catch(() => {});
+    }
+    const count = await this.gridRow.count();
+    if (count >= minimum) return;
+    throw new Error(
+      `Contract Summary grid has ${count} row(s) for the selected depository and effective date, ` +
+      `but this scenario needs at least ${minimum}.`
+    );
+  }
+
   async selectFirstRow() {
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._requireGridRows();
     await this.gridRow.first().click();
   }
 
   async selectSecondRow() {
-    await this.gridRow.nth(1).waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._requireGridRows(2);
     await this.gridRow.nth(1).click();
   }
 
   async doubleClickFirstRow() {
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._requireGridRows();
     await this.gridRow.first().dblclick();
   }
 

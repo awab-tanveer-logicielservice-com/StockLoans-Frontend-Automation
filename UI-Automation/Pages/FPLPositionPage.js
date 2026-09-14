@@ -12,7 +12,7 @@ export class FPLPositionPage {
   async navigate() {
     const origin = new URL(this.page.url()).origin;
     await this.page.goto(`${origin}/fpl/accountPositions`);
-    await this.page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await this._dismissSplashScreen();
     // Wait for loading overlay to disappear, then for the header row
     await LOCATORS.FPLPositionsPage.loadingOverlay(this.page)

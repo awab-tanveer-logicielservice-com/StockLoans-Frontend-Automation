@@ -1,14 +1,14 @@
-import { createBdd } from 'playwright-bdd';
+﻿import { createBdd } from 'playwright-bdd';
 import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
 // NOTE: The following steps are already registered in other step files and are
 // reused here automatically by playwright-bdd:
-//   - "the user is logged in to the application"       → commonSteps.js
-//   - "the user navigates to the application"          → commonSteps.js
-//   - "the user logs in with valid credentials"        → LoginStepDef.js
-//   - "the user should be redirected to the dashboard" → LoginStepDef.js
+//   - "the user is logged in to the application"       â†’ commonSteps.js
+//   - "the user navigates to the application"          â†’ commonSteps.js
+//   - "the user logs in with valid credentials"        â†’ LoginStepDef.js
+//   - "the user should be redirected to the dashboard" â†’ LoginStepDef.js
 //
 // The following steps are defined HERE and shared with AddNewSecurity.feature
 // (addNewModalLayoutsPage._getSaveButton() falls back to 'Add' when no module is set):
@@ -19,7 +19,7 @@ const { Given, When, Then } = createBdd(test);
 //   - "the Save button should be enabled"
 //   - "the user closes the modal without saving"
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user navigates to the Users module', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.navigateTo('user');
@@ -33,13 +33,13 @@ When('the user navigates to the Entity module', async ({ addNewModalLayoutsPage 
     await addNewModalLayoutsPage.navigateTo('entity');
 });
 
-// ── Add New button ────────────────────────────────────────────────────────────
+// â”€â”€ Add New button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user clicks the Add New button', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.clickAddNewButton();
 });
 
-// ── Modal visibility ──────────────────────────────────────────────────────────
+// â”€â”€ Modal visibility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Then('the Add New User modal should be visible', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.verifyModalVisible();
@@ -53,7 +53,7 @@ Then('the Add New Entity modal should be visible', async ({ addNewModalLayoutsPa
     await addNewModalLayoutsPage.verifyModalVisible();
 });
 
-// ── Modal closed ──────────────────────────────────────────────────────────────
+// â”€â”€ Modal closed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Then('the Add New User modal should be closed', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.verifyModalClosed();
@@ -67,7 +67,7 @@ Then('the Add New Entity modal should be closed', async ({ addNewModalLayoutsPag
     await addNewModalLayoutsPage.verifyModalClosed();
 });
 
-// ── Theme-aware styling ───────────────────────────────────────────────────────
+// â”€â”€ Theme-aware styling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Then('the Add New User modal should be centered with theme-aware styling', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.verifyStyling();
@@ -81,7 +81,7 @@ Then('the Add New Entity modal should be centered with theme-aware styling', asy
     await addNewModalLayoutsPage.verifyStyling();
 });
 
-// ── Fill required fields ──────────────────────────────────────────────────────
+// â”€â”€ Fill required fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user fills in all required fields in the Add New User modal', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.fillRequiredFields('user');
@@ -95,7 +95,7 @@ When('the user fills in all required fields in the Add New Entity modal', async 
     await addNewModalLayoutsPage.fillRequiredFields('entity');
 });
 
-// ── Fill required except one ──────────────────────────────────────────────────
+// â”€â”€ Fill required except one â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user fills in all required fields except one in the Add New User modal', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.fillRequiredFieldsExceptOne('user');
@@ -109,7 +109,7 @@ When('the user fills in all required fields except one in the Add New Entity mod
     await addNewModalLayoutsPage.fillRequiredFieldsExceptOne('entity');
 });
 
-// ── Fill with existing data ───────────────────────────────────────────────────
+// â”€â”€ Fill with existing data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user fills in all required fields using details of an existing user', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.fillRequiredFieldsWithExisting('user');
@@ -123,7 +123,7 @@ When('the user fills in all required fields using details of an existing entity'
     await addNewModalLayoutsPage.fillRequiredFieldsWithExisting('entity');
 });
 
-// ── Grid assertions ───────────────────────────────────────────────────────────
+// â”€â”€ Grid assertions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Then('the Users grid should refresh with the new user record', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.verifyGridRefreshed();
@@ -149,16 +149,16 @@ Then('the Entity grid should remain unchanged', async ({ addNewModalLayoutsPage 
     await addNewModalLayoutsPage.verifyGridUnchanged();
 });
 
-// ── Toolbar visibility ────────────────────────────────────────────────────────
+// â”€â”€ Toolbar visibility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Then('the Add New button should be visible and enabled on the toolbar', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.verifyAddButtonEnabledOnToolbar();
 });
 
-// ── Read-only access ──────────────────────────────────────────────────────────
+// â”€â”€ Read-only access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Given('the user is logged in with read-only permissions', async ({ page, loginPage, testUsers }) => {
-    await page.setViewportSize({ width: 1900, height: 945 });
+    await page.setViewportSize({ width: 1536, height: 720 });
     await loginPage.navigate();
     await loginPage.login(
         testUsers.readOnlyUsername || testUsers.username,
@@ -170,7 +170,7 @@ Then('the Add New button should not be available or should be disabled', async (
     await addNewModalLayoutsPage.verifyAddButtonNotAvailable();
 });
 
-// ── Shared: Save / Success / Error / Close (also used by AddNewSecurity.feature) ─────
+// â”€â”€ Shared: Save / Success / Error / Close (also used by AddNewSecurity.feature) â”€â”€â”€â”€â”€
 
 When('the user clicks the Save button', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.clickSaveButton();
@@ -196,7 +196,7 @@ When('the user closes the modal without saving', async ({ addNewModalLayoutsPage
     await addNewModalLayoutsPage.closeModalWithoutSaving();
 });
 
-// ── Cross-module consistency ──────────────────────────────────────────────────
+// â”€â”€ Cross-module consistency â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user opens the Add New modal on the Users module', async ({ addNewModalLayoutsPage }) => {
     await addNewModalLayoutsPage.openModalOnModule('user');

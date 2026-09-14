@@ -1,0 +1,42 @@
+[
+  {
+    "password": "your_secret_password",
+    "symbols": ["META","GOOGL"],
+    "mpid": "VCTH",
+    "mode": "stress",
+    "messageType": "order",
+    "stressSize": 2000
+  },
+  {
+    "password": "your_secret_password",
+    "symbols": ["META","GOOGL"],
+    "mpid": "VCTH",
+    "mode": "stress",
+    "messageType": "order",
+    "stressSize": 4000
+  },
+  {
+    "password": "your_secret_password",
+    "symbols": ["META","GOOGL"],
+    "mpid": "VCTH",
+    "mode": "stress",
+    "messageType": "order",
+    "stressSize": 6000
+  },
+  {
+    "password": "your_secret_password",
+    "symbols": ["META","GOOGL"],
+    "mpid": "VCTH",
+    "mode": "stress",
+    "messageType": "order",
+    "stressSize": 8000
+  },
+  {
+    "password": "your_secret_password",
+    "symbols": ["META","GOOGL"],
+    "mpid": "VCTH",
+    "mode": "stress",
+    "messageType": "order",
+    "stressSize": 10000
+  }
+]

@@ -18,7 +18,18 @@ export class SearchLendingPitLookUpPage {
         if (!this.page.url().startsWith(target)) {
             await this.page.goto(target);
         }
-        await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+        await this.page.waitForLoadState('domcontentloaded').catch(() => {});
+        // Leave the page genuinely rendered: the verify* helpers below use
+        // isVisible(), which returns immediately instead of waiting.
+        await Promise.any([
+            this.searchHeaderRow.first().waitFor({ state: 'visible', timeout: 20000 }),
+            this.page.locator('ag-grid-angular, .ag-root-wrapper').first()
+                .waitFor({ state: 'visible', timeout: 20000 }),
+        ]).catch(() => {});
+        // Same reasoning as BulkSnapshotPage.navigateToBulkSnapshot: this page
+        // object's checks use isVisible(), which does not wait, so they need a
+        // settled layout. Bounded settle in place of the old 15s networkidle.
+        await this.page.waitForTimeout(2500);
     }
 
     async verifySearchHeaderVisible() {
@@ -116,14 +127,22 @@ export class SearchLendingPitLookUpPage {
     }
 
     async verifyGridDisplaysResults() {
-        // Try ag-grid rows, then table rows
+        // This used to end in `if (!visible) return;` — a soft pass that made the
+        // check unfailable, so a search returning nothing still reported "results
+        // shown". That is how TSLA sat in the Examples table expecting results
+        // long after Lending Pit stopped carrying it. Assert on real data rows.
+        //
+        // `.ag-center-cols-container .ag-row` is data rows only; the old fallback
+        // `[role="rowgroup"] [role="row"]` also matched the header row, so it
+        // would have reported success on an empty grid even without the soft pass.
         const agRows = this.page.locator('.ag-center-cols-container .ag-row');
-        const isAgRows = await agRows.first().isVisible({ timeout: 10000 }).catch(() => false);
-        if (!isAgRows) {
-            const tableRows = this.page.locator('tbody tr, [role="rowgroup"] [role="row"]');
-            const visible = await tableRows.first().waitFor({ state: 'visible', timeout: 45000 }).then(() => true).catch(() => false);
-            if (!visible) return; // QA env slow to load search results — soft pass
-        }
+        const tableRows = this.page.locator('tbody tr');
+        await Promise.race([
+            agRows.first().waitFor({ state: 'visible', timeout: 45000 }).catch(() => {}),
+            tableRows.first().waitFor({ state: 'visible', timeout: 45000 }).catch(() => {}),
+        ]);
+        const count = (await agRows.count()) || (await tableRows.count());
+        expect(count, 'Lending Pit search returned no data rows').toBeGreaterThan(0);
     }
 
     async verifyPageHeaderVisible() {
@@ -222,13 +241,23 @@ export class SearchLendingPitLookUpPage {
     }
 
     async verifyEmptyStateOverlay() {
-        // Accept: ag-grid overlay OR custom "No Data Available" empty state
-        const agOverlay = this.page.locator('.ag-overlay-no-rows-wrapper');
-        const customEmpty = LOCATORS.LendingPitLookupPage.emptyStateHeading(this.page);
-        const isAgOverlay = await agOverlay.isVisible({ timeout: 5000 }).catch(() => false);
-        if (!isAgOverlay) {
-            await customEmpty.waitFor({ state: 'visible', timeout: 15000 });
-        }
+        // Accept: ag-grid overlay OR custom "No Data Available" empty state.
+        //
+        // This used to probe the ag-Grid overlay with isVisible({ timeout }),
+        // which does NOT wait — Playwright accepts the option and ignores it, so
+        // the check returned false while the overlay was still rendering and the
+        // method then waited 15s for a custom heading this screen never shows.
+        // Race real waits on both instead, so whichever the app renders wins.
+        const agOverlay = this.page.locator('.ag-overlay-no-rows-wrapper').first();
+        const customEmpty = LOCATORS.LendingPitLookupPage.emptyStateHeading(this.page).first();
+        await Promise.race([
+            agOverlay.waitFor({ state: 'visible', timeout: 20000 }).catch(() => {}),
+            customEmpty.waitFor({ state: 'visible', timeout: 20000 }).catch(() => {}),
+        ]);
+        const shown =
+            (await agOverlay.isVisible().catch(() => false)) ||
+            (await customEmpty.isVisible().catch(() => false));
+        expect(shown, 'no empty-state indicator visible on the Lending Pit grid').toBe(true);
     }
 
     async verifyPageNotCrashed() {

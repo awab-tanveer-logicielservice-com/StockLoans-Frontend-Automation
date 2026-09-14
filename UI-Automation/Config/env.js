@@ -18,4 +18,13 @@ export const ENV = {
   get shortInterestRatesURL() {
     return `${new URL(this.baseURL).origin}/shortInterestRates`;
   },
+  // Reports and Short (Interest) Rate Adjustment pages are only exercised against
+  // the fixed dev-upgrade deployment, independent of whatever BASE_URL the rest
+  // of the suite targets — restored after being dropped when baseURL/etc. above
+  // became BASE_URL-driven getters.
+  devBaseURL: 'https://vcl-stockloan-dev-upgrade.web.app/login',
+  devDashboardURL: 'https://vcl-stockloan-dev-upgrade.web.app/contract-summary',
+  devShortInterestRatesURL: 'https://vcl-stockloan-dev-upgrade.web.app/shortInterestRates',
+  devShortRatesURL: 'https://vcl-stockloan-dev-upgrade.web.app/shortrates',
+  devReportsURL: 'https://vcl-stockloan-dev-upgrade.web.app/reports',
 };

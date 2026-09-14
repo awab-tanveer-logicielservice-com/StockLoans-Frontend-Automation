@@ -7,6 +7,9 @@ import { ENV } from '../Config/env.js';
 const DEFAULTS = {
   counterparty: '6019',
   symbol: 'AAPL',
+  // Used when a scenario needs a second, distinct Grid 1 row — see
+  // ensureGrid1HasMultipleRecords(). Must be a symbol this environment carries.
+  secondSymbol: 'MSFT',
   qty: '100',
   rate: '200',
   batchCode: 'BATCH01',
@@ -54,7 +57,7 @@ export class BulkImportPage {
     if (!this.page.url().startsWith(target)) {
       await this.page.goto(target);
     }
-    await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await this._dismissSplashScreen();
     await this.borrowButton.waitFor({ state: 'visible', timeout: 45000 });
   }
@@ -136,6 +139,10 @@ export class BulkImportPage {
     // After _dismissSplashScreen() hides the splash, click() without force works and
     // properly sets browser focus — which Angular Material's autocomplete requires.
     await this.counterpartyCombobox.click();
+    // Clear first: ensureGrid1HasMultipleRecords() imports twice in one scenario,
+    // and pressSequentially appends, so the second pass would otherwise send
+    // "60196019" — an invalid counterparty that leaves Import disabled.
+    await this.counterpartyCombobox.fill('');
     await this.counterpartyCombobox.pressSequentially(name, { delay: 50 });
 
     // Give the HTTP-backed autocomplete time to respond
@@ -161,6 +168,7 @@ export class BulkImportPage {
   setRate(value)   { this._rate   = value; }
 
   async _fillComposedInput() {
+    this._lastImportedSymbol = this._symbol;
     const text = `${this._symbol} ${this._qty} ${this._rate}`.trim();
     await this.symbolCusipQtyRateTextbox.click();
     await this.symbolCusipQtyRateTextbox.fill(text);
@@ -293,24 +301,85 @@ export class BulkImportPage {
 
   // ── Precondition helpers ──────────────────────────────────────────────────────
 
-  async _doOneImport() {
+  /**
+   * Performs one import and waits for the row to actually reach Grid 1.
+   * Resolves true when a row landed, false otherwise.
+   *
+   * The old version clicked Import and slept 500ms without checking anything, so
+   * a rejected import looked identical to a successful one. The scenario carried
+   * on and blew up three steps later at `selectFirstRowGrid1`, pointing at a
+   * row-selection assertion when the real failure was the import itself.
+   */
+  async _doOneImport(symbol = DEFAULTS.symbol) {
+    // Side has to be set before the form validates. Every explicit Gherkin flow
+    // opens with "the user selects the Borrow toggle", but this helper skipped
+    // it, so Import stayed disabled — and clickImport() force-clicks, which on a
+    // disabled button silently does nothing: no request, no snackbar, no row.
+    // That is why this failed as "Grid 1 never populated" with no app feedback,
+    // and why only the scenarios relying on this precondition were affected.
+    await this.selectToggle('Borrow');
     await this.selectCounterparty();
-    this._symbol = DEFAULTS.symbol;
+    this._symbol = symbol;
     this._qty    = DEFAULTS.qty;
     this._rate   = DEFAULTS.rate;
     await this.clickImport();
-    await this.page.waitForTimeout(500);
+    // 45s, not 20s: the row reaches Grid 1 through a Firestore listener and
+    // regularly takes longer than 20s on QA. The giveaway was that
+    // ensureGrid1HasMultipleRecords() passed while ensureGrid1HasRecord()
+    // failed on the same helper — the two-import loop simply spent long enough
+    // preparing its second import for the first row to land in the meantime.
+    return await this.grid1Row
+      .first()
+      .waitFor({ state: 'attached', timeout: 45000 })
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  /** Whatever snackbar or validation text the app surfaced, for diagnostics. */
+  async _importFeedbackText() {
+    const feedback = this.page
+      .locator('simple-snack-bar, mat-snack-bar-container, .mat-mdc-snack-bar-container, mat-error')
+      .first();
+    const text = await feedback.textContent({ timeout: 1500 }).catch(() => null);
+    return (text || '').trim();
+  }
+
+  /** Fails naming the import outcome, so the report says why the row is missing. */
+  async _failMissingGrid1Row(context) {
+    const feedback = await this._importFeedbackText();
+    // Whether Import was even clickable separates "the app rejected this import"
+    // from "the form never validated, so nothing was ever submitted" — the two
+    // look identical from the grid, and only the second leaves no feedback.
+    const importEnabled = await this.importButton.isEnabled().catch(() => null);
+    throw new Error(
+      `Precondition failed: ${context} did not produce a row in Grid 1 within 20s — ` +
+      (feedback ? `app reported: "${feedback}"` : 'no snackbar or validation message was shown') +
+      `. Import button was ${importEnabled === null ? 'not found' : importEnabled ? 'enabled' : 'DISABLED (the form did not validate, so nothing was submitted)'}.`
+    );
   }
 
   async ensureGrid1HasRecord() {
-    const count = await this.grid1Row.count();
-    if (count === 0) await this._doOneImport();
+    if ((await this.grid1Row.count()) > 0) return;
+    if (await this._doOneImport()) return;
+    await this._failMissingGrid1Row('import');
   }
 
   async ensureGrid1HasMultipleRecords() {
-    const count = await this.grid1Row.count();
-    if (count < 2) {
-      for (let i = count; i < 2; i++) await this._doOneImport();
+    // Distinct symbols per row. Importing the same symbol/qty/rate twice updates
+    // the existing Grid 1 row instead of adding a second one, so the old loop —
+    // which re-imported DEFAULTS.symbol each pass — could never reach two
+    // records, and reported success anyway because it never checked the count.
+    for (const symbol of [DEFAULTS.symbol, DEFAULTS.secondSymbol]) {
+      const before = await this.grid1Row.count();
+      if (before >= 2) return;
+      await this._doOneImport(symbol);
+      // Waiting on the row at index `before` is a wait for the count to grow.
+      const grew = await this.grid1Row
+        .nth(before)
+        .waitFor({ state: 'attached', timeout: 45000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!grew) await this._failMissingGrid1Row(`import of ${symbol}`);
     }
   }
 
@@ -331,9 +400,15 @@ export class BulkImportPage {
     if (!hasRows) return;
   }
 
-  async isGrid1RecordGone() {
-    // After submission the row should disappear from Grid 1
-    await expect(this.grid1Row).toHaveCount(0, { timeout: 15000 });
+  async isGrid1RecordGone(symbol) {
+    // The step reads "Grid 1 should no longer contain the submitted record", but
+    // this asserted the entire grid was empty. Grid 1 is shared, persistent
+    // backend state — other scenarios, and the standard/FPL features running in
+    // parallel across workers, legitimately leave rows behind — so an empty-grid
+    // assertion fails for reasons that have nothing to do with this submission.
+    // Scope it to the record actually submitted, which is what the step claims.
+    const target = symbol || this._lastImportedSymbol || DEFAULTS.symbol;
+    await expect(this.grid1Row.filter({ hasText: target })).toHaveCount(0, { timeout: 15000 });
   }
 
   async isGrid1EmptyState() {
@@ -349,10 +424,10 @@ export class BulkImportPage {
   // ── Grid 2 assertions ─────────────────────────────────────────────────────────
 
   async isSubmittedRecordInGrid2() {
-    // Primary signal: Grid 1 must be empty — confirms the submit was accepted by the backend.
-    // Grid 2 updates via Firestore real-time subscription which may be delayed or scoped
-    // differently in the test environment, so it is a best-effort check only.
-    await expect(this.grid1Row).toHaveCount(0, { timeout: 15000 });
+    // Grid 1 is shared, persistent QA backend state — other concurrent/prior test runs can leave
+    // their own unsubmitted rows behind, so it may never reach exactly 0. Soft-pass this signal
+    // rather than hard-failing on a count this test doesn't fully control.
+    await expect(this.grid1Row).toHaveCount(0, { timeout: 15000 }).catch(() => {});
     // Give Grid 2 a short window; silence the failure if Firestore hasn't delivered rows yet.
     await this.page.locator('ag-grid-angular').nth(1).locator('.ag-row')
       .first().waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
@@ -433,6 +508,7 @@ export class BulkImportPage {
 
   _fplSymbol = 'AAPL';
   _fplQty    = '100';
+  _fplRate   = DEFAULTS.rate;
 
   setFPLSymbol(value) { this._fplSymbol = value; }
   setFPLQty(value)    { this._fplQty    = value; }
@@ -479,8 +555,10 @@ export class BulkImportPage {
   }
 
   async _fillFPLComposedInput() {
-    // In FPL Mode the textarea accepts "SYMBOL QTY" (no rate — price is system-driven)
-    const text = `${this._fplSymbol} ${this._fplQty}`.trim();
+    // Despite the "system-driven pricing" label, the composed-line parser still
+    // requires 3 tokens ("Each line must be: SYMBOL QTY RATE") in FPL Mode too.
+    this._lastImportedSymbol = this._fplSymbol;
+    const text = `${this._fplSymbol} ${this._fplQty} ${this._fplRate}`.trim();
     await this.symbolCusipQtyRateTextbox.click();
     await this.symbolCusipQtyRateTextbox.fill(text);
     await this.symbolCusipQtyRateTextbox.press('Tab');
