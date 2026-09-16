@@ -80,7 +80,11 @@ export class RememberMePage {
   async clickLoginExpectingError() {
     await this.loginButton.waitFor({ state: 'visible', timeout: this.defaultTimeout });
     await this.loginButton.click({ force: true });
-    await this.page.waitForLoadState('networkidle', { timeout: this.defaultTimeout }).catch(() => {});
+    // The caller asserts on the error, so wait for it rather than for a load
+    // state that a failed login never produces.
+    await this.errorMessage
+      .waitFor({ state: 'visible', timeout: this.defaultTimeout })
+      .catch(() => {});
   }
 
   async loginWith(email, password, rememberMe = false) {
@@ -191,5 +195,37 @@ export class RememberMePage {
     return await this.page.evaluate(() => {
       return localStorage.getItem('rememberedEmail') || localStorage.getItem('email') || '';
     });
+  }
+
+  /**
+   * Writes a saved-credentials record straight into localStorage, using the same
+   * keys Remember Me itself writes, and reloads so the app picks it up.
+   *
+   * This exists so the "overwrites previously saved credentials" scenario does
+   * not need a second real account: the previous user only ever has to be
+   * *stored*, never authenticated, so seeding is both sufficient and honest.
+   * Only the account under test ever reaches the login form.
+   */
+  async seedSavedCredentials(email, password) {
+    await this.page.evaluate(({ email, password }) => {
+      localStorage.setItem('rememberMe', 'true');
+      localStorage.setItem('rememberedEmail', email);
+      localStorage.setItem('rememberedPassword', password);
+      localStorage.setItem('savedCredentials', JSON.stringify({ email, password }));
+    }, { email, password });
+    await this.page.reload();
+    await this.usernameInput.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+  }
+
+  /** Asserts the prefilled email is exactly the expected account. */
+  async assertEmailFieldIs(expectedEmail) {
+    const value = (await this.usernameInput.inputValue()).trim();
+    expect(value.toLowerCase()).toBe(expectedEmail.trim().toLowerCase());
+  }
+
+  /** Asserts the prefilled email is no longer the given (superseded) account. */
+  async assertEmailFieldIsNot(unexpectedEmail) {
+    const value = (await this.usernameInput.inputValue()).trim();
+    expect(value.toLowerCase()).not.toBe(unexpectedEmail.trim().toLowerCase());
   }
 }

@@ -72,7 +72,7 @@ Feature: FPL Accounts - SLS Account Editable Dropdown Column (SLL-234)
       | slsAccount |
       | SOFI       |
       | FPL Test   |
-      | GTN        |
+      | FGM1       |
 
   # ── End-to-End ───────────────────────────────────────────────────────────────
 

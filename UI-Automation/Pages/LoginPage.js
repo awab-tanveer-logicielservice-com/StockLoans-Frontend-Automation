@@ -63,7 +63,12 @@ export class LoginPage {
   async clickLoginButton() {
     await this.loginButton.waitFor({ state: 'visible', timeout: this.defaultTimeout });
     await this.loginButton.click({ force: true });
-    await this.page.waitForLoadState('networkidle', { timeout: this.defaultTimeout }).catch(() => {});
+    // Wait for an actual outcome — either we leave /login or an error renders —
+    // so callers asserting on either don't race the response.
+    await Promise.any([
+      this.page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: this.defaultTimeout }),
+      this.errorMessage.first().waitFor({ state: 'visible', timeout: this.defaultTimeout }),
+    ]).catch(() => {});
   }
 
   async clearEmailField() {

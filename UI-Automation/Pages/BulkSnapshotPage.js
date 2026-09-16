@@ -19,7 +19,23 @@ export class BulkSnapshotPage {
         if (!this.page.url().startsWith(target)) {
             await this.page.goto(target);
         }
-        await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+        await this.page.waitForLoadState('domcontentloaded').catch(() => {});
+        // Gate on the form actually being interactable: every subsequent step types
+        // into or clicks around this input.
+        await this.symbolOrCusipInput.first()
+            .waitFor({ state: 'visible', timeout: 20000 })
+            .catch(() => {});
+        await this.page.locator('.ag-overlay-loading-wrapper')
+            .waitFor({ state: 'hidden', timeout: 20000 })
+            .catch(() => {});
+        // Deliberate settle. This page object's verify* helpers use isVisible(),
+        // which returns immediately instead of waiting, so they need the layout to
+        // have stopped moving before they run — otherwise clicks land on shifting
+        // elements. That guarantee used to come as a side effect of a 15s
+        // networkidle wait that never actually fired; this is the same guarantee
+        // stated honestly and 5x cheaper. Removing it requires reworking the
+        // isVisible() call sites first.
+        await this.page.waitForTimeout(2500);
     }
 
     async openNavigationMenu() {
@@ -77,7 +93,18 @@ export class BulkSnapshotPage {
 
     async clickClearButton() {
         await this.clearButton.waitFor({ state: 'visible', timeout: this.defaultTimeout });
-        await this.clearButton.click();
+        // The button sits in a container Playwright cannot bring into view: it
+        // reports the button visible and enabled but "outside of the viewport",
+        // and scrollIntoViewIfNeeded() does not move the container. `force: true`
+        // does not help either — it skips the actionability checks but the click
+        // still needs viewport coordinates, so it fails with the same error.
+        // dispatchEvent fires the handler directly and needs no coordinates.
+        await this.clearButton.scrollIntoViewIfNeeded().catch(() => {});
+        try {
+            await this.clearButton.click({ force: true, timeout: 5000 });
+        } catch {
+            await this.clearButton.dispatchEvent('click');
+        }
     }
 
     async clearSymbolAndSubmit() {
@@ -181,14 +208,23 @@ export class BulkSnapshotPage {
     async verifyEmptyStateOverlay() {
         const customEmpty = LOCATORS.BulkSnapshotPage.emptyStateHeading(this.page);
         const startSearchingBtn = LOCATORS.BulkSnapshotPage.startSearchingButton(this.page);
-        const isCustomEmpty = await customEmpty.isVisible({ timeout: 5000 }).catch(() => false);
-        if (!isCustomEmpty) {
-            const isStartSearching = await startSearchingBtn.isVisible({ timeout: 5000 }).catch(() => false);
-            if (!isStartSearching) {
-                const agOverlay = this.page.locator('.ag-overlay-no-rows-wrapper');
-                await agOverlay.waitFor({ state: 'visible', timeout: 15000 });
-            }
-        }
+        const agOverlay = this.page.locator('.ag-overlay-no-rows-wrapper');
+
+        // The build renders one of three empty-state treatments. isVisible() does
+        // not wait, so wait for whichever one appears before asserting.
+        // Promise.any (not race): race would settle on the first *rejection*, so a
+        // locator erroring early would short-circuit the wait for the others.
+        await Promise.any([
+            customEmpty.first().waitFor({ state: 'visible', timeout: 15000 }),
+            startSearchingBtn.first().waitFor({ state: 'visible', timeout: 15000 }),
+            agOverlay.first().waitFor({ state: 'visible', timeout: 15000 }),
+        ]).catch(() => {});
+
+        const shown =
+            (await customEmpty.first().isVisible().catch(() => false)) ||
+            (await startSearchingBtn.first().isVisible().catch(() => false)) ||
+            (await agOverlay.first().isVisible().catch(() => false));
+        expect(shown, 'no empty-state indicator visible on Bulk Snapshot').toBe(true);
     }
 
     async verifyEmptyStateOrValidation() {

@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 import { LOCATORS } from '../utils/locators.js';
 import { ENV } from '../Config/env.js';
 import { devUsers } from '../utils/testdata.js';
+import { waitForRouteSettled } from '../utils/waits.js';
 
 export class ShortRateAdjustmentPage {
   constructor(page) {
@@ -75,7 +76,7 @@ export class ShortRateAdjustmentPage {
 
   async _loginToDev() {
     await this.page.goto(ENV.devBaseURL);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     const user = process.env.E2E_DEV_USER || devUsers.username;
     const pwd  = process.env.E2E_DEV_PWD  || devUsers.password;
     await LOCATORS.LoginPage.usernameInput(this.page).fill(user);
@@ -87,12 +88,14 @@ export class ShortRateAdjustmentPage {
   async navigateToPage() {
     const targetURL = ENV.devShortRatesURL || ENV.shortRatesURL;
     await this.page.goto(targetURL);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    // Settle the route before checking for the auth bounce: resolves as soon as
+    // either the grid renders or the guard redirects to /login.
+    await waitForRouteSettled(this.page, this.grid);
 
     if (this.page.url().includes('/login')) {
       await this._loginToDev();
       await this.page.goto(targetURL);
-      await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+      await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     }
 
     await this._dismissSplashScreen();

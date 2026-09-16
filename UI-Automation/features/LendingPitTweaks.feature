@@ -166,10 +166,14 @@ Feature: Lending Pit UI Tweaks and Ag-Grid Migration (SLL-206)
     Then the expected search outcome should be "<outcome>"
 
     Examples:
+    # Lending Pit carries data for AAPL, MSFT, GOOGL and NVDA only. TSLA used to
+    # sit in this table expecting "results shown" and passed anyway, because
+    # verifyGridDisplaysResults() soft-passed when the grid came back empty.
       | symbol       | outcome       |
       | AAPL         | results shown |
       | MSFT         | results shown |
-      | TSLA         | results shown |
+      | NVDA         | results shown |
+      | GOOGL        | results shown |
       | ZZZZINVALID  | empty grid    |
       |              | empty grid    |
 

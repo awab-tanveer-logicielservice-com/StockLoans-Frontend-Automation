@@ -173,7 +173,7 @@ export const LOCATORS = {
      * Menu button for navigation
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
 
     /**
      * FPL Accounts navigation link
@@ -262,7 +262,9 @@ export const LOCATORS = {
      * @param {Page} page - The page object
      * @param {string} optionName - The option name to select
      */
-    getDropdownOption: (page, optionName) => page.getByRole('option', { name: optionName }),
+    // .first(): substring name matching can resolve to multiple options (e.g. "FPL Test"
+    // matches "FPL Test 3".."FPL Test 9") — any one matching option satisfies the intent here.
+    getDropdownOption: (page, optionName) => page.getByRole('option', { name: optionName }).first(),
 
     /**
      * Mat-select dropdown by ID
@@ -279,7 +281,7 @@ export const LOCATORS = {
     focusedGridCell: (page) => page.locator('.ag-cell.ag-cell-with-height.ag-cell-value.ag-cell-range-right.ag-cell-focus'),
 
     slsAccountColumnHeader: (page) => page.getByRole('columnheader', { name: 'SLS Account' }),
-    slsAccountCell: (page) => page.locator('TODO: add selector — SLS Account gridcell in AG Grid (col-id="slsAccount")'),
+    slsAccountCell: (page) => page.locator('.ag-cell[col-id="name"]'),
     slsAccountDropdown: (page) => page.locator('mat-select').first(),
     slsAccountDropdownOption: (page) => page.locator('mat-option'),
   },
@@ -394,7 +396,7 @@ export const LOCATORS = {
      * Menu button (hamburger/navigation)
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
 
     /**
      * Entities navigation link
@@ -411,7 +413,7 @@ export const LOCATORS = {
      * Menu button for navigation
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
 
     /**
      * Bulk Import navigation link
@@ -447,7 +449,8 @@ export const LOCATORS = {
      * Combined Symbol/CUSIP Qty Rate text input (accessible name is all-caps in the app)
      * Strategy: Playwright's getByRole for textbox (case-insensitive match)
      */
-    symbolCusipQtyRateTextbox: (page) => page.getByRole('textbox', { name: /symbol.cusip.qty.rate/i }),
+    // FPL Mode's label drops "CUSIP" ("Symbol Qty Rate" vs. standard mode's "Symbol/Cusip Qty Rate")
+    symbolCusipQtyRateTextbox: (page) => page.getByRole('textbox', { name: /symbol.*qty.*rate/i }),
 
     /**
      * Import button — caption may be "Import" or "Import (N)" depending on state
@@ -560,7 +563,7 @@ export const LOCATORS = {
      * Menu button for navigation
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
 
     /**
      * Users navigation link
@@ -588,7 +591,7 @@ export const LOCATORS = {
      * Menu button for navigation
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
 
     /**
      * Counterparties navigation link
@@ -738,7 +741,7 @@ export const LOCATORS = {
      * Menu button for navigation
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
 
     /**
      * Security Master navigation link
@@ -925,7 +928,7 @@ export const LOCATORS = {
      * Menu button for navigation
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
 
     /**
      * Lending Pit Lookup navigation link
@@ -965,7 +968,13 @@ export const LOCATORS = {
      * "No Data Available" custom empty-state heading shown before any search
      * Strategy: CSS heading selector
      */
-    emptyStateHeading: (page) => page.getByRole('heading', { name: 'No Data Available' }),
+    // The build renders its empty state as a plain div reading "No Rows To Show",
+    // rendered as a sibling *outside* the grid — not as a heading, and not inside
+    // .ag-overlay-no-rows-wrapper. Matching only the old 'No Data Available'
+    // heading meant this locator never resolved on either screen. Match on text
+    // so any of the wordings the build has used still counts as an empty state.
+    emptyStateHeading: (page) =>
+      page.getByText(/no rows to show|no data available|no results/i).first(),
 
     /**
      * "Start Searching" prompt button inside the custom empty state
@@ -992,21 +1001,38 @@ export const LOCATORS = {
   // BULK SNAPSHOT PAGE LOCATORS
   // ============================================
   BulkSnapshotPage: {
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
     bulkSnapshotLink: (page) => page.getByRole('link', { name: 'Bulk Snapshot' }),
     /** Multi-line textarea — one symbol/CUSIP per line */
     symbolOrCusipInput: (page) => page.getByLabel(/symbol or cusip/i).first(),
     /** Blue "FETCH RATES" submit button below the textarea */
     submitButton: (page) => page.getByRole('button', { name: /fetch rates/i }).first(),
-    /** "CLEAR" button — resets the textarea */
-    clearButton: (page) => page.getByRole('button', { name: /^clear$/i }),
+    /** "CLEAR" button — resets the textarea. Scoped to the raised-button variant since
+     *  an unrelated date-filter widget on the same page also has its own "Clear" button. */
+    // Two "Clear" buttons exist on this screen: the search form's (beside "Fetch
+    // Rates") and the Trade panel's (beside Rebate Rate / Comment / Submit). The
+    // old `button.mat-mdc-raised-button` + /clear/i match resolved to the Trade
+    // panel's, which sits off-screen — so the click failed with "outside of the
+    // viewport", and once forced through it cleared the wrong form. Anchor to the
+    // search form by way of the Fetch Rates button it sits next to.
+    clearButton: (page) =>
+      page
+        .locator('div:has(> button:has-text("Fetch Rates"))')
+        .getByRole('button', { name: /^\s*clear\s*$/i })
+        .first(),
     /** "Use cached rates" checkbox — checked by default */
     useCachedRatesCheckbox: (page) => page.getByRole('checkbox', { name: /use cached rates/i }),
     /** "Start Searching" button inside the empty state panel */
     startSearchingButton: (page) => page.getByRole('button', { name: 'Start Searching' }),
     pageHeading: (page) => page.getByRole('heading', { name: /bulk snapshot/i }),
     /** "No Data Available" empty state heading */
-    emptyStateHeading: (page) => page.getByRole('heading', { name: 'No Data Available' }),
+    // The build renders its empty state as a plain div reading "No Rows To Show",
+    // rendered as a sibling *outside* the grid — not as a heading, and not inside
+    // .ag-overlay-no-rows-wrapper. Matching only the old 'No Data Available'
+    // heading meant this locator never resolved on either screen. Match on text
+    // so any of the wordings the build has used still counts as an empty state.
+    emptyStateHeading: (page) =>
+      page.getByText(/no rows to show|no data available|no results/i).first(),
     resultsGrid: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
     getGridcell: (page, cellName) => page.getByRole('gridcell', { name: cellName }),
   },
@@ -1188,7 +1214,7 @@ export const LOCATORS = {
   // USER ROLES PAGE LOCATORS
   // ============================================
   UserRolesPage: {
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
     usersLink: (page) => page.getByRole('link', { name: 'Users' }),
     addNewUserButton: (page) => page.getByRole('button', { name: 'ADD NEW USER' }),
 
@@ -1231,7 +1257,7 @@ export const LOCATORS = {
      * Generic menu button (reusable)
      * Strategy: Chained getByRole with filter
      */
-    menuButton: (page) => page.getByRole('button').filter({ hasText: 'menu' }),
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
   },
 
   // ============================================
@@ -1255,5 +1281,77 @@ export const LOCATORS = {
     cusipColumnHeader:  (page) => page.locator('.ag-header-cell').filter({ hasText: 'Cusip' }).first(),
     rateColumnHeader:   (page) => page.locator('.ag-header-cell').filter({ hasText: 'Rate' }).first(),
     sourceColumnHeader: (page) => page.locator('.ag-header-cell').filter({ hasText: 'Source' }).first(),
+  },
+
+  // ============================================
+  // ACCESS REVIEW PAGE LOCATORS (SLL-236)
+  // ============================================
+  // The Access Review screen is not built yet (SLL-236 is To Do), so every
+  // selector below is a role/label-first best guess derived from the ticket and
+  // from how the rest of this Angular Material + AG-Grid app is structured.
+  // TODO(SLL-236): confirm each one against the built UI before enabling the
+  // feature file in playwright.config.js.
+  AccessReviewPage: {
+    pageHeading: (page) => page.getByRole('heading', { name: /access review/i }),
+
+    // ── Request form ──
+    /** Opens the new access review request form */
+    initiateRequestButton: (page) => page.getByRole('button', { name: /initiate|new access review|raise request/i }).first(),
+    /** User whose role is being changed */
+    targetUserInput: (page) => page.getByLabel(/target user|user/i).first(),
+    /** Role being granted or revoked */
+    roleSelect: (page) => page.getByLabel(/role/i).first(),
+    firstApproverInput: (page) => page.getByLabel(/first approver|approver 1/i).first(),
+    secondApproverInput: (page) => page.getByLabel(/second approver|approver 2/i).first(),
+    /** Chips or list showing the approvers currently attached to the request */
+    selectedApproversList: (page) => page.locator('[class*="approver"]').first(),
+    justificationInput: (page) => page.getByLabel(/justification|reason|comments/i).first(),
+    submitRequestButton: (page) => page.getByRole('button', { name: /^submit/i }).first(),
+
+    // ── Grid / queues ──
+    requestsGrid: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
+    gridRows: (page) => page.locator('.ag-center-cols-container .ag-row'),
+    emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper').first(),
+    statusFilter: (page) => page.getByLabel(/status/i).first(),
+    myRequestsTab: (page) => page.getByRole('tab', { name: /my requests/i }),
+    pendingApprovalsTab: (page) => page.getByRole('tab', { name: /pending approval/i }),
+    allRequestsTab: (page) => page.getByRole('tab', { name: /all requests/i }),
+
+    // ── Request details ──
+    detailsPanel: (page) => page.locator('mat-dialog-container, [class*="details-panel"]').first(),
+    requestStatus: (page) => page.locator('[class*="status"]').first(),
+    auditTrail: (page) => page.locator('[class*="audit"], [class*="history"]').first(),
+    /** "first" / "second" approver section inside the details panel */
+    approverTab: (page, which) => page.getByRole('tab', { name: new RegExp(`${which} approver`, 'i') }),
+
+    // ── Decision actions ──
+    acceptButton: (page) => page.getByRole('button', { name: /^accept$/i }),
+    rejectButton: (page) => page.getByRole('button', { name: /^reject$/i }),
+    rejectionReasonInput: (page) => page.getByLabel(/rejection reason|reason/i).first(),
+    finalApprovalButton: (page) => page.getByRole('button', { name: /final approval|approve request/i }),
+    finalRejectButton: (page) => page.getByRole('button', { name: /final reject|decline request/i }),
+    /** Confirmation dialog that some Material flows put behind a decision */
+    confirmDialogButton: (page) => page.getByRole('button', { name: /^(confirm|yes|ok)$/i }).first(),
+
+    // ── Export ──
+    exportButton: (page) => page.getByRole('button', { name: /export/i }).first(),
+    exportFormatOption: (page, format) => page.getByRole('menuitem', { name: new RegExp(format, 'i') }),
+
+    // ── Feedback ──
+    snackBar: (page) => page.locator('mat-snack-bar-container'),
+    validationError: (page) => page.locator('mat-error'),
+
+    /** Form values the scenarios fill in. Override per environment via env vars. */
+    defaults: {
+      requester: process.env.AR_REQUESTER || 'awab.tanveer@vcttechnologiesllc.com',
+      targetUser: process.env.AR_TARGET_USER || 'hussain.raza@logicielservice.com',
+      role: process.env.AR_ROLE || 'Can approve contracts',
+      approvers: [
+        process.env.AR_APPROVER_1 || 'approver.one@logicielservice.com',
+        process.env.AR_APPROVER_2 || 'approver.two@logicielservice.com',
+      ],
+      justification: 'Role change required for desk transfer — raised by automation.',
+      rejectionReason: 'Rejected by automated regression check.',
+    },
   },
 };

@@ -1,4 +1,4 @@
-import { createBdd } from 'playwright-bdd';
+﻿import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 import { test } from './fixtures.js';
 import { UserRolesPage } from '../Pages/UserRolesPage.js';
@@ -8,7 +8,7 @@ const { Given, When, Then } = createBdd(test);
 // Tracks roles added within the current scenario for context-aware "all three roles" assertion
 const _recentlyAddedRoles = [];
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user navigates to the User Management page', async ({ userRolesPage }) => {
   await userRolesPage.navigateToUsers();
@@ -40,17 +40,17 @@ When('the user navigates to the User Roles sub-page for a user with no assigned 
     const ariaChecked = await firstSwitch.getAttribute('aria-checked').catch(() => 'true');
     if (ariaChecked !== 'true') return; // Found a user with at least one unassigned role
   }
-  // No fully-unassigned user found — proceed with whoever is open
+  // No fully-unassigned user found â€” proceed with whoever is open
 });
 
 When('the user reloads the User Roles sub-page for the same user', async ({ userRolesPage }) => {
   await userRolesPage.reloadPage();
-  // After reload the side panel is closed — re-open the first user and click the Roles tab
+  // After reload the side panel is closed â€” re-open the first user and click the Roles tab
   await userRolesPage.openFirstUserDetails();
   await userRolesPage.clickUserRolesTab();
 });
 
-// ── Role add / remove ─────────────────────────────────────────────────────────
+// â”€â”€ Role add / remove â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user adds the {string} role', async ({ userRolesPage }, roleName) => {
   _recentlyAddedRoles.push(roleName);
@@ -73,7 +73,7 @@ When('the user removes all assigned roles', async ({ userRolesPage }) => {
   await userRolesPage.removeAllRoles();
 });
 
-// ── Pre-condition setup steps ─────────────────────────────────────────────────
+// â”€â”€ Pre-condition setup steps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Given('the {string} role is currently assigned to the user', async ({ userRolesPage }, roleName) => {
   await userRolesPage.addRole(roleName);
@@ -103,7 +103,7 @@ Given('the user removes the {string} role and saves', async ({ userRolesPage }, 
   await userRolesPage.verifySuccessSnackBar();
 });
 
-// ── Save / Cancel ─────────────────────────────────────────────────────────────
+// â”€â”€ Save / Cancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 When('the user saves the role changes', async ({ userRolesPage }) => {
   await userRolesPage.saveRoles();
@@ -117,7 +117,7 @@ When('the user navigates away from the page without saving', async ({ userRolesP
   await userRolesPage.navigateToUsers();
 });
 
-// ── Multi-user steps (simplified: treats the same user as "User A" and "User B") ──
+// â”€â”€ Multi-user steps (simplified: treats the same user as "User A" and "User B") â”€â”€
 
 When('the user assigns {string} to User A and saves', async ({ userRolesPage }, roleName) => {
   await userRolesPage.navigateToUserRolesSubpage();
@@ -134,18 +134,18 @@ When('the user attempts to navigate to the User Roles sub-page', async ({ userRo
   await userRolesPage.navigateToUserRolesSubpage().catch(() => {});
 });
 
-// ── Admin access steps ────────────────────────────────────────────────────────
+// â”€â”€ Admin access steps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Given('the user is logged in as an administrator', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1900, height: 945 });
+  await page.setViewportSize({ width: 1536, height: 720 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });
 
 Given('the user is logged in without administrator privileges', async ({ page, loginPage }) => {
-  await page.setViewportSize({ width: 1900, height: 945 });
+  await page.setViewportSize({ width: 1536, height: 720 });
   await loginPage.navigate();
-  // Attempt with a restricted account — skip gracefully if no restricted user is configured
+  // Attempt with a restricted account â€” skip gracefully if no restricted user is configured
   // This step is a placeholder: configure E2E_READONLY_USER / E2E_READONLY_PWD env vars for full coverage
   const readonlyUser = process.env.E2E_READONLY_USER;
   const readonlyPwd = process.env.E2E_READONLY_PWD;
@@ -156,7 +156,7 @@ Given('the user is logged in without administrator privileges', async ({ page, l
   }
 });
 
-// ── Assertions ────────────────────────────────────────────────────────────────
+// â”€â”€ Assertions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Then('the User Roles sub-page should be visible within User Details', async ({ userRolesPage }) => {
   await userRolesPage.verifyUserRolesSubpageVisible();
@@ -250,13 +250,13 @@ Then('the role list should indicate no roles are currently assigned', async ({ u
   const rolesPanel = userRolesPage.page.getByRole('tabpanel', { name: 'Roles' });
   const panelVisible = await rolesPanel.isVisible({ timeout: 5000 }).catch(() => false);
   if (!panelVisible) {
-    console.warn('[WARN] Roles tabpanel not visible — soft-passing "no roles" scenario');
+    console.warn('[WARN] Roles tabpanel not visible â€” soft-passing "no roles" scenario');
     return;
   }
   const firstSwitch = rolesPanel.getByRole('switch').first();
   const ariaChecked = await firstSwitch.getAttribute('aria-checked').catch(() => null);
   if (ariaChecked === 'true') {
-    console.warn('[WARN] No user with zero roles found in test environment — soft-passing');
+    console.warn('[WARN] No user with zero roles found in test environment â€” soft-passing');
     return;
   }
   for (const role of UserRolesPage.allRoles) {

@@ -36,3 +36,13 @@ VansahConfig.json
 # Allure Reports
 allure-results/
 allure-report/
+allure-results-*/
+allure-report-*/
+
+# Captured Firebase session from the auth setup project
+UI-Automation/.auth/
+
+# Confluence personal API token used by .claude/scripts/confluence-publish.cjs
+# (.claude/ is already ignored above; this is belt-and-braces — never commit this file)
+.confluence-creds.json
+.claude/.confluence-creds.json

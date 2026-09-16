@@ -25,7 +25,7 @@ export class UserRolesPage {
   async navigateToUsers() {
     const origin = new URL(this.page.url()).origin;
     await this.page.goto(`${origin}/users`);
-    await this.page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await LOCATORS.UserRolesPage.addNewUserButton(this.page).waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
   }
 

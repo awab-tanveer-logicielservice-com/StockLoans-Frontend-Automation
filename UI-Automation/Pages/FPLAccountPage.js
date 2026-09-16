@@ -41,7 +41,7 @@ export class FPLAccountPage {
   async navigate() {
     await this.page.goto(ENV.dashboardURL);
     try {
-      await this.page.waitForLoadState('networkidle', { timeout: this.defaultTimeout });
+      await this.page.waitForLoadState('domcontentloaded');
     } catch (e) {}
     await this._dismissSplashScreen();
   }
@@ -70,7 +70,7 @@ export class FPLAccountPage {
   async navigateToFPLAccounts() {
     const origin = new URL(this.page.url()).origin;
     await this.page.goto(`${origin}/fpl/accounts`);
-    await this.page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
     await this._dismissSplashScreen();
     // Wait for grid loading overlay to disappear before checking rows
     await this.page.locator('.ag-loading, [class*="Loading"]').waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
@@ -219,6 +219,13 @@ export class FPLAccountPage {
       await cell.click();
     } catch (e) {
       await cell.click({ force: true });
+    }
+    // The AG-Grid cell editor renders a closed mat-select — it doesn't auto-open its
+    // options panel, so the trigger itself needs an explicit click to reveal mat-options.
+    const dropdown = LOCATORS.FPLAccountPage.slsAccountDropdown(this.page);
+    const visible = await dropdown.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
+    if (visible) {
+      await dropdown.click().catch(() => {});
     }
   }
 

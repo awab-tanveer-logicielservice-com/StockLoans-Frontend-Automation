@@ -38,7 +38,10 @@ export class ContractDetailsPage {
     }
     await this.grid.waitFor({ state: 'visible', timeout: 30000 });
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
+    // Short grace period only: if the grid already finished loading, the overlay
+    // never appears and this wait is pure dead time. 1s is enough to catch the
+    // overlay when it does show; the 'hidden' wait below does the real work.
+    await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
     await loadingOverlay.waitFor({ state: 'hidden', timeout: 120000 }).catch(() => {});
   }
 
@@ -107,7 +110,7 @@ export class ContractDetailsPage {
     await this.applyButton.click();
     // Wait for the loading overlay to appear then disappear (confirms API call completed)
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
     await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
     await this.page.waitForTimeout(1000);
   }
@@ -323,9 +326,7 @@ export class ContractDetailsPage {
   // ── Master-Detail ──────────────────────────────────────────────────────────
 
   async expandFirstRow() {
-    const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: 30000 });
+    await this._requireGridRows();
     await this.page.locator('.ag-group-contracted').first().click();
     await this.page.waitForTimeout(1000);
   }
@@ -348,6 +349,51 @@ export class ContractDetailsPage {
 
   // ── Row Selection ──────────────────────────────────────────────────────────
 
+  /**
+   * Waits for the grid to finish loading; resolves true when it has data rows.
+   *
+   * Waiting on `.ag-overlay-loading-wrapper` is not sufficient — this screen
+   * renders its own "Loading..." indicator outside the ag-Grid overlay, so that
+   * wait returns while the fetch is still in flight and the row wait then burns
+   * its whole budget against a grid that is still empty. Settling on the first
+   * real outcome (rows, or the no-rows overlay) both survives a slow fetch and
+   * lets callers tell "slow" apart from "genuinely empty".
+   */
+  async _waitForGridSettled(timeout = 90000) {
+    // Do NOT race data rows against the no-rows overlay. ag-Grid shows that
+    // overlay while a fetch is still in flight, so the race resolved as soon as
+    // it appeared and reported an empty grid before the data had a chance to
+    // arrive — reporting "still loading" as a confident "0 rows".
+    //
+    // Let the loading indicators clear first, then give rows the whole budget.
+    const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
+    await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
+
+    // The app renders its own "Loading..." element outside the ag-Grid overlay.
+    await this.page
+      .getByText(/^\s*Loading\.\.\.\s*$/)
+      .first()
+      .waitFor({ state: 'hidden', timeout: 60000 })
+      .catch(() => {});
+
+    const appeared = await this.gridRow
+      .first()
+      .waitFor({ state: 'visible', timeout })
+      .then(() => true)
+      .catch(() => false);
+    return appeared && (await this.gridRow.count()) > 0;
+  }
+
+  /** Settles the grid, failing with a data-specific message when it is empty. */
+  async _requireGridRows() {
+    if (await this._waitForGridSettled()) return;
+    throw new Error(
+      'Contract Details grid has no rows for the selected depository and effective date — ' +
+      'this scenario requires at least one contract to select.'
+    );
+  }
+
   async _clickRow(row) {
     // Prefer the AG-Grid selection checkbox; fall back to clicking the row itself
     const checkbox = row.locator('.ag-selection-checkbox').first();
@@ -360,18 +406,18 @@ export class ContractDetailsPage {
   }
 
   async selectFirstRow() {
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._requireGridRows();
     await this._clickRow(this.gridRow.first());
   }
 
   async selectFirstOpenRow() {
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._requireGridRows();
     const openRow = this.gridRow.filter({ hasText: 'Open' }).first();
     await this._clickRow((await openRow.count() > 0 && await openRow.isVisible()) ? openRow : this.gridRow.first());
   }
 
   async selectFirstOpenLoanRow() {
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._requireGridRows();
     // Loan-side rows: try text patterns, then fall back to non-Borrow Open rows
     const patterns = [/\bLoan\b/, /\bLN\b/];
     for (const p of patterns) {
@@ -384,7 +430,7 @@ export class ContractDetailsPage {
   }
 
   async selectFirstOpenBorrowRow() {
-    const hasRows = await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
+    const hasRows = await this._waitForGridSettled();
     if (!hasRows) return;
     const borrowRow = this.gridRow.filter({ hasText: 'Open' }).filter({ hasText: /\bBorrow\b/ }).first();
     if (await borrowRow.count() > 0 && await borrowRow.isVisible()) {
@@ -396,14 +442,13 @@ export class ContractDetailsPage {
   }
 
   async selectFirstClosedRow() {
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
+    await this._requireGridRows();
     const closedRow = this.gridRow.filter({ hasText: 'Closed' }).first();
     await this._clickRow((await closedRow.count() > 0 && await closedRow.isVisible()) ? closedRow : this.gridRow.first());
   }
 
   async selectMultipleRows() {
-    const hasRows = await this.gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout })
-      .then(() => true).catch(() => false);
+    const hasRows = await this._waitForGridSettled();
     if (!hasRows) return;
     await this.gridRow.first().click({ force: true });
     const isMac = process.platform === 'darwin';
