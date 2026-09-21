@@ -1,5 +1,5 @@
 // QA account (https://qa-sls-v2.web.app). Used for any BASE_URL that isn't a
-// 'dev' URL — see the switch in fixtures.js / auth.setup.js.
+// 'dev' URL - see the switch in fixtures.js / auth.setup.js.
 // The previous default here (awab.tanveer@vcttechnologiesllc.com) no longer
 // authenticates on QA: login stays on /login until the 60s timeout.
 export const users = {
@@ -17,7 +17,7 @@ export const devUsers = {
  * -> admin). There are no dedicated accounts on the test environments yet, so
  * each role falls back to the primary account unless its env vars are set.
  * Until real accounts exist, the role-restriction scenarios exercise what the
- * primary account is allowed to see rather than a genuinely separate identity —
+ * primary account is allowed to see rather than a genuinely separate identity -
  * set these before trusting those results.
  */
 export function accessReviewRoleUsers(fallback) {

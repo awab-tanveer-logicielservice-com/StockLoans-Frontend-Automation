@@ -3,7 +3,7 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// ── Import mode toggle ────────────────────────────────────────────────────────
+// --- Import mode toggle ---
 
 When('the user activates FPL Mode', async ({ bulkImportPage }) => {
   await bulkImportPage.activateFPLMode();
@@ -13,7 +13,7 @@ When('the user switches back to standard import mode', async ({ bulkImportPage }
   await bulkImportPage.deactivateFPLMode();
 });
 
-// ── Page-level assertions ─────────────────────────────────────────────────────
+// --- Page-level assertions ---
 
 Then('the FPL Mode interface should be displayed', async ({ bulkImportPage }) => {
   await bulkImportPage.isFPLModeActive();
@@ -31,7 +31,7 @@ Then('the rate field should not be required in FPL Mode', async ({ bulkImportPag
   await bulkImportPage.isFPLRateFieldAbsent();
 });
 
-// ── Form fill — FPL symbol & quantity ────────────────────────────────────────
+// --- Form fill - FPL symbol & quantity ---
 
 When('the user enters a valid FPL symbol', async ({ bulkImportPage }) => {
   bulkImportPage.setFPLSymbol('AAPL');
@@ -49,19 +49,19 @@ When('the user enters {string} as the FPL allocation quantity', async ({ bulkImp
   bulkImportPage.setFPLQty(value);
 });
 
-// ── Import action ─────────────────────────────────────────────────────────────
+// --- Import action ---
 
 When('the user clicks the FPL import button', async ({ bulkImportPage }) => {
   await bulkImportPage.clickFPLImport();
 });
 
-// ── Precondition helpers ──────────────────────────────────────────────────────
+// --- Precondition helpers ---
 
 Given('at least one FPL allocation record exists in Grid 1', async ({ bulkImportPage }) => {
   await bulkImportPage.ensureGrid1HasFPLRecord();
 });
 
-// ── Grid 1 assertions ─────────────────────────────────────────────────────────
+// --- Grid 1 assertions ---
 
 Then('Grid 1 should display the imported FPL allocation record', async ({ bulkImportPage }) => {
   await bulkImportPage.isGrid1FPLRecordVisible();
@@ -75,13 +75,13 @@ Then('the system should apply pricing automatically for the FPL allocation', asy
   await bulkImportPage.isFPLSystemPricingApplied();
 });
 
-// ── Grid 2 assertions ─────────────────────────────────────────────────────────
+// --- Grid 2 assertions ---
 
 Then('Grid 2 should display the FPL submission history', async ({ bulkImportPage }) => {
   await bulkImportPage.isGrid2FPLHistoryVisible();
 });
 
-// ── Validation error assertions ───────────────────────────────────────────────
+// --- Validation error assertions ---
 
 Then('a validation error for the FPL Symbol field should be displayed', async ({ bulkImportPage }) => {
   await bulkImportPage.isFPLValidationErrorVisible();
@@ -91,7 +91,7 @@ Then('a validation error for the FPL Quantity field should be displayed', async 
   await bulkImportPage.isFPLValidationErrorVisible();
 });
 
-// ── Scenario Outline outcome ──────────────────────────────────────────────────
+// --- Scenario Outline outcome ---
 
 Then('the expected FPL import outcome should be {string}', async ({ bulkImportPage }, outcome) => {
   await bulkImportPage.assertFPLOutcome(outcome);

@@ -1,10 +1,10 @@
-@smokeBDD @Smoke @Regression @SLL-169
+@Smoke @Regression @SLL-169
 Feature: Login Functionality - Firebase Authentication
   As a user of the SLS v2 application
   I want to securely log in using Firebase Authentication
   So that I can access the StockLoans platform
 
-  @smokeBDD @Smoke @Regression @SLL-169
+  @Smoke @Regression @SLL-169
   Scenario: Successful login with valid credentials redirects to Contract Summary dashboard
     Given the user navigates to the application
     When the user logs in with valid credentials

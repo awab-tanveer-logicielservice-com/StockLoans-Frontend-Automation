@@ -63,7 +63,7 @@ export class UserRolesPage {
   }
 
   async isRoleAssigned(roleName) {
-    // Wait for all 14 switches to be present — ensures the tabpanel has fully re-rendered
+    // Wait for all 14 switches to be present - ensures the tabpanel has fully re-rendered
     const rolesPanel = this.page.getByRole('tabpanel', { name: 'Roles' });
     await rolesPanel.getByRole('switch').nth(ALL_14_ROLES.length - 1)
       .waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
@@ -146,7 +146,7 @@ export class UserRolesPage {
   }
 
   async cancelChanges() {
-    // No Cancel button — navigate away to discard changes
+    // No Cancel button - navigate away to discard changes
     await this.navigateToUsers();
   }
 
@@ -179,7 +179,7 @@ export class UserRolesPage {
   }
 
   async verifyRoleNotAssigned(roleName) {
-    // Wait for any active snack bar to dismiss — ensures the save round-trip is complete
+    // Wait for any active snack bar to dismiss - ensures the save round-trip is complete
     // and the component has re-rendered from the Firebase response before we read state.
     await this.page.locator('mat-snack-bar-container').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
     const assigned = await this.isRoleAssigned(roleName);

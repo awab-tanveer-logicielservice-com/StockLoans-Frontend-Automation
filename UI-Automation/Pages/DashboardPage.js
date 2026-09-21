@@ -21,7 +21,7 @@ export class DashboardPage {
 
   async verifyTableHeaderVisible() {
     const visible = await this.tableHeader.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-    if (!visible) return; // dashboard not loaded in time — soft pass
+    if (!visible) return; // dashboard not loaded in time - soft pass
   }
 
   async searchSymbol(symbol) {

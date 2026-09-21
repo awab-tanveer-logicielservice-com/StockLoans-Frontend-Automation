@@ -1,4 +1,4 @@
-﻿import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
 import { ENV } from './UI-Automation/Config/env.js';
 import { DEMO_SCENARIOS, grepForTitles } from './UI-Automation/Config/demoScenarios.js';
@@ -22,7 +22,7 @@ const BRAVE_PATH =
 // The browser window is sized to match (and --start-maximized dropped), so a
 // headed run shows the app at exactly this size rather than a maximized window
 // with a smaller viewport inside it. The step definitions call setViewportSize
-// with the same dimensions â€” keep them in step with VIEWPORT_DEFAULT if this
+// with the same dimensions - keep them in step with VIEWPORT_DEFAULT if this
 // changes, or they will override it per scenario.
 const VIEWPORT_DEFAULT = '1536x720';
 
@@ -63,7 +63,7 @@ const bddUse = {
   }
 };
 
-// Extra evidence captured only by the demo projects â€” see their definitions
+// Extra evidence captured only by the demo projects - see their definitions
 // at the bottom of `projects`.
 const demoArtifacts = {
   screenshot: 'only-on-failure',
@@ -164,8 +164,7 @@ export default defineConfig({
       use: bddUse,
     },
     {
-      // Runs only @Smoke-tagged scenarios. Word-boundary regex avoids matching
-      // the unrelated @smokeBDD tag that's present on nearly every scenario.
+      // Runs only @Smoke-tagged scenarios.
       name: 'smoke',
       testDir: bddConfig,
       grep: /@Smoke\b/,
@@ -181,13 +180,13 @@ export default defineConfig({
       use: bddUse,
     },
     {
-      // Login / Remember Me. No 'auth setup' dependency and no injected session â€”
+      // Login / Remember Me. No 'auth setup' dependency and no injected session -
       // these scenarios drive the real login form from a logged-out state.
       name: 'login',
       testDir: loginBddConfig,
       use: bddUse,
     },
-    // â”€â”€ Demo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // --- Demo ---
     // `npm run demo` runs both demo projects in one shot (see scripts/run-demo.mjs).
     // Split in two because the Login scenario must start logged out while the
     // Trade scenarios replay the captured session from 'auth setup'.

@@ -4,7 +4,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
   and finally authorised by an Admin
   So that every role change is reviewed, auditable, and exportable for record-keeping
 
-  # SLL-236 has no formal acceptance-criteria section — the criteria below are derived
+  # SLL-236 has no formal acceptance-criteria section - the criteria below are derived
   # from the ticket description and numbered so each scenario maps back to one:
   #   AC1  A user can initiate an access review request
   #   AC2  The requester can add two approvers to the request
@@ -19,10 +19,10 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
   # otherwise fall back to the primary account, so the role scenarios stay
   # expressive without silently passing on a wrong identity.
 
-  # ── Happy Path ───────────────────────────────────────
+  # --- Happy Path ---
 
   # Precondition: User is authenticated and holds permission to raise access review requests
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1589
+  @Smoke @Regression @SLL-236 @SLL-C1589
   Scenario: Requester initiates an access review request with two approvers and submits it successfully
     Given the user is logged in to the application
     When the user navigates to the Access Review page
@@ -35,10 +35,10 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then a success confirmation should be displayed for the access review request
     And the access review request should appear in the Access Review grid with status "Pending Approver Review"
 
-  # ── Acceptance Criteria ──────────────────────────────
+  # --- Acceptance Criteria ---
 
   # Precondition: User is authenticated; Access Review page is accessible (AC1)
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1590
+  @Smoke @Regression @SLL-236 @SLL-C1590
   Scenario: AC1 — Access Review page exposes the option to initiate a new access review request
     Given the user is logged in to the application
     When the user navigates to the Access Review page
@@ -46,7 +46,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the Initiate Access Review Request button should be visible
 
   # Precondition: An access review request form is open (AC2)
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1591
+  @Smoke @Regression @SLL-236 @SLL-C1591
   Scenario: AC2 — Requester adds two approvers and both are listed on the request
     Given the user is logged in to the application
     And an access review request form is open
@@ -54,7 +54,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then both selected approvers should be listed on the access review request
 
   # Precondition: A submitted request exists awaiting the first approver's decision (AC3)
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1592
+  @Smoke @Regression @SLL-236 @SLL-C1592
   Scenario: AC3 — Approver accepts an access review request
     Given the user is logged in as "approver one"
     And an access review request is pending the approver's decision
@@ -63,7 +63,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the access review request status should be "Partially Approved"
 
   # Precondition: A submitted request exists awaiting the first approver's decision (AC4)
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1593
+  @Smoke @Regression @SLL-236 @SLL-C1593
   Scenario: AC4 — Approver rejects an access review request
     Given the user is logged in as "approver one"
     And an access review request is pending the approver's decision
@@ -72,7 +72,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the access review request status should be "Rejected"
 
   # Precondition: A request exists where both approvers have already accepted (AC5)
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1594
+  @Smoke @Regression @SLL-236 @SLL-C1594
   Scenario: AC5 — Admin gives the final approval on a fully approved request
     Given the user is logged in as "admin"
     And an access review request has been accepted by both approvers
@@ -81,17 +81,17 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the access review request status should be "Approved"
 
   # Precondition: At least one access review request exists in the grid (AC6)
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1595
+  @Smoke @Regression @SLL-236 @SLL-C1595
   Scenario: AC6 — User exports access review details for reporting
     Given the user is logged in to the application
     When the user navigates to the Access Review page
     And the user exports the access review details as "CSV"
     Then the access review export file should be downloaded
 
-  # ── Role-Based Access ────────────────────────────────
+  # --- Role-Based Access ---
 
   # Precondition: Requester is authenticated and owns an access review request
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1596
+  @Smoke @Regression @SLL-236 @SLL-C1596
   Scenario: Requester can raise a request but the approve and reject actions are not available to them
     Given the user is logged in as "requester"
     And an access review request raised by the current user exists
@@ -99,7 +99,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the Accept and Reject actions should not be available on the access review request
 
   # Precondition: Approver one is authenticated and has a request assigned to them
-  @smokeBDD @Regression @SLL-236 @SLL-C1597
+  @Regression @SLL-236 @SLL-C1597
   Scenario: Approver one sees the request in their pending queue with Accept and Reject available
     Given the user is logged in as "approver one"
     When the user navigates to the Access Review page
@@ -108,7 +108,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the Accept and Reject actions should be available on the access review request
 
   # Precondition: Approver two is authenticated and has a request assigned to them
-  @smokeBDD @Regression @SLL-236 @SLL-C1598
+  @Regression @SLL-236 @SLL-C1598
   Scenario: Approver two sees the request in their pending queue with Accept and Reject available
     Given the user is logged in as "approver two"
     When the user navigates to the Access Review page
@@ -117,24 +117,24 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the Accept and Reject actions should be available on the access review request
 
   # Precondition: Admin is authenticated; a request has both approver acceptances
-  @smokeBDD @Regression @SLL-236 @SLL-C1599
+  @Regression @SLL-236 @SLL-C1599
   Scenario: Admin sees requests awaiting final approval with the Final Approval action available
     Given the user is logged in as "admin"
     And an access review request has been accepted by both approvers
     When the user opens the access review request details
     Then the Final Approval action should be available on the access review request
 
-  # ── Workflow States & Transitions ────────────────────
+  # --- Workflow States & Transitions ---
 
   # Precondition: A request has just been submitted by the requester
-  @smokeBDD @Regression @SLL-236 @SLL-C1600
+  @Regression @SLL-236 @SLL-C1600
   Scenario: Newly submitted request is in the Pending Approver Review state
     Given the user is logged in to the application
     And an access review request has just been submitted
     Then the access review request status should be "Pending Approver Review"
 
   # Precondition: A submitted request awaits both approver decisions
-  @smokeBDD @Regression @SLL-236 @SLL-C1601
+  @Regression @SLL-236 @SLL-C1601
   Scenario: Request moves to Partially Approved after the first approver accepts
     Given the user is logged in as "approver one"
     And an access review request is pending the approver's decision
@@ -142,7 +142,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the access review request status should be "Partially Approved"
 
   # Precondition: A request has one approver acceptance recorded
-  @smokeBDD @Regression @SLL-236 @SLL-C1602
+  @Regression @SLL-236 @SLL-C1602
   Scenario: Request moves to Pending Admin Approval after the second approver accepts
     Given the user is logged in as "approver two"
     And an access review request has been accepted by the first approver
@@ -150,7 +150,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the access review request status should be "Pending Admin Approval"
 
   # Precondition: A request has both approver acceptances recorded
-  @smokeBDD @Regression @SLL-236 @SLL-C1603
+  @Regression @SLL-236 @SLL-C1603
   Scenario: Request moves to Approved after the Admin final approval
     Given the user is logged in as "admin"
     And an access review request has been accepted by both approvers
@@ -158,7 +158,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the access review request status should be "Approved"
 
   # Precondition: A request has both approver acceptances recorded
-  @smokeBDD @Regression @SLL-236 @SLL-C1604
+  @Regression @SLL-236 @SLL-C1604
   Scenario: Request moves to Rejected when the Admin declines the final approval
     Given the user is logged in as "admin"
     And an access review request has been accepted by both approvers
@@ -166,17 +166,17 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the access review request status should be "Rejected"
 
   # Precondition: A submitted request awaits approver decisions
-  @smokeBDD @Regression @SLL-236 @SLL-C1605
+  @Regression @SLL-236 @SLL-C1605
   Scenario: Request moves to Rejected as soon as one approver rejects it
     Given the user is logged in as "approver one"
     And an access review request is pending the approver's decision
     When the approver rejects the access review request
     Then the access review request status should be "Rejected"
 
-  # ── Status / Column Display ──────────────────────────
+  # --- Status / Column Display ---
 
   # Precondition: At least one access review request exists in the grid
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1606
+  @Smoke @Regression @SLL-236 @SLL-C1606
   Scenario: Access Review grid displays the expected reporting columns
     Given the user is logged in to the application
     When the user navigates to the Access Review page
@@ -189,17 +189,17 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the Access Review grid should display the "Requested Date" column
 
   # Precondition: A request has progressed through an approver acceptance
-  @smokeBDD @Regression @SLL-236 @SLL-C1607
+  @Regression @SLL-236 @SLL-C1607
   Scenario: Approver decisions are reflected in the request audit trail
     Given the user is logged in to the application
     And an access review request has been accepted by the first approver
     When the user opens the access review request details
     Then the access review audit trail should record the approver decision
 
-  # ── Positive Data Variations ─────────────────────────
+  # --- Positive Data Variations ---
 
   # Precondition: An access review request form is open
-  @smokeBDD @Regression @SLL-236 @SLL-C1608
+  @Regression @SLL-236 @SLL-C1608
   Scenario: Request with a single-word justification is accepted
     Given the user is logged in to the application
     And an access review request form is open
@@ -208,7 +208,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then a success confirmation should be displayed for the access review request
 
   # Precondition: An access review request form is open
-  @smokeBDD @Regression @SLL-236 @SLL-C1609
+  @Regression @SLL-236 @SLL-C1609
   Scenario: Request with a detailed multi-sentence justification is accepted
     Given the user is logged in to the application
     And an access review request form is open
@@ -216,10 +216,10 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the user submits the access review request
     Then a success confirmation should be displayed for the access review request
 
-  # ── Business Rules & Restrictions ────────────────────
+  # --- Business Rules & Restrictions ---
 
   # Precondition: A submitted request has no approver acceptances yet
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1610
+  @Smoke @Regression @SLL-236 @SLL-C1610
   Scenario: Admin cannot give the final approval before both approvers have accepted
     Given the user is logged in as "admin"
     And an access review request is pending the approver's decision
@@ -227,7 +227,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the Final Approval action should not be available on the access review request
 
   # Precondition: A request has one approver acceptance and no second decision
-  @smokeBDD @Regression @SLL-236 @SLL-C1611
+  @Regression @SLL-236 @SLL-C1611
   Scenario: Admin cannot give the final approval when only the first approver has accepted
     Given the user is logged in as "admin"
     And an access review request has been accepted by the first approver
@@ -235,7 +235,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the Final Approval action should not be available on the access review request
 
   # Precondition: A request has already been rejected by an approver
-  @smokeBDD @Regression @SLL-236 @SLL-C1612
+  @Regression @SLL-236 @SLL-C1612
   Scenario: Rejected request cannot proceed to Admin final approval
     Given the user is logged in as "admin"
     And an access review request has been rejected by an approver
@@ -244,7 +244,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the access review request status should be "Rejected"
 
   # Precondition: An approver has already recorded a decision on the request
-  @smokeBDD @Regression @SLL-236 @SLL-C1613
+  @Regression @SLL-236 @SLL-C1613
   Scenario: Approver cannot record a second decision on the same request
     Given the user is logged in as "approver one"
     And an access review request has already been decided by the current approver
@@ -252,7 +252,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the Accept and Reject actions should not be available on the access review request
 
   # Precondition: An access review request form is open
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1614
+  @Smoke @Regression @SLL-236 @SLL-C1614
   Scenario: Requester cannot add themselves as an approver on their own request
     Given the user is logged in to the application
     And an access review request form is open
@@ -260,7 +260,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then a validation error should be displayed for the access review request
 
   # Precondition: An access review request form is open
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1615
+  @Smoke @Regression @SLL-236 @SLL-C1615
   Scenario: The same user cannot be added as both approvers on a request
     Given the user is logged in to the application
     And an access review request form is open
@@ -268,7 +268,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then a validation error should be displayed for the access review request
 
   # Precondition: A request exists that the current user is not an approver on
-  @smokeBDD @Regression @SLL-236 @SLL-C1616
+  @Regression @SLL-236 @SLL-C1616
   Scenario: A user who is not an approver on the request cannot accept or reject it
     Given the user is logged in to the application
     And an access review request the current user is not an approver on exists
@@ -276,21 +276,21 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the Accept and Reject actions should not be available on the access review request
 
   # Precondition: A request has both approver acceptances; current user is not an Admin
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1617
+  @Smoke @Regression @SLL-236 @SLL-C1617
   Scenario: A non-admin user cannot give the final approval on a fully approved request
     Given the user is logged in as "requester"
     And an access review request has been accepted by both approvers
     When the user opens the access review request details
     Then the Final Approval action should not be available on the access review request
 
-  # ── Validation / Negative ────────────────────────────
+  # --- Validation / Negative ---
   # Scoped to the approver-count rule the ticket actually states ("add two
   # approvers"). Generic field-level validation (mandatory fields, approver
   # input format, rejection reasons, justification length) was removed from the
-  # Vansah folder as out of scope for SLL-236 — see the note at the end of this file.
+  # Vansah folder as out of scope for SLL-236 - see the note at the end of this file.
 
   # Precondition: An access review request form is open
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1620
+  @Smoke @Regression @SLL-236 @SLL-C1620
   Scenario: Approver count below the limit — one approver is not enough to submit
     Given the user is logged in to the application
     And an access review request form is open
@@ -300,7 +300,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the access review request should not be submitted
 
   # Precondition: An access review request form is open
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1621
+  @Smoke @Regression @SLL-236 @SLL-C1621
   Scenario: Approver count at the limit — exactly two approvers is accepted
     Given the user is logged in to the application
     And an access review request form is open
@@ -308,10 +308,10 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the user submits the access review request
     Then a success confirmation should be displayed for the access review request
 
-  # ── Edge Cases ───────────────────────────────────────
+  # --- Edge Cases ---
 
   # Precondition: Authenticated user with no access review requests raised or assigned
-  @smokeBDD @Regression @SLL-236 @SLL-C1624
+  @Regression @SLL-236 @SLL-C1624
   Scenario: Access Review page shows an empty state when no requests exist
     Given the user is logged in to the application
     When the user navigates to the Access Review page
@@ -319,7 +319,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the Access Review grid should display the empty state overlay
 
   # Precondition: An access review request form is open
-  @smokeBDD @Regression @SLL-236 @SLL-C1625
+  @Regression @SLL-236 @SLL-C1625
   Scenario: Special characters in the justification are handled without breaking the page
     Given the user is logged in to the application
     And an access review request form is open
@@ -328,7 +328,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the Access Review page should not crash
 
   # Precondition: A request awaits both approver decisions
-  @smokeBDD @Regression @SLL-236 @SLL-C1627
+  @Regression @SLL-236 @SLL-C1627
   Scenario: Request state stays consistent when the page is reloaded mid-workflow
     Given the user is logged in as "approver one"
     And an access review request is pending the approver's decision
@@ -337,7 +337,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     Then the access review request status should be "Partially Approved"
 
   # Precondition: An export has been triggered on a grid with no rows
-  @smokeBDD @Regression @SLL-236 @SLL-C1628
+  @Regression @SLL-236 @SLL-C1628
   Scenario: Exporting an empty Access Review grid does not break the page
     Given the user is logged in to the application
     When the user navigates to the Access Review page
@@ -345,10 +345,10 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     And the user exports the access review details as "CSV"
     Then the Access Review page should not crash
 
-  # ── Data-Driven ──────────────────────────────────────
+  # --- Data-Driven ---
 
   # Precondition: A submitted request exists awaiting both approver decisions
-  @smokeBDD @Regression @SLL-236 @SLL-C1629
+  @Regression @SLL-236 @SLL-C1629
   Scenario Outline: Approver decision combinations resolve to the expected request status
     Given the user is logged in to the application
     And an access review request is pending the approver's decision
@@ -364,7 +364,7 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
       | Reject | Reject | Rejected               |
 
   # Precondition: At least one access review request exists in the grid
-  @smokeBDD @Regression @SLL-236 @SLL-C1630
+  @Regression @SLL-236 @SLL-C1630
   Scenario Outline: Access review details export in each supported format
     Given the user is logged in to the application
     When the user navigates to the Access Review page
@@ -377,10 +377,10 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
       | Excel  |
       | PDF    |
 
-  # ── End-to-End ───────────────────────────────────────
+  # --- End-to-End ---
 
   # Precondition: Fresh session; valid credentials available; requester, two approvers and an Admin exist
-  @smokeBDD @Smoke @Regression @SLL-236 @SLL-C1631
+  @Smoke @Regression @SLL-236 @SLL-C1631
   Scenario: Full lifecycle — raise request, two approver acceptances, Admin final approval, then export
     Given the user navigates to the application
     When the user logs in with valid credentials
@@ -405,13 +405,13 @@ Feature: Authorization Access Review System for User Role Changes (SLL-236)
     When the user exports the access review details as "CSV"
     Then the access review export file should be downloaded
 
-  # ── Removed from scope ───────────────────────────────
+  # --- Removed from scope ---
   # These five cases were imported and then deleted from the Vansah folder as
   # out of scope for SLL-236, so they were dropped from this file too. Their
-  # step definitions and page-object helpers were removed with them — restore
+  # step definitions and page-object helpers were removed with them - restore
   # from git history if the scope changes.
   #   SLL-C1618  Submitting the request with a mandatory field left blank (Outline, 5 rows)
   #   SLL-C1619  Invalid approver input is rejected (Outline, 3 rows)
-  #   SLL-C1622  Approver count above the limit — a third approver cannot be added
+  #   SLL-C1622  Approver count above the limit - a third approver cannot be added
   #   SLL-C1623  Rejecting a request without a rejection reason is not allowed
   #   SLL-C1626  Justification at maximum allowed length is handled gracefully

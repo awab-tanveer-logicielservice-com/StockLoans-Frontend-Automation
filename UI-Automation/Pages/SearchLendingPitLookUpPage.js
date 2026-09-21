@@ -121,13 +121,13 @@ export class SearchLendingPitLookUpPage {
             expect(count).toBeGreaterThan(0);
             return;
         }
-        // Acceptable: grid shows empty state (no data before search) — page is functioning correctly
+        // Acceptable: grid shows empty state (no data before search) - page is functioning correctly
         const emptyOrContainer = this.page.locator('main, [role="main"], h3').first();
         await emptyOrContainer.waitFor({ state: 'visible', timeout: 10000 });
     }
 
     async verifyGridDisplaysResults() {
-        // This used to end in `if (!visible) return;` — a soft pass that made the
+        // This used to end in `if (!visible) return;` - a soft pass that made the
         // check unfailable, so a search returning nothing still reported "results
         // shown". That is how TSLA sat in the Examples table expecting results
         // long after Lending Pit stopped carrying it. Assert on real data rows.
@@ -161,7 +161,7 @@ export class SearchLendingPitLookUpPage {
         const agGrid = this.page.locator('ag-grid-angular, .ag-root-wrapper').first();
         const isAgGrid = await agGrid.isVisible({ timeout: 3000 }).catch(() => false);
         if (!isAgGrid) {
-            // Grid might be a table or custom component — verify the result area is present
+            // Grid might be a table or custom component - verify the result area is present
             const resultArea = this.page.locator('main, [role="main"], .results-container, table').first();
             await resultArea.waitFor({ state: 'visible', timeout: 10000 });
         }
@@ -170,7 +170,7 @@ export class SearchLendingPitLookUpPage {
     async verifyPageHeadingsVisible() {
         const heading = LOCATORS.LendingPitLookupPage.pageHeading(this.page);
         const visible = await heading.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // heading not rendered in time — soft pass
+        if (!visible) return; // heading not rendered in time - soft pass
     }
 
     async verifyThemeColorsApplied() {
@@ -186,7 +186,7 @@ export class SearchLendingPitLookUpPage {
         if (!isAgCol) {
             const anyHeader = this.page.locator('th, [role="columnheader"]').filter({ hasText: columnName });
             const visible = await anyHeader.first().waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-            if (!visible) return; // column header not rendered in time — soft pass
+            if (!visible) return; // column header not rendered in time - soft pass
         }
     }
 
@@ -210,7 +210,7 @@ export class SearchLendingPitLookUpPage {
         const thead = this.page.locator('thead, [role="rowgroup"]').first();
         const isThead = await thead.isVisible({ timeout: 3000 }).catch(() => false);
         if (isThead) return;
-        // Acceptable: grid not yet loaded — verify the page form is present (empty state or search form)
+        // Acceptable: grid not yet loaded - verify the page form is present (empty state or search form)
         const formOrEmpty = this.page.locator('[role="complementary"], aside, h2').first();
         await formOrEmpty.waitFor({ state: 'visible', timeout: 10000 });
     }
@@ -244,7 +244,7 @@ export class SearchLendingPitLookUpPage {
         // Accept: ag-grid overlay OR custom "No Data Available" empty state.
         //
         // This used to probe the ag-Grid overlay with isVisible({ timeout }),
-        // which does NOT wait — Playwright accepts the option and ignores it, so
+        // which does NOT wait - Playwright accepts the option and ignores it, so
         // the check returned false while the overlay was still rendering and the
         // method then waited 15s for a custom heading this screen never shows.
         // Race real waits on both instead, so whichever the app renders wins.

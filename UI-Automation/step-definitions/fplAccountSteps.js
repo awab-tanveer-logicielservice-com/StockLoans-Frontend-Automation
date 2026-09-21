@@ -41,7 +41,7 @@ Then('the center cols viewport should be clickable', async ({ fplAccountPage }) 
   await fplAccountPage.centerColsViewport.click();
 });
 
-// ── SLL-234: SLS Account editable dropdown ────────────────────────────────
+// --- SLL-234: SLS Account editable dropdown ---
 
 When('the user clicks the SLS Account cell for a row', async ({ fplAccountPage }) => {
   await fplAccountPage.clickSLSAccountCell();

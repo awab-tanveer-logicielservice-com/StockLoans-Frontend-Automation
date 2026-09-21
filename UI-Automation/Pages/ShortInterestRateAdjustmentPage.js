@@ -85,7 +85,7 @@ export class ShortInterestRateAdjustmentPage {
 
     await this._dismissSplashScreen();
     await this.rateGrid.waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
-    // Wait up to 30s for data rows — keeps total test well under 240s timeout
+    // Wait up to 30s for data rows - keeps total test well under 240s timeout
     await this.page.locator('.ag-center-cols-container .ag-row').first()
       .waitFor({ state: 'attached', timeout: 30000 }).catch(() => {});
   }
@@ -103,9 +103,9 @@ export class ShortInterestRateAdjustmentPage {
     const firstCell = this.page.locator('.ag-center-cols-container .ag-row .ag-cell').first();
     // Wait for rows to be attached first (dev server is slow), then visible
     const attached = await firstCell.waitFor({ state: 'attached', timeout: 30000 }).then(() => true).catch(() => false);
-    if (!attached) return; // no rows — soft pass
+    if (!attached) return; // no rows - soft pass
     const visible = await firstCell.waitFor({ state: 'visible', timeout: 10000 }).then(() => true).catch(() => false);
-    if (!visible) return; // rows not visible — soft pass
+    if (!visible) return; // rows not visible - soft pass
     await firstCell.click({ force: true });
 
     // Confirm row selection: save button should become enabled
@@ -128,7 +128,7 @@ export class ShortInterestRateAdjustmentPage {
     const inputVisible = await this.rateInputField.waitFor({ state: 'visible', timeout: this.defaultTimeout })
       .then(() => true).catch(() => false);
     if (!inputVisible) {
-      // Rate input panel not visible — no row selected or dev env not ready; soft pass
+      // Rate input panel not visible - no row selected or dev env not ready; soft pass
       return;
     }
     await this.rateInputField.clear();
@@ -155,7 +155,7 @@ export class ShortInterestRateAdjustmentPage {
 
   async clearRateInput() {
     const visible = await this.rateInputField.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
-    if (!visible) return; // no row selected — soft pass
+    if (!visible) return; // no row selected - soft pass
     await this.rateInputField.clear();
     await this.rateInputField.dispatchEvent('blur');
   }
@@ -164,7 +164,7 @@ export class ShortInterestRateAdjustmentPage {
     const btnVisible = await this.saveButton.waitFor({ state: 'visible', timeout: this.defaultTimeout })
       .then(() => true).catch(() => false);
     if (!btnVisible) {
-      // Save button not available — soft pass
+      // Save button not available - soft pass
       return;
     }
     await this.saveButton.click({ force: true });
@@ -196,22 +196,22 @@ export class ShortInterestRateAdjustmentPage {
   async attemptEditRateCell() {
     const firstCell = this.page.locator('.ag-center-cols-container .ag-row .ag-cell').first();
     const attached = await firstCell.waitFor({ state: 'attached', timeout: 90000 }).then(() => true).catch(() => false);
-    if (!attached) return; // no rows — soft pass
+    if (!attached) return; // no rows - soft pass
     const visible = await firstCell.waitFor({ state: 'visible', timeout: 20000 }).then(() => true).catch(() => false);
-    if (!visible) return; // rows not visible — soft pass
+    if (!visible) return; // rows not visible - soft pass
     await firstCell.click({ force: true });
   }
 
   async verifyRateInputNotEditable() {
     const visible = await this.saveButton.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
-    if (!visible) return; // save button not rendered — soft pass
+    if (!visible) return; // save button not rendered - soft pass
     const disabled = await this.saveButton.isDisabled().catch(() => true);
     if (disabled) return; // disabled as expected
-    // Soft pass — admin user in QA env may see save enabled
+    // Soft pass - admin user in QA env may see save enabled
   }
 
   async verifyAccessRestrictionMessage() {
-    // QA env runs with admin credentials — no read-only restriction message appears; soft pass
+    // QA env runs with admin credentials - no read-only restriction message appears; soft pass
     const visible = await this.accessRestrictionMessage.isVisible().catch(() => false);
     if (!visible) return;
   }
@@ -226,7 +226,7 @@ export class ShortInterestRateAdjustmentPage {
 
   async verifyV2ThemeStyling() {
     const visible = await this.pageContainer.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-    if (!visible) return; // heading not rendered within 30s on dev server — soft pass
+    if (!visible) return; // heading not rendered within 30s on dev server - soft pass
   }
 
   async verifySaveBlocked() {
@@ -252,7 +252,7 @@ export class ShortInterestRateAdjustmentPage {
 
   async verifyRateInputEnabled() {
     const visible = await this.rateInputField.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
-    if (!visible) return; // no row selected — soft pass
+    if (!visible) return; // no row selected - soft pass
     await expect(this.rateInputField).toBeEnabled({ timeout: this.defaultTimeout });
   }
 
@@ -286,9 +286,9 @@ export class ShortInterestRateAdjustmentPage {
 
   async verifyMaxLengthEnforced() {
     const visible = await this.rateInputField.isVisible().catch(() => false);
-    if (!visible) return; // no row selected — soft pass
+    if (!visible) return; // no row selected - soft pass
     const value = await this.rateInputField.inputValue().catch(() => '');
-    if (!value) return; // no value — soft pass
+    if (!value) return; // no value - soft pass
     expect(value.replace(/[^0-9]/g, '').length).toBeLessThanOrEqual(20);
   }
 

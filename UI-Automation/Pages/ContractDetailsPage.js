@@ -28,7 +28,7 @@ export class ContractDetailsPage {
   defaultTimeout = 15000;
   defaultSymbol  = 'QQQ';
 
-  // ── Navigation & Core ──────────────────────────────────────────────────────
+  // --- Navigation & Core ---
 
   async navigate() {
     const origin = new URL(ENV.baseURL).origin;
@@ -64,7 +64,7 @@ export class ContractDetailsPage {
       await col.first().waitFor({ state: 'visible', timeout: 8000 });
       await expect(col.first()).toBeVisible();
     } catch {
-      // Column may be scrolled off-screen — check by col-id attribute
+      // Column may be scrolled off-screen - check by col-id attribute
       const colIdMap = { 'PRC': '.ag-header-cell[col-id="prc"], .ag-header-cell[col-id="profitCenter"]' };
       if (colIdMap[colHeaderText]) {
         const byId = this.page.locator(colIdMap[colHeaderText]);
@@ -89,19 +89,19 @@ export class ContractDetailsPage {
       await this.emptyStateOverlay.waitFor({ state: 'visible', timeout: 15000 });
       await expect(this.emptyStateOverlay).toBeVisible();
     } catch {
-      // Fallback: check row count — soft-pass if QA filter didn't fully empty the grid
+      // Fallback: check row count - soft-pass if QA filter didn't fully empty the grid
       await this.page.waitForTimeout(2000);
       const rowCount = await this.gridRow.count();
       if (rowCount === 0) {
-        // Truly empty — pass
+        // Truly empty - pass
       } else {
-        // Grid not empty in QA — soft pass (filter may not clear in this environment)
+        // Grid not empty in QA - soft pass (filter may not clear in this environment)
         await expect(this.page.locator('ag-grid-angular').first()).toBeVisible();
       }
     }
   }
 
-  // ── Filters ────────────────────────────────────────────────────────────────
+  // --- Filters ---
 
   async filterBySymbol(symbol) {
     await this.symbolCusipFilter.waitFor({ state: 'visible', timeout: this.defaultTimeout });
@@ -151,11 +151,11 @@ export class ContractDetailsPage {
             await this.applyButton.click({ force: true });
             await this.page.waitForTimeout(1500);
           } catch {
-            // Date picker interaction failed — soft pass
+            // Date picker interaction failed - soft pass
           }
           return;
         }
-        // Fallback selector also failed — soft pass
+        // Fallback selector also failed - soft pass
         return;
 
       }
@@ -206,7 +206,7 @@ export class ContractDetailsPage {
     await this.page.waitForTimeout(2000);
   }
 
-  // ── Action Button Checks ───────────────────────────────────────────────────
+  // --- Action Button Checks ---
 
   async isTradeButtonVisible() {
     const btn = LOCATORS.ContractDetailsPage.tradeButton(this.page);
@@ -243,7 +243,7 @@ export class ContractDetailsPage {
     if (!visible) return;
     await this.page.waitForTimeout(1500);
     const disabled = await btn.getAttribute('disabled');
-    if (disabled !== null) return; // soft pass — no eligible Open contracts in QA
+    if (disabled !== null) return; // soft pass - no eligible Open contracts in QA
     await expect(btn).not.toHaveAttribute('disabled');
   }
 
@@ -264,7 +264,7 @@ export class ContractDetailsPage {
     if (!visible) return;
     await this.page.waitForTimeout(1500);
     const disabled = await btn.getAttribute('disabled');
-    if (disabled !== null) return; // soft pass — no eligible loan-side Open contracts in QA
+    if (disabled !== null) return; // soft pass - no eligible loan-side Open contracts in QA
     await expect(btn).not.toHaveAttribute('disabled');
   }
 
@@ -285,7 +285,7 @@ export class ContractDetailsPage {
     if (!visible) return;
     await this.page.waitForTimeout(1500);
     const disabled = await btn.getAttribute('disabled');
-    if (disabled !== null) return; // soft pass — no eligible Open borrow-side contracts in QA
+    if (disabled !== null) return; // soft pass - no eligible Open borrow-side contracts in QA
     await expect(btn).not.toHaveAttribute('disabled');
   }
 
@@ -300,7 +300,7 @@ export class ContractDetailsPage {
     if (!(disabled !== null || ariaDisabled === 'true' || classes.includes('mat-mdc-button-disabled'))) return;
   }
 
-  // ── Live Quote ─────────────────────────────────────────────────────────────
+  // --- Live Quote ---
 
   async isLiveQuoteVisible() {
     const banner = LOCATORS.ContractDetailsPage.liveQuoteBanner(this.page);
@@ -319,11 +319,11 @@ export class ContractDetailsPage {
     // If the banner element is absent entirely, we're done
     const banner = LOCATORS.ContractDetailsPage.liveQuoteBanner(this.page);
     if (await banner.count() === 0) return;
-    // Accept as hidden — the structural label is always visible; actual data
+    // Accept as hidden - the structural label is always visible; actual data
     // visibility is validated by isLiveQuoteVisible() in the positive scenario.
   }
 
-  // ── Master-Detail ──────────────────────────────────────────────────────────
+  // --- Master-Detail ---
 
   async expandFirstRow() {
     await this._requireGridRows();
@@ -347,12 +347,12 @@ export class ContractDetailsPage {
     await expect(detail).not.toBeVisible();
   }
 
-  // ── Row Selection ──────────────────────────────────────────────────────────
+  // --- Row Selection ---
 
   /**
    * Waits for the grid to finish loading; resolves true when it has data rows.
    *
-   * Waiting on `.ag-overlay-loading-wrapper` is not sufficient — this screen
+   * Waiting on `.ag-overlay-loading-wrapper` is not sufficient - this screen
    * renders its own "Loading..." indicator outside the ag-Grid overlay, so that
    * wait returns while the fetch is still in flight and the row wait then burns
    * its whole budget against a grid that is still empty. Settling on the first
@@ -363,7 +363,7 @@ export class ContractDetailsPage {
     // Do NOT race data rows against the no-rows overlay. ag-Grid shows that
     // overlay while a fetch is still in flight, so the race resolved as soon as
     // it appeared and reported an empty grid before the data had a chance to
-    // arrive — reporting "still loading" as a confident "0 rows".
+    // arrive - reporting "still loading" as a confident "0 rows".
     //
     // Let the loading indicators clear first, then give rows the whole budget.
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
@@ -460,7 +460,7 @@ export class ContractDetailsPage {
     await this.page.waitForTimeout(500);
   }
 
-  // ── Trade Panel ────────────────────────────────────────────────────────────
+  // --- Trade Panel ---
 
   async openTradePanel() {
     const btn = LOCATORS.ContractDetailsPage.tradeButton(this.page);
@@ -544,24 +544,24 @@ export class ContractDetailsPage {
   }
 
   async isTradeSuccessVisible() {
-    // Snackbar appears briefly after submit — check within a short window
+    // Snackbar appears briefly after submit - check within a short window
     const snackbar = this.page.locator('mat-snack-bar-container, simple-snack-bar').first();
     try {
       await snackbar.waitFor({ state: 'visible', timeout: 5000 });
       return;
     } catch { /* snackbar already dismissed or not shown */ }
-    // Wait for trade panel to close — closure is implicit success confirmation
+    // Wait for trade panel to close - closure is implicit success confirmation
     const counterparty = this.page.getByRole('textbox', { name: 'Counterparty' });
     try {
       await expect(counterparty).not.toBeVisible({ timeout: 10000 });
       return;
     } catch { /* panel still open — fall through to text match */ }
-    // QA env may not show success text — soft pass
+    // QA env may not show success text - soft pass
     return;
   }
 
   async isTradePanelClosed() {
-    // Panel closes on success — check success notification OR counterparty hidden
+    // Panel closes on success - check success notification OR counterparty hidden
     const snackbar = this.page.locator('mat-snack-bar-container, simple-snack-bar').first();
     const panelClosed = this.page.getByRole('textbox', { name: 'Counterparty' });
     try {
@@ -625,14 +625,14 @@ export class ContractDetailsPage {
     await expect(error).toBeVisible({ timeout: this.defaultTimeout });
   }
 
-  // ── ReRate Dialog ──────────────────────────────────────────────────────────
+  // --- ReRate Dialog ---
 
   async openReRateDialog() {
     const btn = LOCATORS.ContractDetailsPage.rerateButton(this.page);
     const visible = await btn.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
     if (!visible) return;
     const disabled = await btn.getAttribute('disabled');
-    if (disabled !== null) return; // button disabled — no eligible contracts; soft pass
+    if (disabled !== null) return; // button disabled - no eligible contracts; soft pass
     await this.page.waitForTimeout(1000);
     await btn.dispatchEvent('click');
     const dialog = LOCATORS.ContractDetailsPage.rerateDialog(this.page);
@@ -641,14 +641,14 @@ export class ContractDetailsPage {
 
   async enterValidRebateRate(rate = '1.5') {
     const dialog = LOCATORS.ContractDetailsPage.rerateDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog not open — soft pass
+    if (await dialog.count() === 0) return; // dialog not open - soft pass
     const rateInput = dialog.getByRole('spinbutton');
     await rateInput.fill(rate).catch(() => {});
   }
 
   async enterNonNumericRebateRate() {
     const dialog = LOCATORS.ContractDetailsPage.rerateDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog not open — soft pass
+    if (await dialog.count() === 0) return; // dialog not open - soft pass
     const rateInput = dialog.getByRole('spinbutton');
     const visible = await rateInput.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
     if (!visible) return;
@@ -675,7 +675,7 @@ export class ContractDetailsPage {
 
   async submitReRateDialogEmpty() {
     const dialog = LOCATORS.ContractDetailsPage.rerateDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog never opened — soft pass
+    if (await dialog.count() === 0) return; // dialog never opened - soft pass
     const rateInput = dialog.getByRole('spinbutton');
     if (await rateInput.isVisible()) {
       await rateInput.click();
@@ -691,14 +691,14 @@ export class ContractDetailsPage {
 
   async isReRateContractSummaryVisible() {
     const dialog = LOCATORS.ContractDetailsPage.rerateDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog not open — soft pass
-    // Soft pass — summary row structure varies; just verify dialog is open
+    if (await dialog.count() === 0) return; // dialog not open - soft pass
+    // Soft pass - summary row structure varies; just verify dialog is open
     await expect(dialog).toBeVisible({ timeout: this.defaultTimeout });
   }
 
   async isRebateRateValidationVisible() {
     const dialog = LOCATORS.ContractDetailsPage.rerateDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog never opened — soft pass
+    if (await dialog.count() === 0) return; // dialog never opened - soft pass
     const error = dialog.locator('mat-error, [class*="error"], [class*="invalid"]').first();
     try {
       await expect(error).toBeVisible({ timeout: this.defaultTimeout });
@@ -709,14 +709,14 @@ export class ContractDetailsPage {
     }
   }
 
-  // ── Recall Dialog ──────────────────────────────────────────────────────────
+  // --- Recall Dialog ---
 
   async openRecallDialog() {
     const btn = LOCATORS.ContractDetailsPage.recallButton(this.page);
     const visible = await btn.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
     if (!visible) return;
     const disabled = await btn.getAttribute('disabled');
-    if (disabled !== null) return; // button disabled — no eligible loan contracts; soft pass
+    if (disabled !== null) return; // button disabled - no eligible loan contracts; soft pass
     await this.page.waitForTimeout(1000);
     await btn.dispatchEvent('click');
     const dialog = LOCATORS.ContractDetailsPage.recallDialog(this.page);
@@ -725,7 +725,7 @@ export class ContractDetailsPage {
 
   async enterRecallQuantityExceedingMax() {
     const dialog = LOCATORS.ContractDetailsPage.recallDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog never opened — soft pass
+    if (await dialog.count() === 0) return; // dialog never opened - soft pass
     const qtyInput = dialog.getByRole('spinbutton');
     await qtyInput.fill('999999999');
     await qtyInput.press('Tab');
@@ -757,23 +757,23 @@ export class ContractDetailsPage {
 
   async isRecallQuantityValidationVisible() {
     const dialog = LOCATORS.ContractDetailsPage.recallDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog never opened — soft pass
+    if (await dialog.count() === 0) return; // dialog never opened - soft pass
     const error = dialog.locator('mat-error').first();
     try {
       await expect(error).toBeVisible({ timeout: this.defaultTimeout });
     } catch {
-      // Soft pass — validation may not render in QA env
+      // Soft pass - validation may not render in QA env
     }
   }
 
-  // ── Return Dialog ──────────────────────────────────────────────────────────
+  // --- Return Dialog ---
 
   async openReturnDialog() {
     const btn = LOCATORS.ContractDetailsPage.returnButton(this.page);
     const visible = await btn.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
     if (!visible) return;
     const disabled = await btn.getAttribute('disabled');
-    if (disabled !== null) return; // button disabled — no eligible contracts; soft pass
+    if (disabled !== null) return; // button disabled - no eligible contracts; soft pass
     await this.page.waitForTimeout(1000);
     await btn.dispatchEvent('click');
     const dialog = LOCATORS.ContractDetailsPage.returnDialog(this.page);
@@ -791,7 +791,7 @@ export class ContractDetailsPage {
 
   async enterValidReturnFields() {
     const dialog = LOCATORS.ContractDetailsPage.returnDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog not open — soft pass
+    if (await dialog.count() === 0) return; // dialog not open - soft pass
     const qtyInput = dialog.getByRole('spinbutton');
     await qtyInput.fill('1').catch(() => {});
     const textInputs = dialog.getByRole('textbox');
@@ -821,18 +821,18 @@ export class ContractDetailsPage {
 
   async isReturnQuantityValidationVisible() {
     const dialog = LOCATORS.ContractDetailsPage.returnDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog not open — soft pass
+    if (await dialog.count() === 0) return; // dialog not open - soft pass
     const error = dialog.locator('mat-error').first();
     try {
       await expect(error).toBeVisible({ timeout: this.defaultTimeout });
     } catch {
-      // Soft pass — validation may not render a mat-error in QA env
+      // Soft pass - validation may not render a mat-error in QA env
     }
   }
 
   async isSameDayAcknowledgementRequired() {
     const dialog = LOCATORS.ContractDetailsPage.returnDialog(this.page);
-    if (await dialog.count() === 0) return; // dialog not open — soft pass
+    if (await dialog.count() === 0) return; // dialog not open - soft pass
     const checkbox = dialog.locator('mat-checkbox, input[type="checkbox"], [role="checkbox"]').first();
     try {
       await expect(checkbox).toBeVisible({ timeout: this.defaultTimeout });
@@ -841,12 +841,12 @@ export class ContractDetailsPage {
       try {
         await expect(ackText).toBeVisible({ timeout: 5000 });
       } catch {
-        // Soft pass — acknowledgement UI not present for this contract in QA
+        // Soft pass - acknowledgement UI not present for this contract in QA
       }
     }
   }
 
-  // ── Profit Center ──────────────────────────────────────────────────────────
+  // --- Profit Center ---
 
   async isProfitCenterEditable() {
     const prcCell = this.page.locator('.ag-cell[col-id="prc"], .ag-cell[col-id="profitCenter"]').first();
@@ -857,7 +857,7 @@ export class ContractDetailsPage {
 
   async isProfitCenterReadOnly() {
     const prcCell = this.page.locator('.ag-cell[col-id="prc"], .ag-cell[col-id="profitCenter"]').first();
-    // When loading overlay is persistent (past date), cell interactions are blocked — this counts as read-only
+    // When loading overlay is persistent (past date), cell interactions are blocked - this counts as read-only
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
     if (await loadingOverlay.isVisible()) return;
     await prcCell.waitFor({ state: 'visible', timeout: this.defaultTimeout });
@@ -926,7 +926,7 @@ export class ContractDetailsPage {
       await successText.waitFor({ state: 'visible', timeout: 5000 });
       return;
     } catch { /* fall through */ }
-    // Check cell value was updated to 'A' (our single char) — silent save
+    // Check cell value was updated to 'A' (our single char) - silent save
     const prcCell = this.page.locator('.ag-cell[col-id="prc"], .ag-cell[col-id="profitCenter"]').first();
     if (await prcCell.count() > 0) {
       const cellText = await prcCell.textContent();
@@ -977,7 +977,7 @@ export class ContractDetailsPage {
     // Soft pass: the app accepted the value without frontend validation
   }
 
-  // ── Common Assertions ──────────────────────────────────────────────────────
+  // --- Common Assertions ---
 
   async isSuccessMessageVisible() {
     // Check snackbar/toast notification first
@@ -992,7 +992,7 @@ export class ContractDetailsPage {
   async isSelectionCleared() {
     const selectedRows = this.page.locator('.ag-row-selected');
     const count = await selectedRows.count();
-    // Soft pass — some QA flows don't deselect after submit
+    // Soft pass - some QA flows don't deselect after submit
     if (count > 0) return;
   }
 }

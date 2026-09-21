@@ -54,12 +54,12 @@ export const LOCATORS = {
     errorMessage: (page) => page.locator('p.error-text'),
 
     /**
-     * Validation error for the email field — email input in Angular invalid state
+     * Validation error for the email field - email input in Angular invalid state
      */
     emailValidationError: (page) => page.locator('#email.ng-invalid'),
 
     /**
-     * Validation error for the password field — password input in Angular invalid state
+     * Validation error for the password field - password input in Angular invalid state
      */
     passwordValidationError: (page) => page.locator('#password.ng-invalid'),
   },
@@ -263,7 +263,7 @@ export const LOCATORS = {
      * @param {string} optionName - The option name to select
      */
     // .first(): substring name matching can resolve to multiple options (e.g. "FPL Test"
-    // matches "FPL Test 3".."FPL Test 9") — any one matching option satisfies the intent here.
+    // matches "FPL Test 3".."FPL Test 9") - any one matching option satisfies the intent here.
     getDropdownOption: (page, optionName) => page.getByRole('option', { name: optionName }).first(),
 
     /**
@@ -309,7 +309,7 @@ export const LOCATORS = {
     loanCheckbox: (page) => page.getByRole('checkbox', { name: 'Loan' }),
 
     /**
-     * Counterparty combobox — Angular Material autocomplete inside the trade dialog
+     * Counterparty combobox - Angular Material autocomplete inside the trade dialog
      */
     counterpartyCombobox: (page) => page.locator('mat-dialog-container').getByRole('combobox').first(),
 
@@ -353,7 +353,7 @@ export const LOCATORS = {
     borrowCheckboxContainer: (page) => page.getByRole('checkbox', { name: 'Borrow' }),
 
     /**
-     * Loan checkbox container — uses role-based locator for MDC Material compatibility
+     * Loan checkbox container - uses role-based locator for MDC Material compatibility
      */
     loanCheckboxContainer: (page) => page.getByRole('checkbox', { name: 'Loan' }),
   },
@@ -440,7 +440,7 @@ export const LOCATORS = {
     loanButton: (page) => page.getByRole('button', { name: 'Loan' }),
 
     /**
-     * Counterparty text input — role is textbox, not combobox; first() skips the Trade-panel copy
+     * Counterparty text input - role is textbox, not combobox; first() skips the Trade-panel copy
      * Strategy: Playwright's getByRole for textbox
      */
     counterpartyCombobox: (page) => page.getByRole('textbox', { name: 'Counterparty' }).first(),
@@ -453,18 +453,18 @@ export const LOCATORS = {
     symbolCusipQtyRateTextbox: (page) => page.getByRole('textbox', { name: /symbol.*qty.*rate/i }),
 
     /**
-     * Import button — caption may be "Import" or "Import (N)" depending on state
+     * Import button - caption may be "Import" or "Import (N)" depending on state
      * Strategy: regex match so it works in both states
      */
     importButton: (page) => page.getByRole('button', { name: /^import/i }).first(),
 
-    /** Submit selected rows from Grid 1 to Grid 2 — first() skips the Trade-panel copy */
+    /** Submit selected rows from Grid 1 to Grid 2 - first() skips the Trade-panel copy */
     submitButton: (page) => page.getByRole('button', { name: /^submit$/i }).first(),
 
-    /** First AG-Grid on page — import staging area (Grid 1) */
+    /** First AG-Grid on page - import staging area (Grid 1) */
     grid1: (page) => page.locator('ag-grid-angular').first(),
 
-    /** Second AG-Grid on page — submission history (Grid 2) */
+    /** Second AG-Grid on page - submission history (Grid 2) */
     grid2: (page) => page.locator('ag-grid-angular').nth(1),
 
     /** Data rows inside Grid 1 */
@@ -477,7 +477,7 @@ export const LOCATORS = {
     grid1SelectAll: (page) => page.locator('ag-grid-angular').first()
       .getByRole('checkbox', { name: /Column with Header Selection/ }).first(),
 
-    /** Checkbox on the first data row of Grid 1 — ag-grid renders as role=checkbox with space-to-toggle label */
+    /** Checkbox on the first data row of Grid 1 - ag-grid renders as role=checkbox with space-to-toggle label */
     grid1FirstRowCheckbox: (page) => page.locator('ag-grid-angular').first()
       .getByRole('checkbox', { name: /Press Space to toggle row selection/ }).first(),
 
@@ -508,7 +508,7 @@ export const LOCATORS = {
     /** "Standard" button in the Import mode toggle group (Standard / FPL) */
     standardModeButton: (page) => page.getByRole('button', { name: 'Standard' }).first(),
 
-    /** Status column header in Grid 1 — visible in FPL Mode for allocation status tracking */
+    /** Status column header in Grid 1 - visible in FPL Mode for allocation status tracking */
     fplStatusColumnHeader: (page) =>
       page.locator('ag-grid-angular').first().locator('.ag-header-cell-text').filter({ hasText: /status/i }).first(),
   },
@@ -572,7 +572,7 @@ export const LOCATORS = {
     usersLink: (page) => page.getByRole('link', { name: 'Users' }),
 
     /**
-     * Basic Info tabpanel — use dialog container as a reliable open-dialog check
+     * Basic Info tabpanel - use dialog container as a reliable open-dialog check
      */
     basicInfoTabpanel: (page) => page.locator('mat-dialog-container, [role="dialog"]').first(),
   },
@@ -606,7 +606,7 @@ export const LOCATORS = {
     headerRow: (page) => page.getByRole('row', { name: 'Name Borrow Limit Lend Limit' }),
 
     /**
-     * Basic Info tabpanel — use dialog container as a reliable open-dialog check
+     * Basic Info tabpanel - use dialog container as a reliable open-dialog check
      */
     basicInfoTabpanel: (page) => page.locator('mat-dialog-container, [role="dialog"]').first(),
 
@@ -774,13 +774,13 @@ export const LOCATORS = {
     updateContractsCheckbox: (page) => page.getByRole('checkbox', { name: 'Update Contracts' }),
 
     /**
-     * Symbol input field — accessible name is "Symbol *" in the Add New Security dialog
+     * Symbol input field - accessible name is "Symbol *" in the Add New Security dialog
      * Strategy: exact match on the required-field label to avoid ambiguity with header/Trade panel "Symbol" inputs
      */
     symbolInput: (page) => page.getByRole('textbox', { name: 'Symbol *', exact: true }),
 
     /**
-     * CUSIP input field — accessible name is "CUSIP *" in the Add New Security dialog
+     * CUSIP input field - accessible name is "CUSIP *" in the Add New Security dialog
      * Strategy: exact match on the required-field label
      */
     cusipInput: (page) => page.getByRole('textbox', { name: 'CUSIP *', exact: true }),
@@ -841,18 +841,18 @@ export const LOCATORS = {
 
     /**
      * Security Master page header/title
-     * Strategy: getByRole heading — confirms the page has loaded
+     * Strategy: getByRole heading - confirms the page has loaded
      */
     securityMasterHeader: (page) => page.getByRole('heading', { name: 'Security Master' }),
 
     /**
-     * AG-Grid root wrapper — present once search results are rendered
+     * AG-Grid root wrapper - present once search results are rendered
      * Strategy: CSS selector for AG-Grid container
      */
     searchResultsGrid: (page) => page.locator('.ag-root-wrapper'),
 
     /**
-     * Dynamic locator — result row matching a given symbol text
+     * Dynamic locator - result row matching a given symbol text
      * Strategy: getByRole row with the symbol name
      * @param {Page} page
      * @param {string} symbol - the symbol text to locate
@@ -878,19 +878,19 @@ export const LOCATORS = {
     cusipValidationError: (page) => page.locator('mat-error').filter({ hasText: /cusip/i }).first(),
 
     /**
-     * Slide toggle in its checked/active state — confirms Update Contracts is enabled
+     * Slide toggle in its checked/active state - confirms Update Contracts is enabled
      * Strategy: CSS selector combining the toggle component with the checked modifier class
      */
     updateContractsToggleActive: (page) => page.locator('mat-slide-toggle button[aria-checked="true"], mat-slide-toggle.mat-checked, mat-slide-toggle.mat-mdc-slide-toggle-checked').first(),
 
     /**
-     * First row in the Ag-Grid search results — used to select a security record
+     * First row in the Ag-Grid search results - used to select a security record
      * Strategy: CSS selector targeting center-cols container rows
      */
     firstSearchResultRow: (page) => page.locator('.ag-center-cols-container .ag-row').first(),
 
     /**
-     * Second row in the Ag-Grid search results — used to select a different security
+     * Second row in the Ag-Grid search results - used to select a different security
      * Strategy: nth selector
      */
     secondSearchResultRow: (page) => page.locator('.ag-center-cols-container .ag-row').nth(1),
@@ -914,7 +914,7 @@ export const LOCATORS = {
     updateButton: (page) => page.getByRole('button', { name: /^update$/i }),
 
     /**
-     * Modal/dialog container — present when Add New Security modal is open
+     * Modal/dialog container - present when Add New Security modal is open
      * Strategy: Angular Material dialog container
      */
     modalContainer: (page) => page.locator('mat-dialog-container'),
@@ -955,12 +955,12 @@ export const LOCATORS = {
     clearButton: (page) => page.locator('aside, [role="complementary"]').getByRole('button', { name: 'Clear' }),
 
     /**
-     * Search page loaded indicator — Fetch Rates button is always visible after navigation
+     * Search page loaded indicator - Fetch Rates button is always visible after navigation
      */
     searchHeaderRow: (page) => page.getByRole('button', { name: 'Fetch Rates' }),
 
     /**
-     * Results grid container — present after search even when empty
+     * Results grid container - present after search even when empty
      */
     resultsHeaderRow: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
 
@@ -969,7 +969,7 @@ export const LOCATORS = {
      * Strategy: CSS heading selector
      */
     // The build renders its empty state as a plain div reading "No Rows To Show",
-    // rendered as a sibling *outside* the grid — not as a heading, and not inside
+    // rendered as a sibling *outside* the grid - not as a heading, and not inside
     // .ag-overlay-no-rows-wrapper. Matching only the old 'No Data Available'
     // heading meant this locator never resolved on either screen. Match on text
     // so any of the wordings the build has used still counts as an empty state.
@@ -1003,16 +1003,16 @@ export const LOCATORS = {
   BulkSnapshotPage: {
     menuButton: (page) => page.locator('.sidebar-menu-toggle'),
     bulkSnapshotLink: (page) => page.getByRole('link', { name: 'Bulk Snapshot' }),
-    /** Multi-line textarea — one symbol/CUSIP per line */
+    /** Multi-line textarea - one symbol/CUSIP per line */
     symbolOrCusipInput: (page) => page.getByLabel(/symbol or cusip/i).first(),
     /** Blue "FETCH RATES" submit button below the textarea */
     submitButton: (page) => page.getByRole('button', { name: /fetch rates/i }).first(),
-    /** "CLEAR" button — resets the textarea. Scoped to the raised-button variant since
+    /** "CLEAR" button - resets the textarea. Scoped to the raised-button variant since
      *  an unrelated date-filter widget on the same page also has its own "Clear" button. */
     // Two "Clear" buttons exist on this screen: the search form's (beside "Fetch
     // Rates") and the Trade panel's (beside Rebate Rate / Comment / Submit). The
     // old `button.mat-mdc-raised-button` + /clear/i match resolved to the Trade
-    // panel's, which sits off-screen — so the click failed with "outside of the
+    // panel's, which sits off-screen - so the click failed with "outside of the
     // viewport", and once forced through it cleared the wrong form. Anchor to the
     // search form by way of the Fetch Rates button it sits next to.
     clearButton: (page) =>
@@ -1020,14 +1020,14 @@ export const LOCATORS = {
         .locator('div:has(> button:has-text("Fetch Rates"))')
         .getByRole('button', { name: /^\s*clear\s*$/i })
         .first(),
-    /** "Use cached rates" checkbox — checked by default */
+    /** "Use cached rates" checkbox - checked by default */
     useCachedRatesCheckbox: (page) => page.getByRole('checkbox', { name: /use cached rates/i }),
     /** "Start Searching" button inside the empty state panel */
     startSearchingButton: (page) => page.getByRole('button', { name: 'Start Searching' }),
     pageHeading: (page) => page.getByRole('heading', { name: /bulk snapshot/i }),
     /** "No Data Available" empty state heading */
     // The build renders its empty state as a plain div reading "No Rows To Show",
-    // rendered as a sibling *outside* the grid — not as a heading, and not inside
+    // rendered as a sibling *outside* the grid - not as a heading, and not inside
     // .ag-overlay-no-rows-wrapper. Matching only the old 'No Data Available'
     // heading meant this locator never resolved on either screen. Match on text
     // so any of the wordings the build has used still counts as an empty state.
@@ -1041,22 +1041,22 @@ export const LOCATORS = {
   // MEMO SEG PAGE LOCATORS
   // ============================================
   MemoSegPage: {
-    /** Sidebar nav link — actual text is "MemoSeg" (no space) */
+    /** Sidebar nav link - actual text is "MemoSeg" (no space) */
     memoSegLink: (page) => page.getByRole('link', { name: /memoseg/i }),
-    /** Batch input textarea — placeholder "e.g. AAPL 100\nMSFT 200" */
+    /** Batch input textarea - placeholder "e.g. AAPL 100\nMSFT 200" */
     textInput: (page) => page.getByPlaceholder('e.g. AAPL 100'),
-    /** SEG button — triggers the batch segmentation (disabled until input is valid) */
+    /** SEG button - triggers the batch segmentation (disabled until input is valid) */
     submitButton: (page) => page.getByRole('button', { name: /^seg$/i }),
-    /** Summary grid — first AG-Grid; aggregates records by symbol */
+    /** Summary grid - first AG-Grid; aggregates records by symbol */
     summaryGrid: (page) => page.locator('ag-grid-angular').first(),
-    /** Detail grid — second AG-Grid; shows individual allocation records */
+    /** Detail grid - second AG-Grid; shows individual allocation records */
     detailGrid: (page) => page.locator('ag-grid-angular').nth(1),
     unSegButton: (page) => page.getByRole('button', { name: /un-?seg/i }),
     validationError: (page) => page.locator('mat-error').first(),
     emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper').first(),
     /** Header row inside the detail grid */
     detailGridHeaders: (page) => page.locator('ag-grid-angular').nth(1).locator('.ag-header-row').first(),
-    /** First data row in the summary grid — the grid uses flat rows, not AG row-groups */
+    /** First data row in the summary grid - the grid uses flat rows, not AG row-groups */
     firstGroupedRow: (page) => page.locator('ag-grid-angular').first().locator('.ag-center-cols-container .ag-row').first(),
     quantityValidationError: (page) => page.locator('mat-error').filter({ hasText: /quantity/i }).first(),
     symbolValidationError: (page) => page.locator('mat-error').filter({ hasText: /symbol/i }).first(),
@@ -1221,10 +1221,10 @@ export const LOCATORS = {
     // First data row in the Users AG-Grid
     firstUserRow: (page) => page.locator('ag-grid-angular .ag-row[row-index="0"]'),
 
-    // User Details tabs — the tab label in the side panel is "Roles" (not "User Roles")
+    // User Details tabs - the tab label in the side panel is "Roles" (not "User Roles")
     userRolesTab: (page) => page.getByRole('tab', { name: 'Roles' }),
 
-    // Role toggle — Angular Material mat-checkbox or mat-list-option
+    // Role toggle - Angular Material mat-checkbox or mat-list-option
     roleCheckbox: (page, roleName) =>
       page.locator('mat-checkbox').filter({ hasText: roleName }).first(),
     roleListOption: (page, roleName) =>
@@ -1294,7 +1294,7 @@ export const LOCATORS = {
   AccessReviewPage: {
     pageHeading: (page) => page.getByRole('heading', { name: /access review/i }),
 
-    // ── Request form ──
+    // --- Request form ---
     /** Opens the new access review request form */
     initiateRequestButton: (page) => page.getByRole('button', { name: /initiate|new access review|raise request/i }).first(),
     /** User whose role is being changed */
@@ -1308,7 +1308,7 @@ export const LOCATORS = {
     justificationInput: (page) => page.getByLabel(/justification|reason|comments/i).first(),
     submitRequestButton: (page) => page.getByRole('button', { name: /^submit/i }).first(),
 
-    // ── Grid / queues ──
+    // --- Grid / queues ---
     requestsGrid: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
     gridRows: (page) => page.locator('.ag-center-cols-container .ag-row'),
     emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper').first(),
@@ -1317,14 +1317,14 @@ export const LOCATORS = {
     pendingApprovalsTab: (page) => page.getByRole('tab', { name: /pending approval/i }),
     allRequestsTab: (page) => page.getByRole('tab', { name: /all requests/i }),
 
-    // ── Request details ──
+    // --- Request details ---
     detailsPanel: (page) => page.locator('mat-dialog-container, [class*="details-panel"]').first(),
     requestStatus: (page) => page.locator('[class*="status"]').first(),
     auditTrail: (page) => page.locator('[class*="audit"], [class*="history"]').first(),
     /** "first" / "second" approver section inside the details panel */
     approverTab: (page, which) => page.getByRole('tab', { name: new RegExp(`${which} approver`, 'i') }),
 
-    // ── Decision actions ──
+    // --- Decision actions ---
     acceptButton: (page) => page.getByRole('button', { name: /^accept$/i }),
     rejectButton: (page) => page.getByRole('button', { name: /^reject$/i }),
     rejectionReasonInput: (page) => page.getByLabel(/rejection reason|reason/i).first(),
@@ -1333,11 +1333,11 @@ export const LOCATORS = {
     /** Confirmation dialog that some Material flows put behind a decision */
     confirmDialogButton: (page) => page.getByRole('button', { name: /^(confirm|yes|ok)$/i }).first(),
 
-    // ── Export ──
+    // --- Export ---
     exportButton: (page) => page.getByRole('button', { name: /export/i }).first(),
     exportFormatOption: (page, format) => page.getByRole('menuitem', { name: new RegExp(format, 'i') }),
 
-    // ── Feedback ──
+    // --- Feedback ---
     snackBar: (page) => page.locator('mat-snack-bar-container'),
     validationError: (page) => page.locator('mat-error'),
 

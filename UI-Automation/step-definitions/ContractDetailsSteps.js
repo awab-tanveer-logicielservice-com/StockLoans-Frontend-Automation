@@ -4,13 +4,13 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then, And } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 When('the user navigates to the Contract Details page', async ({ contractDetailsPage }) => {
   await contractDetailsPage.navigate();
 });
 
-// ── Grid Visibility ───────────────────────────────────────────────────────────
+// --- Grid Visibility ---
 
 Then('the Contract Details grid should be visible', async ({ contractDetailsPage }) => {
   await contractDetailsPage.isGridVisible();
@@ -20,7 +20,7 @@ Then('the grid should display contract rows for the selected depository', async 
   await contractDetailsPage.hasGridRows();
 });
 
-// ── Column Visibility ─────────────────────────────────────────────────────────
+// --- Column Visibility ---
 
 Then('the grid should display the Symbol column', async ({ contractDetailsPage }) => {
   await contractDetailsPage.isColumnVisible('Symbol');
@@ -38,7 +38,7 @@ Then('the grid should display the Profit Center column', async ({ contractDetail
   await contractDetailsPage.isColumnVisible('PRC');
 });
 
-// ── Action Controls ───────────────────────────────────────────────────────────
+// --- Action Controls ---
 
 Then('the Trade action control should be visible and enabled', async ({ contractDetailsPage }) => {
   await contractDetailsPage.isTradeButtonVisible();
@@ -58,12 +58,12 @@ Then('the Return action control should be visible', async ({ contractDetailsPage
 });
 
 Then('the Trade, ReRate, Recall, and Return action controls should not be available for the read-only user', async ({ page }) => {
-  // Requires a read-only user account (E2E_READONLY_USER env var) — skip when not configured
+  // Requires a read-only user account (E2E_READONLY_USER env var) - skip when not configured
   if (!process.env.E2E_READONLY_USER) return;
   await expect(page.locator('button').filter({ hasText: 'Trade' })).not.toBeVisible();
 });
 
-// ── Filter Assertions (ContractDetails-specific) ───────────────────────────────
+// --- Filter Assertions (ContractDetails-specific) ---
 
 Then('the grid should display only contracts matching the entered symbol', async ({ contractDetailsPage }) => {
   await contractDetailsPage.hasGridRows();
@@ -85,7 +85,7 @@ Then('the grid should display only contracts matching the entered profit center'
   await contractDetailsPage.hasGridRows();
 });
 
-// ── Start Date Filter ─────────────────────────────────────────────────────────
+// --- Start Date Filter ---
 
 When('the user enters a start date range in the Start Date filter', async ({ contractDetailsPage }) => {
   await contractDetailsPage.filterByField('StartDate', '01/01/2025');
@@ -107,7 +107,7 @@ Then('the grid should display contracts matching the selected preset date range'
   await contractDetailsPage.isGridVisible();
 });
 
-// ── Effective Date ────────────────────────────────────────────────────────────
+// --- Effective Date ---
 
 When('the user changes the Effective Date to a different date', async ({ contractDetailsPage }) => {
   await contractDetailsPage.changeEffectiveDate();
@@ -129,7 +129,7 @@ When('the user changes the Effective Date to a past date', async ({ contractDeta
   await contractDetailsPage.changeToPastDate();
 });
 
-// ── Live Quote ────────────────────────────────────────────────────────────────
+// --- Live Quote ---
 
 Then('the live quote snapshot banner should be visible', async ({ contractDetailsPage }) => {
   await contractDetailsPage.isLiveQuoteVisible();
@@ -139,7 +139,7 @@ Then('the live quote snapshot banner should not be visible', async ({ contractDe
   await contractDetailsPage.isLiveQuoteHidden();
 });
 
-// ── Master-Detail History ─────────────────────────────────────────────────────
+// --- Master-Detail History ---
 
 When('the user expands the first contract row', async ({ contractDetailsPage }) => {
   await contractDetailsPage.expandFirstRow();
@@ -157,7 +157,7 @@ Then('the contract history detail panel should not be visible', async ({ contrac
   await contractDetailsPage.isHistoryDetailHidden();
 });
 
-// ── Pinned Totals & P&L ───────────────────────────────────────────────────────
+// --- Pinned Totals & P&L ---
 
 Then('the pinned total row should reflect totals from Open and Warning contracts only', async ({ contractDetailsPage }) => {
   await contractDetailsPage.isPinnedRowVisible();
@@ -200,7 +200,7 @@ Then('the pinned total row should recalculate to reflect all Open and Warning co
   await contractDetailsPage.hasGridRows();
 });
 
-// ── Profit Center Edit ────────────────────────────────────────────────────────
+// --- Profit Center Edit ---
 
 Then('the Profit Center field should be editable', async ({ contractDetailsPage }) => {
   await contractDetailsPage.isProfitCenterEditable();
@@ -230,7 +230,7 @@ Then('a validation error should be displayed for the Profit Center field', async
   await contractDetailsPage.isProfitCenterValidationVisible();
 });
 
-// ── Trade Panel ───────────────────────────────────────────────────────────────
+// --- Trade Panel ---
 
 When('the user opens the Trade panel', async ({ contractDetailsPage }) => {
   await contractDetailsPage.openTradePanel();
@@ -321,7 +321,7 @@ Then('the Loan side should require its own rebate rate field', async ({ contract
   await contractDetailsPage.isLoanSideRequiresRebateRate();
 });
 
-// ── ReRate Dialog ─────────────────────────────────────────────────────────────
+// --- ReRate Dialog ---
 
 When('the user selects an Open contract row', async ({ contractDetailsPage }) => {
   await contractDetailsPage.selectFirstOpenRow();
@@ -383,7 +383,7 @@ When('the user enters a non-numeric value in the rebate rate field', async ({ co
   await contractDetailsPage.enterNonNumericRebateRate();
 });
 
-// ── Recall Dialog ─────────────────────────────────────────────────────────────
+// --- Recall Dialog ---
 
 When('the user selects exactly one Open loan-side contract row', async ({ contractDetailsPage }) => {
   await contractDetailsPage.selectFirstOpenLoanRow();
@@ -425,7 +425,7 @@ When('the user enters a valid recall quantity', async ({ contractDetailsPage }) 
   await contractDetailsPage.enterValidRecallQuantity();
 });
 
-// ── Return Dialog ─────────────────────────────────────────────────────────────
+// --- Return Dialog ---
 
 When('the user selects exactly one Open borrow-side contract row', async ({ contractDetailsPage }) => {
   await contractDetailsPage.selectFirstOpenBorrowRow();
@@ -471,6 +471,6 @@ When('the user submits the Return dialog', async ({ contractDetailsPage }) => {
   await contractDetailsPage.submitReturnDialog();
 });
 
-// ── Empty / Validation ────────────────────────────────────────────────────────
+// --- Empty / Validation ---
 // Note: 'the grid should display the empty state overlay' is already registered
 // in ContractSummarySteps.js and uses the same DOM locators, so it is not re-registered here.

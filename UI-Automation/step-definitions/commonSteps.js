@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Common steps shared across multiple feature files.
  * Defines reusable Given/When/Then steps for login and shared navigation.
  */
@@ -34,7 +34,7 @@ Given('the user is logged in to the application', async ({ page, loginPage, test
   ]).catch(() => {});
 
   if (page.url().includes('/login')) {
-    // No captured session, or it expired mid-run â€” do a real UI login.
+    // No captured session, or it expired mid-run - do a real UI login.
     await loginPage.login(testUsers.username, testUsers.password);
   }
 });

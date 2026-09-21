@@ -1,4 +1,4 @@
-﻿import { test as base } from 'playwright-bdd';
+import { test as base } from 'playwright-bdd';
 import { LoginPage } from '../Pages/LoginPage.js';
 import { DashboardPage } from '../Pages/DashboardPage.js';
 import { FPLAccountPage } from '../Pages/FPLAccountPage.js';
@@ -77,7 +77,7 @@ const singleBrowserFixtures = !SINGLE_BROWSER
       ],
       // Override the built-in page/context so every page object and step gets the
       // shared instances. Note these deliberately do NOT depend on the built-in
-      // `page`/`context` fixtures â€” depending on them would make Playwright
+      // `page`/`context` fixtures - depending on them would make Playwright
       // create the very per-test window we're trying to avoid.
       page: async ({ sharedPage }, use) => {
         await use(sharedPage);
@@ -212,6 +212,6 @@ export const test = base.extend({
     await use(accessReviewRoleUsers(testUsers));
   },
   // Spread last so its page/context overrides win when the flag is on. Empty
-  // object â€” and therefore a no-op â€” for every normal run.
+  // object - and therefore a no-op - for every normal run.
   ...singleBrowserFixtures,
 });

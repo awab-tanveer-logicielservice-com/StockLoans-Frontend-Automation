@@ -4,13 +4,13 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 Given('the user navigates to the Contract Summary page', async ({ contractSummaryPage }) => {
   await contractSummaryPage.navigate();
 });
 
-// ── Grid Visibility ───────────────────────────────────────────────────────────
+// --- Grid Visibility ---
 
 Then('the Contract Summary grid should be visible', async ({ contractSummaryPage }) => {
   await contractSummaryPage.isGridVisible();
@@ -24,7 +24,7 @@ Then('each summary row should represent a unique symbol grouping', async ({ cont
   await contractSummaryPage.hasGridRows();
 });
 
-// ── Column Visibility ─────────────────────────────────────────────────────────
+// --- Column Visibility ---
 
 Then('the grid should display the Borrow Rate column', async ({ contractSummaryPage }) => {
   await contractSummaryPage.isColumnVisible('Borrow');
@@ -54,7 +54,7 @@ Then('the grid should display the Rebate column', async ({ contractSummaryPage }
   await contractSummaryPage.isColumnVisible('Rebate');
 });
 
-// ── Calculation Assertions ────────────────────────────────────────────────────
+// --- Calculation Assertions ---
 
 Then('the Borrow Rate column should reflect the weighted average by quantity', async ({ contractSummaryPage }) => {
   await contractSummaryPage.isColumnVisible('Borrow');
@@ -94,7 +94,7 @@ Then('the Return column should reflect netted borrow-side and loan-side pending 
   await contractSummaryPage.hasGridRows();
 });
 
-// ── Pinned Total Row ──────────────────────────────────────────────────────────
+// --- Pinned Total Row ---
 
 Then('the pinned total row should be visible at the bottom of the grid', async ({ contractSummaryPage }) => {
   await contractSummaryPage.isPinnedRowVisible();
@@ -115,7 +115,7 @@ Then('the pinned total row should recalculate to reflect all summary rows', asyn
 
 Then('the pinned total row should display zero values', async ({ page, contractSummaryPage, contractDetailsPage }) => {
   const pageObj = page.url().includes('contract-details') ? contractDetailsPage : contractSummaryPage;
-  // When all rows are filtered out AG-Grid hides the floating-bottom row — treat as zero state
+  // When all rows are filtered out AG-Grid hides the floating-bottom row - treat as zero state
   try {
     await pageObj.isPinnedRowVisible();
   } catch {
@@ -123,7 +123,7 @@ Then('the pinned total row should display zero values', async ({ page, contractS
   }
 });
 
-// ── Filters ───────────────────────────────────────────────────────────────────
+// --- Filters ---
 
 Given('the user enters a symbol in the Symbol\\/CUSIP filter', async ({ page, contractSummaryPage, contractDetailsPage }) => {
   const pageObj = page.url().includes('contract-details') ? contractDetailsPage : contractSummaryPage;
@@ -174,7 +174,7 @@ When('the user filters by {string} with value {string}', async ({ page, contract
   }
 });
 
-// ── Filter Assertions ─────────────────────────────────────────────────────────
+// --- Filter Assertions ---
 
 Then('the grid should display only rows matching the entered symbol', async ({ contractSummaryPage }) => {
   await contractSummaryPage.hasGridRows();
@@ -214,7 +214,7 @@ Then('the expected filter outcome should be {string}', async ({ page, contractSu
   }
 });
 
-// ── Details Toggle ────────────────────────────────────────────────────────────
+// --- Details Toggle ---
 
 Given('the user enables the Details toggle', async ({ contractSummaryPage }) => {
   await contractSummaryPage.enableDetailsToggle();
@@ -232,7 +232,7 @@ Then('the lower detail panel should not be visible', async ({ contractSummaryPag
   await contractSummaryPage.isDetailPanelHidden();
 });
 
-// ── Row Selection ─────────────────────────────────────────────────────────────
+// --- Row Selection ---
 
 Given('the user selects a summary row', async ({ contractSummaryPage }) => {
   await contractSummaryPage.selectFirstRow();
@@ -258,7 +258,7 @@ Then('trade and contract action controls should not be available for the read-on
   await expect(page.locator('button').filter({ hasText: 'Trade' })).not.toBeVisible();
 });
 
-// ── Double-click Navigation ───────────────────────────────────────────────────
+// --- Double-click Navigation ---
 
 When('the user double-clicks a summary row', async ({ contractSummaryPage }) => {
   await contractSummaryPage.doubleClickFirstRow();
@@ -277,7 +277,7 @@ Then('the Contract Details page should display only contracts matching the selec
   await expect(page).toHaveURL(/\/contract-details/);
 });
 
-// ── Depository Scoping ────────────────────────────────────────────────────────
+// --- Depository Scoping ---
 
 Then('the summary grid should display contracts for the selected depository only', async ({ contractSummaryPage }) => {
   await contractSummaryPage.hasGridRows();
@@ -292,7 +292,7 @@ Then('the summary grid should reload with data for the newly selected depository
   await contractSummaryPage.isGridVisible();
 });
 
-// ── Negative / Empty State ────────────────────────────────────────────────────
+// --- Negative / Empty State ---
 
 Given('the selected depository has no contracts', async ({ page, contractSummaryPage, contractDetailsPage }) => {
   const pageObj = page.url().includes('contract-details') ? contractDetailsPage : contractSummaryPage;

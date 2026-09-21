@@ -54,13 +54,13 @@ test.describe('FPL Positions Page', () => {
     await expect(aaplRow.getByRole('gridcell', { name: 'AAPL' })).toBeVisible();
     await expect(aaplRow.getByRole('gridcell', { name: 'SOFI FPL' })).toBeVisible();
 
-    // Verify data rows exist — grid should not show empty state
+    // Verify data rows exist - grid should not show empty state
     const hasNoRows = await fplPositionPage.isNoRowsOverlayVisible();
     expect(hasNoRows).toBe(false);
   });
 
   test('should collapse and re-expand group row', async ({ page }) => {
-    // Group starts expanded — collapse it
+    // Group starts expanded - collapse it
     await fplPositionPage.clickGroupRow('VCSO-SOF -OMNIHK');
     await page.waitForTimeout(1000);
 

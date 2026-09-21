@@ -4,13 +4,13 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 When('the user navigates to the Report page', async ({ reportPage }) => {
   await reportPage.navigateToPage();
 });
 
-// ── Filter Controls Visibility ────────────────────────────────────────────────
+// --- Filter Controls Visibility ---
 
 Then('the From Date picker should be visible', async ({ reportPage }) => {
   await reportPage.verifyFromDateVisible();
@@ -32,7 +32,7 @@ Then('the From Date picker, To Date picker, and Report Type dropdown should disp
   await reportPage.verifyThemeStyling();
 });
 
-// ── Date Input Steps ──────────────────────────────────────────────────────────
+// --- Date Input Steps ---
 
 When('the user selects a valid From Date', async ({ reportPage }) => {
   await reportPage.selectFromDate(reportPage.validFromDate);
@@ -87,7 +87,7 @@ When('the user selects a date range that contains no data', async ({ reportPage 
   await reportPage.selectToDate(reportPage.emptyRangeTo);
 });
 
-// ── Report Type Steps ─────────────────────────────────────────────────────────
+// --- Report Type Steps ---
 
 When('the user selects a report type from the dropdown', async ({ reportPage }) => {
   await reportPage.selectReportType();
@@ -109,7 +109,7 @@ Then('the selected report type should be displayed in the dropdown', async ({ re
   await reportPage.verifySelectedReportTypeReflected();
 });
 
-// ── Grouping Steps ────────────────────────────────────────────────────────────
+// --- Grouping Steps ---
 
 When('the user selects the {string} grouping level', async ({ reportPage }, groupingLabel) => {
   await reportPage.selectGroupingLevel(groupingLabel);
@@ -132,7 +132,7 @@ Given('the user has generated a report with {string} grouping', async ({ reportP
   await reportPage.clickGenerate();
 });
 
-// ── Generate Report Steps ─────────────────────────────────────────────────────
+// --- Generate Report Steps ---
 
 When('the user generates the report', async ({ reportPage }) => {
   await reportPage.clickGenerate();
@@ -173,7 +173,7 @@ Given('the user has expanded a group row', async ({ reportPage }) => {
   await reportPage.expandFirstGroupRow();
 });
 
-// ── Grid & Data Assertion Steps ───────────────────────────────────────────────
+// --- Grid & Data Assertion Steps ---
 
 Then('report data should be displayed in the Ag-Grid', async ({ reportPage }) => {
   await reportPage.verifyReportDataDisplayed();
@@ -219,7 +219,7 @@ Then('the data grid should be an Ag-Grid component', async ({ reportPage }) => {
   await reportPage.verifyAgGridComponent();
 });
 
-// ── Group Row Expand / Collapse ───────────────────────────────────────────────
+// --- Group Row Expand / Collapse ---
 
 When('the user expands a group row in the Ag-Grid', async ({ reportPage }) => {
   await reportPage.expandFirstGroupRow();
@@ -241,7 +241,7 @@ Then('child records for that group should be visible', async ({ reportPage }) =>
   await reportPage.verifyChildRecordsVisible();
 });
 
-// ── Validation Steps ──────────────────────────────────────────────────────────
+// --- Validation Steps ---
 
 Then('a validation error should be displayed indicating From Date cannot be after To Date', async ({ reportPage }) => {
   await reportPage.verifyDateRangeValidationError();
@@ -263,7 +263,7 @@ Then('a validation error should be displayed for the To Date field', async ({ re
   await reportPage.verifyToDateError();
 });
 
-// ── Empty State & Reset ───────────────────────────────────────────────────────
+// --- Empty State & Reset ---
 
 Then('the report grid should display an empty state or no results message', async ({ reportPage }) => {
   await reportPage.verifyEmptyStateInGrid();
@@ -273,7 +273,7 @@ Then('the Ag-Grid should reset or no data should be displayed', async ({ reportP
   await reportPage.verifyGridReset();
 });
 
-// ── Layout ────────────────────────────────────────────────────────────────────
+// --- Layout ---
 
 Then('the filters, grouping controls, and data grid should all be visible on a single screen', async ({ reportPage }) => {
   await reportPage.verifySingleScreenLayout();

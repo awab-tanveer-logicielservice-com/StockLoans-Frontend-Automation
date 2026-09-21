@@ -17,7 +17,7 @@ export class LCORPage {
     }).catch(() => {});
   }
 
-  // ── Navigation ──────────────────────────────────────────────────────────────
+  // --- Navigation ---
 
   async navigate() {
     const origin = new URL(ENV.baseURL).origin;
@@ -69,7 +69,7 @@ export class LCORPage {
     }
   }
 
-  // ── Grid Helpers ────────────────────────────────────────────────────────────
+  // --- Grid Helpers ---
 
   async waitForGridLoad() {
     const loading = this.page.locator('.ag-overlay-loading-wrapper');
@@ -78,7 +78,7 @@ export class LCORPage {
     await this.page.waitForTimeout(500);
   }
 
-  // ── Depository ──────────────────────────────────────────────────────────────
+  // --- Depository ---
 
   async selectDepository() {
     await this.hideSplash();
@@ -98,7 +98,7 @@ export class LCORPage {
     }
   }
 
-  // ── Form Fields ─────────────────────────────────────────────────────────────
+  // --- Form Fields ---
 
   async enterContraLoanetId(value = '0294') {
     const field = LOCATORS.LCORPage.contraLoanetIdInput(this.page);
@@ -158,7 +158,7 @@ export class LCORPage {
     await field.fill(value);
   }
 
-  // ── Composite Fill Helpers ──────────────────────────────────────────────────
+  // --- Composite Fill Helpers ---
 
   async fillRequiredFields() {
     await this.enterContraLoanetId();
@@ -168,7 +168,7 @@ export class LCORPage {
   async fillRequiredFieldsExcept(excluded) {
     if (excluded !== 'contraLoanetId') await this.enterContraLoanetId();
     if (excluded === 'quantity') {
-      // Symbol only, no quantity — enter symbol with no trailing number
+      // Symbol only, no quantity - enter symbol with no trailing number
       await this.enterSymbolAndQuantity('AAPL');
     } else if (excluded !== 'symbolOrCusip') {
       await this.enterSymbolAndQuantity();
@@ -178,7 +178,7 @@ export class LCORPage {
     await this.page.waitForTimeout(300);
   }
 
-  // ── Feature-Step Aliases ────────────────────────────────────────────────────
+  // --- Feature-Step Aliases ---
 
   async enterSymbolOrCusip() {
     // Symbol & Quantity are combined; fill the full entry including quantity
@@ -186,10 +186,10 @@ export class LCORPage {
   }
 
   async enterQuantity() {
-    // Quantity is already part of the symbolAndQuantity textarea set above — no-op
+    // Quantity is already part of the symbolAndQuantity textarea set above - no-op
   }
 
-  // ── Invalid Value Scenarios ─────────────────────────────────────────────────
+  // --- Invalid Value Scenarios ---
 
   async enterInvalidQuantity(value) {
     const field = LOCATORS.LCORPage.symbolAndQuantityTextarea(this.page);
@@ -215,7 +215,7 @@ export class LCORPage {
     await this.page.waitForTimeout(500);
   }
 
-  // ── Actions ─────────────────────────────────────────────────────────────────
+  // --- Actions ---
 
   async submitBatch() {
     await this.page.evaluate(() => {
@@ -245,7 +245,7 @@ export class LCORPage {
     }
   }
 
-  // ── Assertions ──────────────────────────────────────────────────────────────
+  // --- Assertions ---
 
   async hasGridRowsOrEmpty() {
     await this.waitForGridLoad();
@@ -273,7 +273,7 @@ export class LCORPage {
     const pinnedRow = LOCATORS.LCORPage.pinnedRow(this.page);
     const hasPinned = await pinnedRow.isVisible().catch(() => false);
     if (hasPinned) return;
-    // No pinned row when grid is empty (dev may have no data) — verify grid is visible
+    // No pinned row when grid is empty (dev may have no data) - verify grid is visible
     await expect(LOCATORS.LCORPage.grid(this.page)).toBeVisible({ timeout: this.defaultTimeout });
   }
 
@@ -305,7 +305,7 @@ export class LCORPage {
       classes.includes('disabled')
     ) return;
 
-    // Button appears enabled — click and accept: error message OR staying on page
+    // Button appears enabled - click and accept: error message OR staying on page
     await btn.click({ force: true });
     await this.page.waitForTimeout(1000);
     const hasError = await this.page.locator('mat-error, [role="alert"], mat-snack-bar-container').isVisible().catch(() => false);

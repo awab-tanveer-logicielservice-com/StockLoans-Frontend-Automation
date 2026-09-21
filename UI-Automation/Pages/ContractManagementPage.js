@@ -17,10 +17,10 @@ export class ContractManagementPage {
     }).catch(() => {});
   }
 
-  // ── Navigation ──────────────────────────────────────────────────────────────
+  // --- Navigation ---
 
   async closeTradePanel() {
-    // Contract Management page opens with the Trade panel visible — close it before interacting
+    // Contract Management page opens with the Trade panel visible - close it before interacting
     const closed = await this.page.evaluate(() => {
       const closeButtons = Array.from(document.querySelectorAll('button[aria-label="Close"]'));
       for (const btn of closeButtons) {
@@ -51,7 +51,7 @@ export class ContractManagementPage {
     await this.page.waitForTimeout(1000);
   }
 
-  // ── Grid Helpers ────────────────────────────────────────────────────────────
+  // --- Grid Helpers ---
 
   async waitForGridLoad() {
     const loading = this.page.locator('.ag-overlay-loading-wrapper');
@@ -80,7 +80,7 @@ export class ContractManagementPage {
     await expect(grid).toBeVisible();
   }
 
-  // ── Depository ──────────────────────────────────────────────────────────────
+  // --- Depository ---
 
   async selectDepository() {
     await this.hideSplash();
@@ -116,7 +116,7 @@ export class ContractManagementPage {
     }
   }
 
-  // ── View Switching ──────────────────────────────────────────────────────────
+  // --- View Switching ---
 
   async selectView(viewText) {
     await this.hideSplash();
@@ -149,7 +149,7 @@ export class ContractManagementPage {
     await this.selectView('All');
   }
 
-  // ── Row Selection ───────────────────────────────────────────────────────────
+  // --- Row Selection ---
 
   async selectSubmittedContractRow() {
     await this.waitForGridLoad();
@@ -166,7 +166,7 @@ export class ContractManagementPage {
       await gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout });
       await gridRow.first().click({ force: true });
     } catch {
-      // No rows visible — soft pass
+      // No rows visible - soft pass
     }
   }
 
@@ -176,7 +176,7 @@ export class ContractManagementPage {
     await gridRow.first().click({ force: true });
   }
 
-  // ── Approve / Deny ──────────────────────────────────────────────────────────
+  // --- Approve / Deny ---
 
   async clickApprove() {
     const btn = LOCATORS.ContractManagementPage.approveButton(this.page);
@@ -185,7 +185,7 @@ export class ContractManagementPage {
       await btn.click({ force: true });
       await this.page.waitForTimeout(2000);
     } catch {
-      // No Approve button visible — no submitted contracts in QA environment; soft pass
+      // No Approve button visible - no submitted contracts in QA environment; soft pass
       await expect(LOCATORS.ContractManagementPage.grid(this.page)).toBeVisible({ timeout: this.defaultTimeout });
     }
   }
@@ -197,7 +197,7 @@ export class ContractManagementPage {
       await btn.click({ force: true });
       await this.page.waitForTimeout(2000);
     } catch {
-      // No Deny button visible — no submitted contracts in QA environment; soft pass
+      // No Deny button visible - no submitted contracts in QA environment; soft pass
       await expect(LOCATORS.ContractManagementPage.grid(this.page)).toBeVisible({ timeout: this.defaultTimeout });
     }
   }
@@ -226,7 +226,7 @@ export class ContractManagementPage {
     await expect(LOCATORS.ContractManagementPage.grid(this.page)).toBeVisible({ timeout: this.defaultTimeout });
   }
 
-  // ── DTC Status Toggle ───────────────────────────────────────────────────────
+  // --- DTC Status Toggle ---
 
   async _clickDtcCheckboxInRow(rowIndex = 0) {
     await this.waitForGridLoad();
@@ -284,7 +284,7 @@ export class ContractManagementPage {
     await expect(LOCATORS.ContractManagementPage.grid(this.page)).toBeVisible({ timeout: this.defaultTimeout });
   }
 
-  // ── Inline Notes Edit ───────────────────────────────────────────────────────
+  // --- Inline Notes Edit ---
 
   async editNotesField() {
     await this.waitForGridLoad();
@@ -300,7 +300,7 @@ export class ContractManagementPage {
       await expect(LOCATORS.ContractManagementPage.grid(this.page)).toBeVisible({ timeout: this.defaultTimeout });
       return;
     }
-    // "Notes" column confirmed in DOM snapshot — col-id="notes"
+    // "Notes" column confirmed in DOM snapshot - col-id="notes"
     const notesCell = gridRow.first().locator('.ag-cell[col-id="notes"]').first();
     if (await notesCell.count() > 0) {
       await notesCell.dblclick({ force: true });
@@ -333,7 +333,7 @@ export class ContractManagementPage {
     await expect(LOCATORS.ContractManagementPage.grid(this.page)).toBeVisible({ timeout: this.defaultTimeout });
   }
 
-  // ── Role-Based Access Checks ────────────────────────────────────────────────
+  // --- Role-Based Access Checks ---
 
   async isApproveDenyNotAvailable() {
     const approveBtn = LOCATORS.ContractManagementPage.approveButton(this.page);

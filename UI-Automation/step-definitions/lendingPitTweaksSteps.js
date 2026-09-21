@@ -3,13 +3,13 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 When('the user navigates to the Lending Pit Lookup page', async ({ searchLendingPitLookUpPage }) => {
   await searchLendingPitLookUpPage.navigateToLendingPitLookup();
 });
 
-// ── Actions ───────────────────────────────────────────────────────────────────
+// --- Actions ---
 
 When('the user enters a valid symbol in the search field', async ({ searchLendingPitLookUpPage }) => {
   await searchLendingPitLookUpPage.enterSymbol('AAPL');
@@ -27,7 +27,7 @@ When('the user clicks the submit button without entering a symbol', async ({ sea
   await searchLendingPitLookUpPage.clearSymbolAndSubmit();
 });
 
-// ── Assertions — Ag-Grid ──────────────────────────────────────────────────────
+// --- Assertions - Ag-Grid ---
 
 Then('the Lending Pit Ag-Grid should be visible', async ({ searchLendingPitLookUpPage }) => {
   await searchLendingPitLookUpPage.verifyAgGridVisible();
@@ -61,7 +61,7 @@ Then('the grid should display the empty state overlay or a validation message', 
   await searchLendingPitLookUpPage.verifyEmptyStateOrValidation();
 });
 
-// ── Assertions — Columns ─────────────────────────────────────────────────────
+// --- Assertions - Columns ---
 
 Then('the results grid should display the {string} column', async ({ searchLendingPitLookUpPage }, columnName) => {
   await searchLendingPitLookUpPage.verifyColumnVisible(columnName);
@@ -71,7 +71,7 @@ Then('the grid should contain a row matching the searched symbol', async ({ sear
   await searchLendingPitLookUpPage.verifyRowMatchesSymbol(null);
 });
 
-// ── Assertions — UI Consistency ───────────────────────────────────────────────
+// --- Assertions - UI Consistency ---
 
 Then('the Lending Pit page header should be visible with consistent styling', async ({ searchLendingPitLookUpPage }) => {
   await searchLendingPitLookUpPage.verifyPageHeaderVisible();
@@ -93,13 +93,13 @@ Then('the Lending Pit page container should have consistent theme colors applied
   await searchLendingPitLookUpPage.verifyThemeColorsApplied();
 });
 
-// ── Assertions — Negative / Edge ─────────────────────────────────────────────
+// --- Assertions - Negative / Edge ---
 
 Then('the page should not crash', async ({ searchLendingPitLookUpPage }) => {
   await searchLendingPitLookUpPage.verifyPageNotCrashed();
 });
 
-// ── Scenario Outline ─────────────────────────────────────────────────────────
+// --- Scenario Outline ---
 
 Then('the expected search outcome should be {string}', async ({ searchLendingPitLookUpPage }, outcome) => {
   await searchLendingPitLookUpPage.verifySearchOutcome(outcome);
