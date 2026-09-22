@@ -27,7 +27,7 @@ export class ReportPage {
 
   defaultTimeout = 15000;
 
-  // ── Dates used across scenarios ──────────────────────────────────────────────
+  // --- Dates used across scenarios ---
   // Using fixed dates in the past so QA data should always exist for them.
   validFromDate = '01/01/2025';
   validToDate   = '01/31/2025';
@@ -142,7 +142,7 @@ export class ReportPage {
   }
 
   async selectReversedDateRange() {
-    // From after To — should trigger validation
+    // From after To - should trigger validation
     await this.selectFromDate(this.validToDate);
     await this.selectToDate(this.validFromDate);
   }
@@ -239,7 +239,7 @@ export class ReportPage {
     // Wait for loading to finish; wide date ranges can take longer
     await this.loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
     await this.page.waitForTimeout(500);
-    // Grid visible and loading done is sufficient — rows may be virtualised
+    // Grid visible and loading done is sufficient - rows may be virtualised
   }
 
   async verifyGroupedBy(groupingLabel) {
@@ -275,7 +275,7 @@ export class ReportPage {
   }
 
   async verifyReportNotGenerated() {
-    // Grid should be hidden or show empty state — no data rows
+    // Grid should be hidden or show empty state - no data rows
     const hasRows = await this.gridRow.first().isVisible({ timeout: 3000 }).catch(() => false);
     const isGridHidden = !(await this.grid.isVisible({ timeout: 3000 }).catch(() => false));
     expect(isGridHidden || !hasRows).toBeTruthy();
@@ -327,7 +327,7 @@ export class ReportPage {
       const expandToggle = firstGroupRow.locator('.ag-group-expanded, .ag-group-value, .ag-cell-expandable').first();
       await expandToggle.click({ force: true });
     } else {
-      // No group rows; grid may have flat data or no data — click first row if present
+      // No group rows; grid may have flat data or no data - click first row if present
       const firstRow = this.page.locator('.ag-center-cols-container .ag-row').first();
       const hasRows = await firstRow.isVisible({ timeout: 3000 }).catch(() => false);
       if (hasRows) {

@@ -3,13 +3,13 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 When('the user navigates to the LCOR page', async ({ lcorPage }) => {
   await lcorPage.navigate();
 });
 
-// ── Depository ────────────────────────────────────────────────────────────────
+// --- Depository ---
 
 When('the user selects a depository', async ({ lcorPage }) => {
   await lcorPage.selectDepository();
@@ -27,7 +27,7 @@ When('the user changes to a different depository', async ({ lcorPage }) => {
   await lcorPage.selectDifferentDepository();
 });
 
-// ── Required Field Entry ──────────────────────────────────────────────────────
+// --- Required Field Entry ---
 
 When('the user enters a valid Contra Loanet ID', async ({ lcorPage }) => {
   await lcorPage.enterContraLoanetId();
@@ -45,7 +45,7 @@ When('the user enters all required LCOR fields', async ({ lcorPage }) => {
   await lcorPage.fillRequiredFields();
 });
 
-// ── Advanced Field Entry ──────────────────────────────────────────────────────
+// --- Advanced Field Entry ---
 
 When('the user enters the minimum quantity', async ({ lcorPage }) => {
   await lcorPage.enterMinQuantity();
@@ -75,7 +75,7 @@ When('the user enters a public comment', async ({ lcorPage }) => {
   await lcorPage.enterPublicComment();
 });
 
-// ── Validation Fill Variants ──────────────────────────────────────────────────
+// --- Validation Fill Variants ---
 
 When('the user fills in LCOR batch fields', async ({ lcorPage }) => {
   await lcorPage.fillRequiredFields();
@@ -101,7 +101,7 @@ When('the user enters {string} in the Min Rebate field', async ({ lcorPage }, va
   await lcorPage.enterInvalidMinRebate(value);
 });
 
-// ── Actions ───────────────────────────────────────────────────────────────────
+// --- Actions ---
 
 When('the user submits the LCOR batch', async ({ lcorPage }) => {
   await lcorPage.submitBatch();
@@ -115,7 +115,7 @@ When('the user clicks on an LCOR row in the grid', async ({ lcorPage }) => {
   await lcorPage.clickGridRow();
 });
 
-// ── Assertions ────────────────────────────────────────────────────────────────
+// --- Assertions ---
 
 Then('current-day LCOR records for the selected depository should be displayed in the grid', async ({ lcorPage }) => {
   await lcorPage.hasGridRowsOrEmpty();

@@ -51,7 +51,7 @@ export class AddNewCounterPartyPage {
                 await this.entityDropdown.click({ force: true, timeout: 3000 });
                 clicked = true;
             } catch {
-                return; // entity dropdown not clickable — soft-pass
+                return; // entity dropdown not clickable - soft-pass
             }
         }
 

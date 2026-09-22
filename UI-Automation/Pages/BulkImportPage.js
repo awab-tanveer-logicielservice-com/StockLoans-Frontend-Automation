@@ -7,7 +7,7 @@ import { ENV } from '../Config/env.js';
 const DEFAULTS = {
   counterparty: '6019',
   symbol: 'AAPL',
-  // Used when a scenario needs a second, distinct Grid 1 row — see
+  // Used when a scenario needs a second, distinct Grid 1 row - see
   // ensureGrid1HasMultipleRecords(). Must be a symbol this environment carries.
   secondSymbol: 'MSFT',
   qty: '100',
@@ -49,7 +49,7 @@ export class BulkImportPage {
     this._rate   = DEFAULTS.rate;
   }
 
-  // ── Navigation ────────────────────────────────────────────────────────────────
+  // --- Navigation ---
 
   async navigate() {
     const origin = new URL(ENV.baseURL).origin;
@@ -94,7 +94,7 @@ export class BulkImportPage {
     });
   }
 
-  // ── Page-level assertions ─────────────────────────────────────────────────────
+  // --- Page-level assertions ---
 
   async isBulkImportPageVisible() {
     await expect(this.borrowButton).toBeVisible({ timeout: 15000 });
@@ -105,7 +105,7 @@ export class BulkImportPage {
     await expect(this.loanButton).toBeEnabled({ timeout: 10000 });
   }
 
-  // ── Toggle actions ────────────────────────────────────────────────────────────
+  // --- Toggle actions ---
 
   async selectToggle(name) {
     if (/borrow/i.test(name)) {
@@ -133,22 +133,22 @@ export class BulkImportPage {
     await expect(btn).toBeVisible();
   }
 
-  // ── Form fill — counterparty ───────────────────────────────────────────────────
+  // --- Form fill - counterparty ---
 
   async selectCounterparty(name = DEFAULTS.counterparty) {
     // After _dismissSplashScreen() hides the splash, click() without force works and
-    // properly sets browser focus — which Angular Material's autocomplete requires.
+    // properly sets browser focus - which Angular Material's autocomplete requires.
     await this.counterpartyCombobox.click();
     // Clear first: ensureGrid1HasMultipleRecords() imports twice in one scenario,
     // and pressSequentially appends, so the second pass would otherwise send
-    // "60196019" — an invalid counterparty that leaves Import disabled.
+    // "60196019" - an invalid counterparty that leaves Import disabled.
     await this.counterpartyCombobox.fill('');
     await this.counterpartyCombobox.pressSequentially(name, { delay: 50 });
 
     // Give the HTTP-backed autocomplete time to respond
     await this.page.waitForTimeout(2000);
 
-    // Click the dropdown option if it appears (optional — typing the ID alone is accepted)
+    // Click the dropdown option if it appears (optional - typing the ID alone is accepted)
     const option = this.page.locator('mat-option, .mat-option, [role="option"]').first();
     if (await option.isVisible({ timeout: 3000 }).catch(() => false)) {
       try {
@@ -161,7 +161,7 @@ export class BulkImportPage {
     await this.page.waitForTimeout(400);
   }
 
-  // ── Form fill — individual fields (state accumulation) ────────────────────────
+  // --- Form fill - individual fields (state accumulation) ---
 
   setSymbol(value) { this._symbol = value; }
   setQty(value)    { this._qty    = value; }
@@ -176,7 +176,7 @@ export class BulkImportPage {
     await this.page.waitForTimeout(200);
   }
 
-  // ── Additional optional fields ────────────────────────────────────────────────
+  // --- Additional optional fields ---
 
   async enterBatchCode(value = DEFAULTS.batchCode) {
     const field = this.page.locator('input[placeholder*="Batch"], input[name*="batch"]').first();
@@ -228,7 +228,7 @@ export class BulkImportPage {
     }
   }
 
-  // ── Import action ─────────────────────────────────────────────────────────────
+  // --- Import action ---
 
   async clickImport() {
     await this._fillComposedInput();
@@ -238,7 +238,7 @@ export class BulkImportPage {
     await this.page.waitForTimeout(3000);
   }
 
-  // ── Grid 1 interactions ───────────────────────────────────────────────────────
+  // --- Grid 1 interactions ---
 
   async _hideGridOverlays() {
     // The ag-overlay-loading-wrapper sits on top of the grid body and intercepts clicks.
@@ -275,7 +275,7 @@ export class BulkImportPage {
     await this.page.waitForTimeout(300);
   }
 
-  // ── Submit actions ────────────────────────────────────────────────────────────
+  // --- Submit actions ---
 
   async clickSubmit() {
     await this.submitButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -288,7 +288,7 @@ export class BulkImportPage {
 
   async clickSubmitWithoutSelection() {
     await this.submitButton.waitFor({ state: 'visible', timeout: 10000 });
-    // Attempt click even if disabled — should trigger warning
+    // Attempt click even if disabled - should trigger warning
     await this.submitButton.click({ force: true });
     await this.page.waitForTimeout(500);
   }
@@ -299,7 +299,7 @@ export class BulkImportPage {
     await this.page.waitForTimeout(500);
   }
 
-  // ── Precondition helpers ──────────────────────────────────────────────────────
+  // --- Precondition helpers ---
 
   /**
    * Performs one import and waits for the row to actually reach Grid 1.
@@ -313,7 +313,7 @@ export class BulkImportPage {
   async _doOneImport(symbol = DEFAULTS.symbol) {
     // Side has to be set before the form validates. Every explicit Gherkin flow
     // opens with "the user selects the Borrow toggle", but this helper skipped
-    // it, so Import stayed disabled — and clickImport() force-clicks, which on a
+    // it, so Import stayed disabled - and clickImport() force-clicks, which on a
     // disabled button silently does nothing: no request, no snackbar, no row.
     // That is why this failed as "Grid 1 never populated" with no app feedback,
     // and why only the scenarios relying on this precondition were affected.
@@ -326,7 +326,7 @@ export class BulkImportPage {
     // 45s, not 20s: the row reaches Grid 1 through a Firestore listener and
     // regularly takes longer than 20s on QA. The giveaway was that
     // ensureGrid1HasMultipleRecords() passed while ensureGrid1HasRecord()
-    // failed on the same helper — the two-import loop simply spent long enough
+    // failed on the same helper - the two-import loop simply spent long enough
     // preparing its second import for the first row to land in the meantime.
     return await this.grid1Row
       .first()
@@ -348,7 +348,7 @@ export class BulkImportPage {
   async _failMissingGrid1Row(context) {
     const feedback = await this._importFeedbackText();
     // Whether Import was even clickable separates "the app rejected this import"
-    // from "the form never validated, so nothing was ever submitted" — the two
+    // from "the form never validated, so nothing was ever submitted" - the two
     // look identical from the grid, and only the second leaves no feedback.
     const importEnabled = await this.importButton.isEnabled().catch(() => null);
     throw new Error(
@@ -366,8 +366,8 @@ export class BulkImportPage {
 
   async ensureGrid1HasMultipleRecords() {
     // Distinct symbols per row. Importing the same symbol/qty/rate twice updates
-    // the existing Grid 1 row instead of adding a second one, so the old loop —
-    // which re-imported DEFAULTS.symbol each pass — could never reach two
+    // the existing Grid 1 row instead of adding a second one, so the old loop -
+    // which re-imported DEFAULTS.symbol each pass - could never reach two
     // records, and reported success anyway because it never checked the count.
     for (const symbol of [DEFAULTS.symbol, DEFAULTS.secondSymbol]) {
       const before = await this.grid1Row.count();
@@ -383,7 +383,7 @@ export class BulkImportPage {
     }
   }
 
-  // ── Grid 1 assertions ─────────────────────────────────────────────────────────
+  // --- Grid 1 assertions ---
 
   async isGrid1RecordVisible() {
     const hasRows = await this.grid1Row.first().waitFor({ state: 'attached', timeout: 30000 }).then(() => true).catch(() => false);
@@ -403,8 +403,8 @@ export class BulkImportPage {
   async isGrid1RecordGone(symbol) {
     // The step reads "Grid 1 should no longer contain the submitted record", but
     // this asserted the entire grid was empty. Grid 1 is shared, persistent
-    // backend state — other scenarios, and the standard/FPL features running in
-    // parallel across workers, legitimately leave rows behind — so an empty-grid
+    // backend state - other scenarios, and the standard/FPL features running in
+    // parallel across workers, legitimately leave rows behind - so an empty-grid
     // assertion fails for reasons that have nothing to do with this submission.
     // Scope it to the record actually submitted, which is what the step claims.
     const target = symbol || this._lastImportedSymbol || DEFAULTS.symbol;
@@ -421,10 +421,10 @@ export class BulkImportPage {
     await expect(this.grid1Row).toHaveCount(0, { timeout: 15000 });
   }
 
-  // ── Grid 2 assertions ─────────────────────────────────────────────────────────
+  // --- Grid 2 assertions ---
 
   async isSubmittedRecordInGrid2() {
-    // Grid 1 is shared, persistent QA backend state — other concurrent/prior test runs can leave
+    // Grid 1 is shared, persistent QA backend state - other concurrent/prior test runs can leave
     // their own unsubmitted rows behind, so it may never reach exactly 0. Soft-pass this signal
     // rather than hard-failing on a count this test doesn't fully control.
     await expect(this.grid1Row).toHaveCount(0, { timeout: 15000 }).catch(() => {});
@@ -447,19 +447,19 @@ export class BulkImportPage {
   }
 
   async isGrid2EmptyState() {
-    // Grid uses loading overlay (not no-rows wrapper) when empty — check for 0 rows
+    // Grid uses loading overlay (not no-rows wrapper) when empty - check for 0 rows
     await expect(this.grid2Row).toHaveCount(0, { timeout: 15000 });
   }
 
   async areAllRecordsInGrid2() {
-    // Primary signal: Grid 1 must be empty — confirms bulk submit was accepted.
+    // Primary signal: Grid 1 must be empty - confirms bulk submit was accepted.
     await expect(this.grid1Row).toHaveCount(0, { timeout: 15000 });
     // Best-effort: wait briefly for Grid 2 rows (Firestore may be delayed in test env).
     await this.page.locator('ag-grid-angular').nth(1).locator('.ag-row')
       .first().waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
   }
 
-  // ── Restriction / warning assertions ─────────────────────────────────────────
+  // --- Restriction / warning assertions ---
 
   async isSubmitBlocked() {
     // Submit is blocked if it is disabled (no rows selected or no permissions)
@@ -473,19 +473,19 @@ export class BulkImportPage {
 
   async isAccessRestrictionVisible() {
     // For a read-only user an access restriction snackbar/alert should appear.
-    // With admin credentials the submit button is simply disabled — accept that too.
+    // With admin credentials the submit button is simply disabled - accept that too.
     const disabled = await this.submitButton.isDisabled().catch(() => false);
     if (disabled) return;
     await expect(this.accessRestrictionMessage).toBeVisible({ timeout: 10000 });
   }
 
   async isRowSelectionWarningVisible() {
-    // QA env may not show a snackbar warning — soft pass
+    // QA env may not show a snackbar warning - soft pass
     const visible = await this.rowSelectionWarning.isVisible({ timeout: 10000 }).catch(() => false);
     if (!visible) return;
   }
 
-  // ── Validation error assertions ───────────────────────────────────────────────
+  // --- Validation error assertions ---
 
   async isValidationErrorVisible() {
     // The app shows a Material snackbar instead of mat-error for import validation
@@ -494,7 +494,7 @@ export class BulkImportPage {
     ).toBeVisible({ timeout: 10000 });
   }
 
-  // ── Scenario Outline outcome helper ──────────────────────────────────────────
+  // --- Scenario Outline outcome helper ---
 
   async assertExpectedOutcome(outcome) {
     if (/success/i.test(outcome)) {
@@ -504,7 +504,7 @@ export class BulkImportPage {
     }
   }
 
-  // ── FPL Mode ──────────────────────────────────────────────────────────────────
+  // --- FPL Mode ---
 
   _fplSymbol = 'AAPL';
   _fplQty    = '100';
@@ -551,7 +551,7 @@ export class BulkImportPage {
       const required = await rateInput.getAttribute('required');
       if (required !== null) throw new Error('Rate field must not be required in FPL Mode');
     }
-    // If not visible, system-driven pricing is confirmed — pass silently
+    // If not visible, system-driven pricing is confirmed - pass silently
   }
 
   async _fillFPLComposedInput() {
@@ -616,7 +616,7 @@ export class BulkImportPage {
       .first().waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
   }
 
-  // ── Legacy helpers (kept for compatibility) ───────────────────────────────────
+  // --- Legacy helpers (kept for compatibility) ---
 
   async navigateToBulkImport() { await this.navigate(); }
 

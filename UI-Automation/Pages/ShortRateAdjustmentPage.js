@@ -65,7 +65,7 @@ export class ShortRateAdjustmentPage {
   }
 
   async closeTradePanel() {
-    // The Trade panel auto-opens on this page — close it before grid interaction
+    // The Trade panel auto-opens on this page - close it before grid interaction
     const closeBtn = this.page.getByRole('button', { name: 'Close' }).first();
     const isVisible = await closeBtn.isVisible({ timeout: 3000 }).catch(() => false);
     if (isVisible) {
@@ -105,7 +105,7 @@ export class ShortRateAdjustmentPage {
     await this.closeTradePanel();
   }
 
-  // ── Assertions ────────────────────────────────────────────────────────────
+  // --- Assertions ---
 
   async verifyGridVisible() {
     await expect(this.grid).toBeVisible({ timeout: this.defaultTimeout });
@@ -133,7 +133,7 @@ export class ShortRateAdjustmentPage {
     await expect(this.agGridRoot).toBeVisible({ timeout: this.defaultTimeout });
   }
 
-  // ── Row Selection ─────────────────────────────────────────────────────────
+  // --- Row Selection ---
 
   async selectFirstRow() {
     await this.firstCell.waitFor({ state: 'visible', timeout: 20000 });
@@ -150,7 +150,7 @@ export class ShortRateAdjustmentPage {
     }
   }
 
-  // ── Inline Rate Editing ───────────────────────────────────────────────────
+  // --- Inline Rate Editing ---
   // The Rate column uses AG-Grid inline editing: double-click a Rate cell to
   // activate an input within the cell, then press Enter to commit.
 
@@ -202,12 +202,12 @@ export class ShortRateAdjustmentPage {
     if (!inputVisible) {
       await expect(this.grid).toBeVisible({ timeout: this.defaultTimeout });
     } else {
-      // Soft pass — grid is still intact and no unintended save has occurred
+      // Soft pass - grid is still intact and no unintended save has occurred
       await expect(this.grid).toBeVisible({ timeout: this.defaultTimeout });
     }
   }
 
-  // ── Save (commit inline edit) ─────────────────────────────────────────────
+  // --- Save (commit inline edit) ---
 
   async clickSave() {
     // Commit the AG-Grid inline edit by pressing Enter
@@ -221,7 +221,7 @@ export class ShortRateAdjustmentPage {
     await expect(this.grid).toBeVisible({ timeout: this.defaultTimeout });
   }
 
-  // ── Success / Validation ──────────────────────────────────────────────────
+  // --- Success / Validation ---
 
   async verifySuccessMessage() {
     const snackVisible = await this.successMessage.isVisible({ timeout: 8000 }).catch(() => false);
@@ -242,7 +242,7 @@ export class ShortRateAdjustmentPage {
     }
   }
 
-  // ── Empty State ───────────────────────────────────────────────────────────
+  // --- Empty State ---
 
   async waitForGridLoad() {
     await this.grid.waitFor({ state: 'visible', timeout: this.defaultTimeout });

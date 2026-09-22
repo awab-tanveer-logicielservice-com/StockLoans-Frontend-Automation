@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, basename } from 'path';
 
-// ── Config ────────────────────────────────────────────────────────────────────
+// --- Config ---
 const BASE_URL      = 'https://qa-sls-v2.web.app';
 const APP_USER      = 'awab.tanveer@vcttechnologiesllc.com';
 const APP_PWD       = 'Test+123456@!';
@@ -22,7 +22,7 @@ const PAGE_ID       = '2990505999';
 
 const AUTH_HEADER   = 'Basic ' + Buffer.from(`${ATLASS_EMAIL}:${ATLASS_TOKEN}`).toString('base64');
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// --- Helpers ---
 async function hideSplash(page) {
   await page.evaluate(() => {
     document.querySelectorAll('app-splash-screen, .splash-overlay').forEach(el => {
@@ -140,7 +140,7 @@ async function updateExistingAttachment(filename, fileData) {
   return { id: existing.id, filename, downloadUrl };
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+// --- Main ---
 async function main() {
   mkdirSync(SS_DIR, { recursive: true });
 
@@ -151,7 +151,7 @@ async function main() {
   const attachments = {};
 
   try {
-    // ── 1. LOGIN PAGE ─────────────────────────────────────────────────────────
+    // --- 1. LOGIN PAGE ---
     console.log('\n[1/15] Login page…');
     await page.goto(`${BASE_URL}/login`);
     await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
@@ -159,7 +159,7 @@ async function main() {
     await page.waitForSelector('#email', { timeout: 15000 });
     attachments['Login'] = await shot(page, '01-login', 'Login page');
 
-    // ── LOGIN ─────────────────────────────────────────────────────────────────
+    // --- LOGIN ---
     await page.fill('#email', APP_USER);
     await page.fill('#password', APP_PWD);
     await page.click('button.login-btn');
@@ -167,13 +167,13 @@ async function main() {
     await page.waitForTimeout(3000);
     await hideSplash(page);
 
-    // ── 2. STOCK LOAN BLOTTER (Contract Summary = main blotter view) ──────────
+    // --- 2. STOCK LOAN BLOTTER (Contract Summary = main blotter view) ---
     console.log('\n[2/15] Stock Loan Blotter (Contract Summary)…');
     await waitForGrid(page);
     await hideSplash(page);
     attachments['Stock Loan Blotter'] = await shot(page, '02-blotter', 'Stock Loan Blotter');
 
-    // ── 3. NEW BORROW/LOAN ENTRY (Trade Panel) ────────────────────────────────
+    // --- 3. NEW BORROW/LOAN ENTRY (Trade Panel) ---
     console.log('\n[3/15] New Borrow/Loan Entry (Trade panel)…');
     try {
       await clickFirstRow(page);
@@ -187,23 +187,23 @@ async function main() {
     attachments['New Borrow / Loan Entry (Floating Order Entry)'] =
       await shot(page, '03-order-entry', 'Order Entry');
 
-    // ── 4. FIXED QUICK ORDER ENTRY (QOE) ──────────────────────────────────────
+    // --- 4. FIXED QUICK ORDER ENTRY (QOE) ---
     console.log('\n[4/15] Fixed Quick Order Entry…');
     // Close any open dialog first
     await page.keyboard.press('Escape').catch(() => {});
     await page.waitForTimeout(500);
     await hideSplash(page);
-    // QOE strip is typically visible on the same page — crop the top toolbar area
+    // QOE strip is typically visible on the same page - crop the top toolbar area
     attachments['Fixed Quick Order Entry (QOE)'] =
       await shot(page, '04-qoe', 'Fixed QOE');
 
-    // ── 5. SERVER-SIDE FILTERING ──────────────────────────────────────────────
+    // --- 5. SERVER-SIDE FILTERING ---
     console.log('\n[5/15] Server-Side Filtering…');
     // Navigate back to contract summary cleanly
     await page.goto(`${BASE_URL}/contract-summary`);
     await waitForGrid(page);
     await hideSplash(page);
-    // Filters are visible on the page — show them
+    // Filters are visible on the page - show them
     const symbolFilter = page.locator('input[placeholder="Symbol / CUSIP"]');
     if (await symbolFilter.isVisible({ timeout: 5000 })) {
       await symbolFilter.fill('AAPL');
@@ -211,7 +211,7 @@ async function main() {
     attachments['Server-Side Filtering'] =
       await shot(page, '05-filtering', 'Server-Side Filtering');
 
-    // ── 6. PAGING ─────────────────────────────────────────────────────────────
+    // --- 6. PAGING ---
     console.log('\n[6/15] Paging…');
     // Clear filter first
     const clearBtn = page.locator('button').filter({ hasText: /^clear$/i }).first();
@@ -226,7 +226,7 @@ async function main() {
     attachments['Paging'] = await shot(page, '06-paging', 'Paging');
     await page.evaluate(() => window.scrollTo(0, 0));
 
-    // ── 7. TRANSACTION ACTIONS ────────────────────────────────────────────────
+    // --- 7. TRANSACTION ACTIONS ---
     console.log('\n[7/15] Transaction Actions…');
     await page.goto(`${BASE_URL}/contract-summary`);
     await waitForGrid(page);
@@ -240,7 +240,7 @@ async function main() {
     attachments['Transaction Actions'] =
       await shot(page, '07-transaction-actions', 'Transaction Actions');
 
-    // ── 8. LOCATE REQUESTS (Lending Pit) ─────────────────────────────────────
+    // --- 8. LOCATE REQUESTS (Lending Pit) ---
     console.log('\n[8/15] Locate Requests (Lending Pit)…');
     try {
       await navigateViaMenu(page, 'Lending Pit');
@@ -253,7 +253,7 @@ async function main() {
     attachments['Locate Requests'] =
       await shot(page, '08-locate-requests', 'Locate Requests / Lending Pit');
 
-    // ── 9. INCOMING REQUESTS (Bulk Import) ───────────────────────────────────
+    // --- 9. INCOMING REQUESTS (Bulk Import) ---
     console.log('\n[9/15] Incoming Requests (Bulk Import)…');
     try {
       await navigateViaMenu(page, 'Bulk Import');
@@ -266,7 +266,7 @@ async function main() {
     attachments['Incoming Requests'] =
       await shot(page, '09-incoming-requests', 'Incoming Requests / Bulk Import');
 
-    // ── 10. INVENTORY (FPL Accounts) ─────────────────────────────────────────
+    // --- 10. INVENTORY (FPL Accounts) ---
     console.log('\n[10/15] Inventory (FPL Accounts)…');
     try {
       await navigateViaMenu(page, 'FPL Accounts');
@@ -279,7 +279,7 @@ async function main() {
     attachments['Inventory'] =
       await shot(page, '10-inventory', 'Inventory / FPL Accounts');
 
-    // ── 11. MARK-TO-MARKET WINDOW (Contract Details) ─────────────────────────
+    // --- 11. MARK-TO-MARKET WINDOW (Contract Details) ---
     console.log('\n[11/15] Mark-to-Market Window (Contract Details)…');
     await page.goto(`${BASE_URL}/contract-summary`);
     await waitForGrid(page);
@@ -297,7 +297,7 @@ async function main() {
     attachments['Mark-to-Market Window'] =
       await shot(page, '11-mark-to-market', 'Mark-to-Market');
 
-    // ── 12. POSITION SUMMARY (Contract Summary pinned totals) ─────────────────
+    // --- 12. POSITION SUMMARY (Contract Summary pinned totals) ---
     console.log('\n[12/15] Position Summary…');
     await page.goto(`${BASE_URL}/contract-summary`);
     await waitForGrid(page);
@@ -305,7 +305,7 @@ async function main() {
     attachments['Position Summary'] =
       await shot(page, '12-position-summary', 'Position Summary');
 
-    // ── 13. GRID ACTIONS (right-click context menu) ───────────────────────────
+    // --- 13. GRID ACTIONS (right-click context menu) ---
     console.log('\n[13/15] Grid Actions (right-click menu)…');
     await page.goto(`${BASE_URL}/contract-summary`);
     await waitForGrid(page);
@@ -321,7 +321,7 @@ async function main() {
     // Close context menu
     await page.keyboard.press('Escape').catch(() => {});
 
-    // ── 14. BOTTOM TOOLBAR (sub-transactions / detail panel) ─────────────────
+    // --- 14. BOTTOM TOOLBAR (sub-transactions / detail panel) ---
     console.log('\n[14/15] Bottom Toolbar…');
     await page.goto(`${BASE_URL}/contract-summary`);
     await waitForGrid(page);
@@ -342,7 +342,7 @@ async function main() {
     attachments['Bottom Toolbar'] =
       await shot(page, '14-bottom-toolbar', 'Bottom Toolbar');
 
-    // ── 15. ADMIN TAB (hamburger menu open) ───────────────────────────────────
+    // --- 15. ADMIN TAB (hamburger menu open) ---
     console.log('\n[15/15] Admin Tab (navigation menu)…');
     await page.goto(`${BASE_URL}/contract-summary`);
     await waitForGrid(page);
@@ -362,7 +362,7 @@ async function main() {
     await browser.close();
   }
 
-  // ── Upload to Confluence ──────────────────────────────────────────────────
+  // --- Upload to Confluence ---
   console.log('\n\n── Uploading screenshots to Confluence ──────────────────────');
   const results = {};
 

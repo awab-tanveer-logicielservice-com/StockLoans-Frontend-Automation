@@ -5,13 +5,13 @@ import { LOCATORS } from '../utils/locators.js';
 
 const { When, Then } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 When('the user navigates to the Users Management page', async ({ addNewUserPage }) => {
   await addNewUserPage.navigateToUsers();
 });
 
-// ── Page assertions ───────────────────────────────────────────────────────────
+// --- Page assertions ---
 
 Then('the Users AG-Grid should be visible', async ({ page }) => {
   await expect(page.locator('ag-grid-angular').first()).toBeVisible();
@@ -21,14 +21,14 @@ Then('the ADD NEW USER button should be visible', async ({ addNewUserPage }) => 
   await expect(addNewUserPage.addNewUserButton).toBeVisible();
 });
 
-// ── Modal open ────────────────────────────────────────────────────────────────
+// --- Modal open ---
 
 When('the user clicks the ADD NEW USER button', async ({ addNewUserPage }) => {
   await addNewUserPage.clickAddNewUser();
   await addNewUserPage.verifyBasicInfoVisible();  // waits for mat-dialog-container
 });
 
-// ── Field visibility ──────────────────────────────────────────────────────────
+// --- Field visibility ---
 
 Then('the Email field should be visible in the modal', async ({ addNewUserPage }) => {
   await expect(addNewUserPage.emailInput).toBeVisible();
@@ -50,7 +50,7 @@ Then('the Nickname field should be visible in the modal', async ({ addNewUserPag
   await expect(addNewUserPage.nicknameInput).toBeVisible();
 });
 
-// ── Button state ──────────────────────────────────────────────────────────────
+// --- Button state ---
 
 Then('the ADD USER button should be disabled', async ({ addNewUserPage }) => {
   await expect(addNewUserPage.addUserButton).toBeDisabled();
@@ -60,7 +60,7 @@ Then('the ADD USER button should be enabled', async ({ addNewUserPage }) => {
   await expect(addNewUserPage.addUserButton).toBeEnabled();
 });
 
-// ── Fill fields ───────────────────────────────────────────────────────────────
+// --- Fill fields ---
 
 When('the user fills in all new user details', async ({ addNewUserPage }) => {
   const ts = Date.now();
@@ -71,7 +71,7 @@ When('the user fills in all new user details', async ({ addNewUserPage }) => {
   await addNewUserPage.fillNickname(`TU${ts}`);
 });
 
-// ── Email validation ──────────────────────────────────────────────────────────
+// --- Email validation ---
 
 When('the user enters an invalid email {string}', async ({ addNewUserPage }, email) => {
   await addNewUserPage.fillEmail(email);
@@ -98,7 +98,7 @@ Then('no email validation error should be displayed', async ({ page }) => {
   await expect(emailInput).not.toHaveClass(/\berror\b/, { timeout: 5000 });
 });
 
-// ── Submit ────────────────────────────────────────────────────────────────────
+// --- Submit ---
 
 When('the user submits the new user form', async ({ addNewUserPage }) => {
   await addNewUserPage.clickAddUserButton();
@@ -109,4 +109,4 @@ Then('a user creation success notification should be displayed', async ({ page }
   await expect(snackBar).toBeVisible({ timeout: 15000 });
 });
 
-// ── Grid refresh (alias — the shared step in addNewModalLayoutsSteps.js handles the canonical version) ──
+// --- Grid refresh (alias - the shared step in addNewModalLayoutsSteps.js handles the canonical version) ---

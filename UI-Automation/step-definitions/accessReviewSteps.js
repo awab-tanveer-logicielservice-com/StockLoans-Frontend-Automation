@@ -1,5 +1,5 @@
 /**
- * Step definitions for AccessReview.feature — SLL-236
+ * Step definitions for AccessReview.feature - SLL-236
  * Authorization Access Review System for User Role Changes.
  */
 import { createBdd } from 'playwright-bdd';
@@ -7,7 +7,7 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// ── Given — identity ─────────────────────────────────────────────────────────
+// --- Given - identity ---
 
 // Going to /login clears the injected Firebase session (see commonSteps.js), so
 // this genuinely re-authenticates as the requested role rather than reusing the
@@ -18,7 +18,7 @@ Given('the user is logged in as {string}', async ({ loginPage, accessReviewUsers
   await loginPage.login(creds.username, creds.password);
 });
 
-// ── Given — request state ────────────────────────────────────────────────────
+// --- Given - request state ---
 
 Given('an access review request form is open', async ({ accessReviewPage }) => {
   await accessReviewPage.openRequestForm();
@@ -56,7 +56,7 @@ Given('an access review request the current user is not an approver on exists', 
   await accessReviewPage.seedRequestNotApproverOn();
 });
 
-// ── When — navigation ────────────────────────────────────────────────────────
+// --- When - navigation ---
 
 When('the user navigates to the Access Review page', async ({ accessReviewPage }) => {
   await accessReviewPage.navigateToAccessReview();
@@ -78,7 +78,7 @@ When('the user filters the Access Review grid by status {string}', async ({ acce
   await accessReviewPage.filterByStatus(status);
 });
 
-// ── When — raising a request ─────────────────────────────────────────────────
+// --- When - raising a request ---
 
 When('the user clicks the Initiate Access Review Request button', async ({ accessReviewPage }) => {
   await accessReviewPage.clickInitiateRequest();
@@ -104,7 +104,7 @@ When('the user completes the access review request with justification {string}',
   await accessReviewPage.completeRequestWithJustification(justification);
 });
 
-// ── When — approvers on the request ──────────────────────────────────────────
+// --- When - approvers on the request ---
 
 When('the user adds two approvers to the access review request', async ({ accessReviewPage }) => {
   await accessReviewPage.addTwoApprovers();
@@ -126,7 +126,7 @@ When('the user adds the same user as both approvers', async ({ accessReviewPage 
   await accessReviewPage.addSameUserAsBothApprovers();
 });
 
-// ── When — decisions ─────────────────────────────────────────────────────────
+// --- When - decisions ---
 
 When('the approver accepts the access review request', async ({ accessReviewPage }) => {
   await accessReviewPage.approverAccept();
@@ -152,13 +152,13 @@ When('the admin rejects the access review request at final approval', async ({ a
   await accessReviewPage.adminFinalReject();
 });
 
-// ── When — export ────────────────────────────────────────────────────────────
+// --- When - export ---
 
 When('the user exports the access review details as {string}', async ({ accessReviewPage }, format) => {
   await accessReviewPage.exportAs(format);
 });
 
-// ── Then — page identity ─────────────────────────────────────────────────────
+// --- Then - page identity ---
 
 Then('the Access Review page heading should be visible', async ({ accessReviewPage }) => {
   await accessReviewPage.verifyPageHeadingVisible();
@@ -172,7 +172,7 @@ Then('the Access Review page should not crash', async ({ accessReviewPage }) => 
   await accessReviewPage.verifyPageNotCrashed();
 });
 
-// ── Then — request outcome ───────────────────────────────────────────────────
+// --- Then - request outcome ---
 
 Then('a success confirmation should be displayed for the access review request', async ({ accessReviewPage }) => {
   await accessReviewPage.verifySuccessSnackBar();
@@ -194,7 +194,7 @@ Then('the access review audit trail should record the approver decision', async 
   await accessReviewPage.verifyAuditTrailRecordsDecision();
 });
 
-// ── Then — grid ──────────────────────────────────────────────────────────────
+// --- Then - grid ---
 
 Then('the Access Review grid should display the {string} column', async ({ accessReviewPage }, columnName) => {
   await accessReviewPage.verifyColumnVisible(columnName);
@@ -208,7 +208,7 @@ Then('the access review request should be listed in the pending approvals queue'
   await accessReviewPage.verifyRequestListedInQueue();
 });
 
-// ── Then — role and workflow guards ──────────────────────────────────────────
+// --- Then - role and workflow guards ---
 
 Then('the Accept and Reject actions should be available on the access review request', async ({ accessReviewPage }) => {
   await accessReviewPage.verifyAcceptRejectAvailable();
@@ -226,7 +226,7 @@ Then('the Final Approval action should not be available on the access review req
   await accessReviewPage.verifyFinalApprovalNotAvailable();
 });
 
-// ── Then — validation ────────────────────────────────────────────────────────
+// --- Then - validation ---
 
 Then('a validation error should be displayed for the access review request', async ({ accessReviewPage }) => {
   await accessReviewPage.verifyValidationError();
@@ -236,7 +236,7 @@ Then('the access review request should not be submitted', async ({ accessReviewP
   await accessReviewPage.verifyRequestNotSubmitted();
 });
 
-// ── Then — export ────────────────────────────────────────────────────────────
+// --- Then - export ---
 
 Then('the access review export file should be downloaded', async ({ accessReviewPage }) => {
   await accessReviewPage.verifyExportDownloaded();

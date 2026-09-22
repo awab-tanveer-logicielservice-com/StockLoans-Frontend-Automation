@@ -79,7 +79,7 @@ export class AddNewSecurityPage {
         try {
             await this.volumeInput.fill(volume);
         } catch {
-            // number input rejects non-numeric — inject via JS to trigger Angular validation
+            // number input rejects non-numeric - inject via JS to trigger Angular validation
             await this.volumeInput.evaluate((el, v) => {
                 Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, v);
                 el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -108,7 +108,7 @@ export class AddNewSecurityPage {
         try {
             await this.closeDateInput.fill(date);
         } catch {
-            // date input rejects malformed values — inject via JS
+            // date input rejects malformed values - inject via JS
             await this.closeDateInput.evaluate((el, v) => {
                 Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, v);
                 el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -161,7 +161,7 @@ export class AddNewSecurityPage {
     async verifySearchResultsVisible() {
         const grid = LOCATORS.AddNewSecurityPage.searchResultsGrid(this.page);
         await grid.waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
-        // Soft pass — grid may still be loading or search returned no results
+        // Soft pass - grid may still be loading or search returned no results
     }
 
     async waitForSearchResults() {
@@ -180,7 +180,7 @@ export class AddNewSecurityPage {
     async verifySearchResultContains(symbol) {
         const row = LOCATORS.AddNewSecurityPage.getResultRowBySymbol(this.page, symbol);
         await row.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
-        // Soft pass — symbol may not exist in QA database
+        // Soft pass - symbol may not exist in QA database
     }
 
     async verifyNoResultsDisplayed() {
@@ -202,7 +202,7 @@ export class AddNewSecurityPage {
 
     async submitNewSecurity() {
         const visible = await this.addButton.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // dialog not open — soft pass
+        if (!visible) return; // dialog not open - soft pass
         await this.addButton.click();
     }
 
@@ -219,7 +219,7 @@ export class AddNewSecurityPage {
             .waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
     }
 
-    // ── Toolbar assertions ────────────────────────────────────────────────────
+    // --- Toolbar assertions ---
 
     async verifyAddButtonEnabledOnToolbar() {
         await expect(this.addNewSecurityButton).toBeVisible({ timeout: 25000 });
@@ -227,34 +227,34 @@ export class AddNewSecurityPage {
     }
 
     async verifyAddButtonNotVisibleOnToolbar() {
-        // QA env uses admin credentials — button may be visible; soft-pass if disabled or hidden
+        // QA env uses admin credentials - button may be visible; soft-pass if disabled or hidden
         const visible = await this.addNewSecurityButton.isVisible().catch(() => false);
         if (!visible) return;
         // Button visible but may still be disabled for read-only users
         const disabled = await this.addNewSecurityButton.isDisabled().catch(() => false);
         if (disabled) return;
-        // Soft pass — single user env, cannot distinguish read-only role
+        // Soft pass - single user env, cannot distinguish read-only role
     }
 
-    // ── Save button state ─────────────────────────────────────────────────────
+    // --- Save button state ---
 
     async verifySaveButtonEnabled() {
         const enabled = await this.addButton.isEnabled().catch(() => false);
         if (enabled) return;
-        // Button still disabled — form may require a blur/change event to re-evaluate
+        // Button still disabled - form may require a blur/change event to re-evaluate
         await this.page.waitForTimeout(1000);
         const enabledAfterWait = await this.addButton.isEnabled().catch(() => false);
         if (enabledAfterWait) return;
-        // Soft pass — Angular validation may not enable save in QA env for this input combo
+        // Soft pass - Angular validation may not enable save in QA env for this input combo
     }
 
     async verifySaveButtonDisabled() {
         const disabled = await this.addButton.isDisabled().catch(() => true);
         if (disabled) return;
-        // Dev env may not disable save when optional fields are missing — soft pass
+        // Dev env may not disable save when optional fields are missing - soft pass
     }
 
-    // ── Modal open / close ────────────────────────────────────────────────────
+    // --- Modal open / close ---
 
     async verifyModalClosed() {
         await this.symbolInput.waitFor({ state: 'hidden', timeout: 10000 });
@@ -264,7 +264,7 @@ export class AddNewSecurityPage {
         await this.page.keyboard.press('Escape');
     }
 
-    // ── Field visibility in modal ─────────────────────────────────────────────
+    // --- Field visibility in modal ---
 
     async verifyFieldVisible(fieldName) {
         const fieldMap = {
@@ -282,7 +282,7 @@ export class AddNewSecurityPage {
         await expect(locator).toBeVisible({ timeout: 10000 });
     }
 
-    // ── Fill helpers ──────────────────────────────────────────────────────────
+    // --- Fill helpers ---
 
     async fillAllRequiredFields() {
         const ts = Date.now();
@@ -342,7 +342,7 @@ export class AddNewSecurityPage {
         await this.fillCloseDate('2026-12-31');
     }
 
-    // ── Grid / validation assertions ──────────────────────────────────────────
+    // --- Grid / validation assertions ---
 
     async verifyGridVisible() {
         await LOCATORS.AddNewSecurityPage.searchResultsGrid(this.page).waitFor({ state: 'visible', timeout: 15000 });
@@ -355,7 +355,7 @@ export class AddNewSecurityPage {
         // Fallback: browser-level HTML5 validity (number/date inputs reject invalid values natively)
         const invalidInput = this.page.locator('input:invalid, input.ng-invalid').first();
         if (await invalidInput.count() > 0) return;
-        // Soft pass — validation may not render a mat-error in QA env
+        // Soft pass - validation may not render a mat-error in QA env
     }
 
     async verifyNoValidationError() {
@@ -374,7 +374,7 @@ export class AddNewSecurityPage {
         await feedback.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
     }
 
-    // ── Search & Edit helpers ─────────────────────────────────────────────────
+    // --- Search & Edit helpers ---
 
     async searchAndSelectSecurity(symbol = '6019') {
         await this.searchSecurity(symbol);
@@ -408,7 +408,7 @@ export class AddNewSecurityPage {
         const visible = await this.symbolInput.waitFor({ state: 'visible', timeout: 20000 })
           .then(() => true).catch(() => false);
         if (!visible) {
-          // Detail panel may not render immediately in QA env — soft pass
+          // Detail panel may not render immediately in QA env - soft pass
           const anyInput = this.page.locator('mat-form-field input').first();
           await anyInput.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
         }
@@ -432,9 +432,9 @@ export class AddNewSecurityPage {
         const locator = fieldMap[fieldName];
         if (!locator) throw new Error(`Unknown field: "${fieldName}"`);
         const visible = await locator.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // detail view not loaded — soft pass
+        if (!visible) return; // detail view not loaded - soft pass
         const value = await locator.inputValue().catch(() => '');
-        if (!value.trim()) return; // QA env may not populate fields — soft pass
+        if (!value.trim()) return; // QA env may not populate fields - soft pass
         expect(value.trim().length).toBeGreaterThan(0);
     }
 
@@ -460,14 +460,14 @@ export class AddNewSecurityPage {
 
     async modifyClosePriceField() {
         const visible = await this.closePriceInput.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // detail view not loaded — soft pass
+        if (!visible) return; // detail view not loaded - soft pass
         await this.closePriceInput.clear();
         await this.closePriceInput.fill('999.99');
     }
 
     async modifyFieldInDetailView() {
         const visible = await this.descriptionInput.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // detail view not loaded — soft pass
+        if (!visible) return; // detail view not loaded - soft pass
         await this.descriptionInput.clear();
         await this.descriptionInput.fill(`Modified ${Date.now()}`);
     }
@@ -495,7 +495,7 @@ export class AddNewSecurityPage {
         await this.searchInput.clear();
     }
 
-    // ── Update Contract toggle & sub-view ─────────────────────────────────────
+    // --- Update Contract toggle & sub-view ---
 
     async enableUpdateContractToggle() {
         const isChecked = await LOCATORS.AddNewSecurityPage.updateContractsToggleActive(this.page).isVisible().catch(() => false);
@@ -515,7 +515,7 @@ export class AddNewSecurityPage {
 
     async verifyUpdateContractToggleVisible() {
         const visible = await this.slideToggleBar.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // detail view not loaded — soft pass
+        if (!visible) return; // detail view not loaded - soft pass
     }
 
     async verifyUpdateContractToggleDisabledState() {
@@ -525,7 +525,7 @@ export class AddNewSecurityPage {
 
     async verifyContractSubViewVisible() {
         const visible = await this.updateContractsCheckbox.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // sub-view not rendered in QA env — soft pass
+        if (!visible) return; // sub-view not rendered in QA env - soft pass
     }
 
     async verifyContractSubViewNotVisible() {
@@ -551,16 +551,16 @@ export class AddNewSecurityPage {
     async verifyUpdateButtonDisabled() {
         const btn = LOCATORS.AddNewSecurityPage.updateButton(this.page);
         const count = await btn.count();
-        if (count === 0) return; // button not rendered — soft pass
+        if (count === 0) return; // button not rendered - soft pass
         const disabled = await btn.isDisabled().catch(() => true);
         if (disabled) return; // disabled as expected
-        // QA env: Update button may be enabled with partial fill — soft pass
+        // QA env: Update button may be enabled with partial fill - soft pass
     }
 
     async fillExistingSymbol(symbol = '6019') {
         const input = LOCATORS.AddNewSecurityPage.existingSymbolInput(this.page);
         const visible = await input.waitFor({ state: 'visible', timeout: 10000 }).then(() => true).catch(() => false);
-        if (!visible) return; // contract sub-view didn't render (e.g. search symbol has no match in QA) — soft pass
+        if (!visible) return; // contract sub-view didn't render (e.g. search symbol has no match in QA) - soft pass
         await input.click();
         await input.fill(symbol);
     }
@@ -568,7 +568,7 @@ export class AddNewSecurityPage {
     async fillExistingCusip(cusip = '037833100') {
         const input = LOCATORS.AddNewSecurityPage.existingCusipInput(this.page);
         const visible = await input.waitFor({ state: 'visible', timeout: 10000 }).then(() => true).catch(() => false);
-        if (!visible) return; // contract sub-view didn't render — soft pass
+        if (!visible) return; // contract sub-view didn't render - soft pass
         await input.click();
         await input.fill(cusip);
     }
@@ -576,7 +576,7 @@ export class AddNewSecurityPage {
     async fillExistingSymbolNonExistent() {
         const input = LOCATORS.AddNewSecurityPage.existingSymbolInput(this.page);
         const visible = await input.waitFor({ state: 'visible', timeout: 10000 }).then(() => true).catch(() => false);
-        if (!visible) return; // contract sub-view didn't render — soft pass
+        if (!visible) return; // contract sub-view didn't render - soft pass
         await input.click();
         await input.fill('NONEXISTENT99999');
     }
@@ -584,7 +584,7 @@ export class AddNewSecurityPage {
     async clickUpdateButton() {
         const btn = LOCATORS.AddNewSecurityPage.updateButton(this.page);
         const visible = await btn.waitFor({ state: 'visible', timeout: 10000 }).then(() => true).catch(() => false);
-        if (!visible) return; // contract sub-view didn't render — soft pass
+        if (!visible) return; // contract sub-view didn't render - soft pass
         await btn.click();
     }
 

@@ -3,7 +3,7 @@ import { test } from './fixtures.js';
 
 const { When, Then } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 When('the user navigates to the Bulk Snapshot page', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.navigateToBulkSnapshot();
@@ -13,7 +13,7 @@ When('the user opens the navigation menu', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.openNavigationMenu();
 });
 
-// ── Actions ───────────────────────────────────────────────────────────────────
+// --- Actions ---
 
 When('the user enters a valid symbol in the Bulk Snapshot search field', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.enterSymbol('AAPL');
@@ -39,7 +39,7 @@ When('the user clicks the Bulk Snapshot Clear button', async ({ bulkSnapshotPage
   await bulkSnapshotPage.clickClearButton();
 });
 
-// ── Assertions — Page Identity ─────────────────────────────────────────────────
+// --- Assertions - Page Identity ---
 
 Then('the Bulk Snapshot page heading should be visible', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.verifyPageHeadingVisible();
@@ -49,7 +49,7 @@ Then('the navigation link for {string} should be visible', async ({ bulkSnapshot
   await bulkSnapshotPage.verifyNavLinkVisible(linkName);
 });
 
-// ── Assertions — Form Controls ────────────────────────────────────────────────
+// --- Assertions - Form Controls ---
 
 Then('the Bulk Snapshot Fetch Rates button should be visible', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.verifyFetchRatesButtonVisible();
@@ -67,7 +67,7 @@ Then('the Bulk Snapshot symbol textarea should be empty', async ({ bulkSnapshotP
   await bulkSnapshotPage.verifyTextareaCleared();
 });
 
-// ── Assertions — Empty State ───────────────────────────────────────────────────
+// --- Assertions - Empty State ---
 
 Then('the Bulk Snapshot empty state should show "No Data Available" with "Start Searching" button', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.verifyEmptyStateOverlay();
@@ -82,7 +82,7 @@ Then('the Bulk Snapshot grid should display the empty state overlay or a validat
   await bulkSnapshotPage.verifyEmptyStateOrValidation();
 });
 
-// ── Assertions — Ag-Grid ──────────────────────────────────────────────────────
+// --- Assertions - Ag-Grid ---
 
 Then('the Bulk Snapshot Ag-Grid should be visible', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.verifyAgGridVisible();
@@ -96,7 +96,7 @@ Then('the Bulk Snapshot Ag-Grid header row should be visible', async ({ bulkSnap
   await bulkSnapshotPage.verifyAgGridHeadersVisible();
 });
 
-// ── Assertions — Columns & Rows ───────────────────────────────────────────────
+// --- Assertions - Columns & Rows ---
 
 Then('the Bulk Snapshot results grid should display the {string} column', async ({ bulkSnapshotPage }, columnName) => {
   await bulkSnapshotPage.verifyColumnVisible(columnName);
@@ -114,13 +114,13 @@ Then('the Bulk Snapshot grid columns should remain correctly aligned', async ({ 
   await bulkSnapshotPage.verifyColumnsAligned();
 });
 
-// ── Assertions — Negative / Edge ─────────────────────────────────────────────
+// --- Assertions - Negative / Edge ---
 
 Then('the Bulk Snapshot page should not crash', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.verifyPageNotCrashed();
 });
 
-// ── Scenario Outline ─────────────────────────────────────────────────────────
+// --- Scenario Outline ---
 
 Then('the Bulk Snapshot expected search outcome should be {string}', async ({ bulkSnapshotPage }, outcome) => {
   await bulkSnapshotPage.verifySearchOutcome(outcome);

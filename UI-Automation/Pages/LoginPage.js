@@ -63,7 +63,7 @@ export class LoginPage {
   async clickLoginButton() {
     await this.loginButton.waitFor({ state: 'visible', timeout: this.defaultTimeout });
     await this.loginButton.click({ force: true });
-    // Wait for an actual outcome — either we leave /login or an error renders —
+    // Wait for an actual outcome - either we leave /login or an error renders -
     // so callers asserting on either don't race the response.
     await Promise.any([
       this.page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: this.defaultTimeout }),

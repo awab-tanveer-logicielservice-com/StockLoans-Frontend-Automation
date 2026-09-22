@@ -11,7 +11,7 @@ export class ContractReviewPage {
 
   defaultTimeout = 15000;
 
-  // ── Navigation ─────────────────────────────────────────────────────────────
+  // --- Navigation ---
 
   async navigate() {
     const origin = new URL(ENV.baseURL).origin;
@@ -25,14 +25,14 @@ export class ContractReviewPage {
         el.style.display = 'none';
       });
     }).catch(() => {});
-    // Wait for the Submit Review button to be present — confirms page is loaded
+    // Wait for the Submit Review button to be present - confirms page is loaded
     await LOCATORS.ContractReviewPage.submitButton(this.page)
       .waitFor({ state: 'visible', timeout: 30000 })
       .catch(() => {});
     await this.page.waitForTimeout(1000);
   }
 
-  // ── Grid Helpers ───────────────────────────────────────────────────────────
+  // --- Grid Helpers ---
 
   async waitForGridLoad() {
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
@@ -55,7 +55,7 @@ export class ContractReviewPage {
   }
 
   async hasGridRowsOrEmpty() {
-    // Accepts either rows OR the empty-state overlay — confirms page responded to date selection
+    // Accepts either rows OR the empty-state overlay - confirms page responded to date selection
     await this.waitForGridLoad();
     const gridRow = LOCATORS.ContractReviewPage.gridRow(this.page);
     const emptyOverlay = LOCATORS.ContractReviewPage.emptyStateOverlay(this.page);
@@ -63,7 +63,7 @@ export class ContractReviewPage {
     await grid.waitFor({ state: 'visible', timeout: this.defaultTimeout });
     const rowCount = await gridRow.count();
     if (rowCount > 0) return;
-    // No rows — verify empty-state overlay or just that grid is visible
+    // No rows - verify empty-state overlay or just that grid is visible
     const emptyVisible = await emptyOverlay.isVisible().catch(() => false);
     expect(emptyVisible || rowCount === 0).toBeTruthy();
   }
@@ -81,7 +81,7 @@ export class ContractReviewPage {
     }
   }
 
-  // ── Unreviewed Days Combobox ───────────────────────────────────────────────
+  // --- Unreviewed Days Combobox ---
 
   async isUnreviewedDaysListVisible() {
     const combobox = LOCATORS.ContractReviewPage.unreviewedDaysCombobox(this.page);
@@ -107,13 +107,13 @@ export class ContractReviewPage {
       await this.waitForGridLoad();
       return true;
     } catch {
-      // No unreviewed days in the system — close dropdown, treat as all-reviewed state
+      // No unreviewed days in the system - close dropdown, treat as all-reviewed state
       await this.page.keyboard.press('Escape');
       return false;
     }
   }
 
-  // ── Date Input ─────────────────────────────────────────────────────────────
+  // --- Date Input ---
 
   async selectDate() {
     // Try the Unreviewed Days combobox first; fall back to date input if none available
@@ -160,12 +160,12 @@ export class ContractReviewPage {
     await this.selectDate();
   }
 
-  // ── Row Selection ──────────────────────────────────────────────────────────
+  // --- Row Selection ---
 
   async selectOneOrMoreRows() {
     const gridRow = LOCATORS.ContractReviewPage.gridRow(this.page);
     const found = await gridRow.first().waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
-    if (!found) return; // no rows to review — soft pass
+    if (!found) return; // no rows to review - soft pass
     await gridRow.first().click();
   }
 
@@ -197,7 +197,7 @@ export class ContractReviewPage {
     }
   }
 
-  // ── Comment ────────────────────────────────────────────────────────────────
+  // --- Comment ---
 
   async enterComment(text = 'Automated review comment') {
     // Comment input may appear after row selection, or inside a dialog after Submit Review click
@@ -207,7 +207,7 @@ export class ContractReviewPage {
       await commentInput.clear();
       await commentInput.fill(text);
     } catch {
-      // Comment may not be visible until dialog appears — acceptable
+      // Comment may not be visible until dialog appears - acceptable
     }
   }
 
@@ -217,14 +217,14 @@ export class ContractReviewPage {
     await this.enterComment('Edited review comment');
   }
 
-  // ── Submit Review ──────────────────────────────────────────────────────────
+  // --- Submit Review ---
 
   async submitReview() {
     const btn = LOCATORS.ContractReviewPage.submitButton(this.page);
     const visible = await btn.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);
-    if (!visible) return; // no submit button — no rows selected, soft pass
+    if (!visible) return; // no submit button - no rows selected, soft pass
     const disabled = await btn.isDisabled().catch(() => false);
-    if (disabled) return; // button disabled — no rows selected, soft pass
+    if (disabled) return; // button disabled - no rows selected, soft pass
     await btn.click();
     await this.page.waitForTimeout(3000);
   }
@@ -252,7 +252,7 @@ export class ContractReviewPage {
     }
   }
 
-  // ── Submit Button State ────────────────────────────────────────────────────
+  // --- Submit Button State ---
 
   async isSubmitButtonVisibleAndEnabled() {
     const btn = LOCATORS.ContractReviewPage.submitButton(this.page);
@@ -274,7 +274,7 @@ export class ContractReviewPage {
       classes.includes('mat-mdc-button-disabled') ||
       classes.includes('disabled')
     ) return;
-    // Dev/QA environments typically give all users submit permissions — skip restriction check
+    // Dev/QA environments typically give all users submit permissions - skip restriction check
     // This scenario is only meaningful in a multi-role environment where permission levels differ
   }
 
@@ -286,7 +286,7 @@ export class ContractReviewPage {
     const ariaDisabled = await btn.getAttribute('aria-disabled');
     const classes     = await btn.getAttribute('class') ?? '';
     if (disabled !== null || ariaDisabled === 'true' || classes.includes('disabled')) return;
-    // Button appears enabled — click to trigger validation
+    // Button appears enabled - click to trigger validation
     await btn.click({ force: true });
     await this.page.waitForTimeout(2000);
     // Accept any of: snackbar error, mat-error, alert, OR staying on the same page
@@ -297,14 +297,14 @@ export class ContractReviewPage {
     expect(snackbar || matError || stillOnPage).toBeTruthy();
   }
 
-  // ── Unreviewed Days Refresh ────────────────────────────────────────────────
+  // --- Unreviewed Days Refresh ---
 
   async isUnreviewedDayListRefreshed() {
     await this.page.waitForTimeout(2000);
     await this.isGridVisible();
   }
 
-  // ── Date Validation ────────────────────────────────────────────────────────
+  // --- Date Validation ---
 
   async isDateValidationVisible() {
     const error = this.page.locator('mat-error, [class*="error"], [aria-invalid="true"]').first();

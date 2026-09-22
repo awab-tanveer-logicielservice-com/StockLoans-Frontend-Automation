@@ -6,17 +6,17 @@ const { Given, When, Then } = createBdd(test);
 
 // NOTE: The following steps are already registered in other step files and are
 // reused here automatically by playwright-bdd:
-//   - "the user navigates to the Security Master page"  → addNewSecuritySteps.js
-//   - "the user clicks the Save button"                  → addNewModalLayoutsSteps.js
-//   - "a success confirmation should be displayed"       → addNewModalLayoutsSteps.js
-//   - "an appropriate error or warning message …"        → addNewModalLayoutsSteps.js
-//   - "the Save button should be disabled"               → addNewModalLayoutsSteps.js
-//   - "the user enters {string} in the Close Price field"→ addNewSecuritySteps.js
-//   - "the user enters {string} in the Volume field"     → addNewSecuritySteps.js
-//   - "the user enters {string} in the Close Date field" → addNewSecuritySteps.js
-//   - "a validation error should be displayed for …"     → addNewSecuritySteps.js
+//   - "the user navigates to the Security Master page"  -> addNewSecuritySteps.js
+//   - "the user clicks the Save button"                  -> addNewModalLayoutsSteps.js
+//   - "a success confirmation should be displayed"       -> addNewModalLayoutsSteps.js
+//   - "an appropriate error or warning message …"        -> addNewModalLayoutsSteps.js
+//   - "the Save button should be disabled"               -> addNewModalLayoutsSteps.js
+//   - "the user enters {string} in the Close Price field"-> addNewSecuritySteps.js
+//   - "the user enters {string} in the Volume field"     -> addNewSecuritySteps.js
+//   - "the user enters {string} in the Close Date field" -> addNewSecuritySteps.js
+//   - "a validation error should be displayed for …"     -> addNewSecuritySteps.js
 
-// ── Search ────────────────────────────────────────────────────────────────────
+// --- Search ---
 
 When('the user enters a valid Symbol in the search field', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.enterSearchValue('6019');
@@ -50,7 +50,7 @@ When('the user clears the search field', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.clearSearchField();
 });
 
-// ── Record selection ──────────────────────────────────────────────────────────
+// --- Record selection ---
 
 Given('the user searches for and selects a security record', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.searchAndSelectSecurity('6019');
@@ -69,7 +69,7 @@ When('the user selects a different security record from the Ag-Grid', async ({ a
   await addNewSecurityPage.selectDifferentResult();
 });
 
-// ── Grid assertions ───────────────────────────────────────────────────────────
+// --- Grid assertions ---
 
 Then('matching security records should be displayed in the Ag-Grid', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifySearchResultsVisible();
@@ -112,7 +112,7 @@ Then('the search, grid, and detail view should all be visible on a single screen
   await addNewSecurityPage.verifySearchResultsVisible();
 });
 
-// ── Detail view ───────────────────────────────────────────────────────────────
+// --- Detail view ---
 
 Then('the editable detail view should be visible', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifyDetailViewVisible();
@@ -186,7 +186,7 @@ Then('the Close Date input should be editable', async ({ addNewSecurityPage }) =
   await addNewSecurityPage.verifyFieldEditable('Close Date');
 });
 
-// ── Edit fields ───────────────────────────────────────────────────────────────
+// --- Edit fields ---
 
 When('the user modifies the Description field with a new value', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.modifyDescriptionField();
@@ -221,7 +221,7 @@ Then('the security record should remain unchanged in the Ag-Grid', async ({ addN
   await addNewSecurityPage.verifyPageIsLoaded();
 });
 
-// ── Update Contract toggle ────────────────────────────────────────────────────
+// --- Update Contract toggle ---
 
 When('the user enables the Update Contract toggle switch', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.enableUpdateContractToggle();
@@ -243,7 +243,7 @@ Then('the Update Contract toggle switch should be in the disabled state', async 
   await addNewSecurityPage.verifyUpdateContractToggleDisabledState();
 });
 
-// ── Contract update sub-view ──────────────────────────────────────────────────
+// --- Contract update sub-view ---
 
 Then('the contract update sub-view should be visible', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifyContractSubViewVisible();
@@ -273,7 +273,7 @@ Then('the Update action button should be enabled', async ({ addNewSecurityPage }
   await addNewSecurityPage.verifyUpdateButtonEnabled();
 });
 
-// ── Contract update fields ────────────────────────────────────────────────────
+// --- Contract update fields ---
 
 When('the user enters a valid Existing Symbol', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.fillExistingSymbol('6019');

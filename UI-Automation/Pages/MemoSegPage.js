@@ -139,8 +139,8 @@ export class MemoSegPage {
   }
 
   /**
-   * Waits for a grid to stop loading and settle on a real outcome — data rows or
-   * the no-rows overlay — and reports whether it ended up with rows.
+   * Waits for a grid to stop loading and settle on a real outcome - data rows or
+   * the no-rows overlay - and reports whether it ended up with rows.
    *
    * Both checks below previously went straight to the cell lookup while the grid
    * was still rendering its "Loading..." state, so they spent their whole budget
@@ -160,7 +160,7 @@ export class MemoSegPage {
   async verifySummaryGridHasSymbol(symbol) {
     // This used to soft-pass when the symbol was absent, so a batch submission
     // that never landed reported success here and blew up at the detail-grid
-    // check instead — pointing at the wrong step entirely. Assert it properly.
+    // check instead - pointing at the wrong step entirely. Assert it properly.
     const hasRows = await this._waitForGridSettled(this.summaryGrid);
     const cell = LOCATORS.MemoSegPage.getSummaryGridCellBySymbol(this.page, symbol);
     await expect(
@@ -196,7 +196,7 @@ export class MemoSegPage {
   async verifySummaryGridGrouped() {
     const firstRow = LOCATORS.MemoSegPage.firstGroupedRow(this.page);
     const visible = await firstRow.isVisible({ timeout: this.defaultTimeout }).catch(() => false);
-    // Soft pass — batch may not produce grouped rows if QA data is unavailable
+    // Soft pass - batch may not produce grouped rows if QA data is unavailable
     if (visible) await expect(firstRow).toBeVisible();
   }
 

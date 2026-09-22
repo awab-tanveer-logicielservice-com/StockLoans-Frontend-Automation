@@ -4,13 +4,13 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// --- Navigation ---
 
 When('the user navigates to the Security Master page', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.navigateToSecurityMaster();
 });
 
-// ── Toolbar ───────────────────────────────────────────────────────────────────
+// --- Toolbar ---
 
 Then('the Add New Security button should be visible on the Security Master toolbar', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifyAddNewSecurityButtonVisible();
@@ -24,7 +24,7 @@ Then('the Add New Security button should not be available for the read-only user
   await addNewSecurityPage.verifyAddButtonNotVisibleOnToolbar();
 });
 
-// ── Modal open / close ────────────────────────────────────────────────────────
+// --- Modal open / close ---
 
 When('the user clicks the Add New Security button', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.clickAddNewSecurity();
@@ -43,7 +43,7 @@ Then('the modal should be centered with theme-aware styling', async ({ addNewSec
   await addNewSecurityPage.verifyNewSecurityFormVisible();
 });
 
-// ── Field visibility ──────────────────────────────────────────────────────────
+// --- Field visibility ---
 
 Then('the Symbol input field should be visible in the modal', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifyFieldVisible('Symbol');
@@ -77,7 +77,7 @@ Then('the Status input field should be visible in the modal', async ({ addNewSec
   await addNewSecurityPage.verifyFieldVisible('Status');
 });
 
-// ── Fill required / optional fields ──────────────────────────────────────────
+// --- Fill required / optional fields ---
 
 When('the user fills in all required security fields', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.fillAllRequiredFields();
@@ -115,7 +115,7 @@ When('the user fills in all required fields using an existing Symbol', async ({ 
   await addNewSecurityPage.fillRequiredFieldsWithExistingSymbol();
 });
 
-// ── Parameterised field input ─────────────────────────────────────────────────
+// --- Parameterised field input ---
 
 When('the user enters {string} in the Symbol field', async ({ addNewSecurityPage }, value) => {
   await addNewSecurityPage.fillSymbol(value);
@@ -145,13 +145,13 @@ When('the user enters a Description value at the maximum allowed length', async 
   await addNewSecurityPage.fillDescription('A'.repeat(255));
 });
 
-// ── Submit / Success / Error — defined in addNewModalLayoutsSteps.js (shared) ──
+// --- Submit / Success / Error - defined in addNewModalLayoutsSteps.js (shared) ---
 
 Then('the application should handle the special character input appropriately', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifyPageIsLoaded();
 });
 
-// ── Validation errors ─────────────────────────────────────────────────────────
+// --- Validation errors ---
 
 Then('a validation error should be displayed for the Close Price field', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifyAnyValidationError();
@@ -181,7 +181,7 @@ Then('the Volume field should either accept the value or display a boundary vali
   await addNewSecurityPage.verifyBoundaryValidationBehavior();
 });
 
-// ── Grid state ────────────────────────────────────────────────────────────────
+// --- Grid state ---
 
 Then('the Security Master Ag-Grid should refresh with the new security record', async ({ addNewSecurityPage }) => {
   await addNewSecurityPage.verifyPageIsLoaded();
@@ -191,7 +191,7 @@ Then('the Security Master Ag-Grid should remain unchanged', async ({ addNewSecur
   await addNewSecurityPage.verifyPageIsLoaded();
 });
 
-// ── Scenario Outline outcome ──────────────────────────────────────────────────
+// --- Scenario Outline outcome ---
 
 Then('the expected form outcome should be {string}', async ({ addNewSecurityPage }, outcome) => {
   if (outcome === 'save enabled') {

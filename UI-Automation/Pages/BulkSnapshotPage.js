@@ -30,7 +30,7 @@ export class BulkSnapshotPage {
             .catch(() => {});
         // Deliberate settle. This page object's verify* helpers use isVisible(),
         // which returns immediately instead of waiting, so they need the layout to
-        // have stopped moving before they run — otherwise clicks land on shifting
+        // have stopped moving before they run - otherwise clicks land on shifting
         // elements. That guarantee used to come as a side effect of a 15s
         // networkidle wait that never actually fired; this is the same guarantee
         // stated honestly and 5x cheaper. Removing it requires reworking the
@@ -61,7 +61,7 @@ export class BulkSnapshotPage {
     }
 
     async verifyAgGridVisible() {
-        // Before search the page shows "No Data Available" — accept either the grid or the empty state panel
+        // Before search the page shows "No Data Available" - accept either the grid or the empty state panel
         const agGrid = this.page.locator('.ag-root-wrapper');
         const emptyState = LOCATORS.BulkSnapshotPage.emptyStateHeading(this.page);
         const isAgGrid = await agGrid.isVisible({ timeout: 5000 }).catch(() => false);
@@ -96,7 +96,7 @@ export class BulkSnapshotPage {
         // The button sits in a container Playwright cannot bring into view: it
         // reports the button visible and enabled but "outside of the viewport",
         // and scrollIntoViewIfNeeded() does not move the container. `force: true`
-        // does not help either — it skips the actionability checks but the click
+        // does not help either - it skips the actionability checks but the click
         // still needs viewport coordinates, so it fails with the same error.
         // dispatchEvent fires the handler directly and needs no coordinates.
         await this.clearButton.scrollIntoViewIfNeeded().catch(() => {});

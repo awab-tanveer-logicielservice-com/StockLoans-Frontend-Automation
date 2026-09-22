@@ -3,11 +3,11 @@ import { LOCATORS } from '../utils/locators.js';
 import { ENV } from '../Config/env.js';
 
 /**
- * Access Review — Authorization Access Review System for User Role Changes (SLL-236).
+ * Access Review - Authorization Access Review System for User Role Changes (SLL-236).
  *
  * The screen is not built yet (SLL-236 is To Do), so every selector in
  * LOCATORS.AccessReviewPage is a best-guess role/label query carrying a
- * "TODO: confirm against the built UI" note. The flow logic here is real —
+ * "TODO: confirm against the built UI" note. The flow logic here is real -
  * only the selectors should need touching once the screen lands.
  *
  * Workflow modelled: Draft -> Pending Approver Review -> Partially Approved
@@ -33,7 +33,7 @@ export class AccessReviewPage {
 
   defaultTimeout = 10000;
 
-  // ── Navigation ──────────────────────────────────────────────────────────────
+  // --- Navigation ---
 
   async navigateToAccessReview() {
     const origin = new URL(ENV.baseURL).origin;
@@ -69,7 +69,7 @@ export class AccessReviewPage {
     await main.waitFor({ state: 'visible', timeout: this.defaultTimeout });
   }
 
-  // ── Request form ────────────────────────────────────────────────────────────
+  // --- Request form ---
 
   async clickInitiateRequest() {
     await this.initiateButton.waitFor({ state: 'visible', timeout: this.defaultTimeout });
@@ -109,7 +109,7 @@ export class AccessReviewPage {
     await this.secondApproverInput.blur().catch(() => {});
   }
 
-  /** Adds `count` approvers (1 or 2 — the request accepts exactly two). */
+  /** Adds `count` approvers (1 or 2 - the request accepts exactly two). */
   async addApprovers(count) {
     const [a1, a2] = LOCATORS.AccessReviewPage.defaults.approvers;
     if (count >= 1) await this.enterFirstApprover(a1);
@@ -159,11 +159,11 @@ export class AccessReviewPage {
   }
 
   async verifyRequestNotSubmitted() {
-    // The form must still be open — a rejected submit never closes the dialog.
+    // The form must still be open - a rejected submit never closes the dialog.
     await expect(this.submitButton).toBeVisible();
   }
 
-  // ── Grid / queue ────────────────────────────────────────────────────────────
+  // --- Grid / queue ---
 
   _rowWithStatus(status) {
     return LOCATORS.AccessReviewPage.gridRows(this.page).filter({ hasText: status });
@@ -213,7 +213,7 @@ export class AccessReviewPage {
       .waitFor({ state: 'visible', timeout: 30000 });
   }
 
-  // ── Scenario state seeding ──────────────────────────────────────────────────
+  // --- Scenario state seeding ---
 
   /**
    * Selects an existing request in the given status, creating a fresh one first
@@ -285,7 +285,7 @@ export class AccessReviewPage {
     await this.verifyRequestListedInQueue();
   }
 
-  // ── Approver / Admin decisions ──────────────────────────────────────────────
+  // --- Approver / Admin decisions ---
 
   async approverAccept() {
     const accept = LOCATORS.AccessReviewPage.acceptButton(this.page);
@@ -361,7 +361,7 @@ export class AccessReviewPage {
     );
   }
 
-  // ── Assertions ──────────────────────────────────────────────────────────────
+  // --- Assertions ---
 
   async verifySuccessSnackBar() {
     const snackBar = LOCATORS.AccessReviewPage.snackBar(this.page);
@@ -402,7 +402,7 @@ export class AccessReviewPage {
     await expect(trail).toContainText(/accept|approve|reject/i);
   }
 
-  // ── Export ──────────────────────────────────────────────────────────────────
+  // --- Export ---
 
   async exportAs(format) {
     const exportButton = LOCATORS.AccessReviewPage.exportButton(this.page);
@@ -422,7 +422,7 @@ export class AccessReviewPage {
     expect(name.length, 'export download has no filename').toBeGreaterThan(0);
   }
 
-  // ── Internals ───────────────────────────────────────────────────────────────
+  // --- Internals ---
 
   async _pickFirstAutocompleteOption() {
     const option = this.page.getByRole('option').first();

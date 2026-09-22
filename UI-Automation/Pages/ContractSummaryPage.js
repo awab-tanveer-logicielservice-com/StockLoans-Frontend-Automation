@@ -41,7 +41,7 @@ export class ContractSummaryPage {
     await this.grid.waitFor({ state: 'visible', timeout: 30000 });
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
     // Wait for loading to start (Firestore subscription kicks in), then wait for it to finish.
-    // Grace period is short on purpose — when the grid loads fast the overlay never
+    // Grace period is short on purpose - when the grid loads fast the overlay never
     // appears, and a long timeout here is spent waiting for something that won't happen.
     await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
     await loadingOverlay.waitFor({ state: 'hidden', timeout: 120000 });
@@ -54,7 +54,7 @@ export class ContractSummaryPage {
 
   async hasGridRows() {
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    // The overlay clearing doesn't mean rows have rendered — AG Grid hides it
+    // The overlay clearing doesn't mean rows have rendered - AG Grid hides it
     // as soon as the Firestore subscription responds, and the first page of
     // rows can land noticeably later. So wait for the overlay, then wait
     // separately (and generously) for an actual row.
@@ -136,14 +136,14 @@ export class ContractSummaryPage {
 
   /**
    * Waits for the grid to finish loading; resolves true when it has data rows.
-   * Settling on the first real outcome — rows, or the no-rows overlay — keeps a
+   * Settling on the first real outcome - rows, or the no-rows overlay - keeps a
    * slow fetch from being reported the same way as a genuinely empty grid.
    */
   async _waitForGridSettled(timeout = 90000) {
     // Do NOT race data rows against the no-rows overlay. ag-Grid displays that
     // overlay while a fetch is still in flight, so the race resolved the moment
     // the overlay appeared and reported an empty grid before the data had any
-    // chance to arrive — turning "still loading" into a false "0 rows".
+    // chance to arrive - turning "still loading" into a false "0 rows".
     //
     // Instead: let the loading indicators clear, then give the rows the whole
     // budget. Only a grid that produces no row in 90s is treated as empty.
@@ -171,7 +171,7 @@ export class ContractSummaryPage {
   async _requireGridRows(minimum = 1) {
     await this._waitForGridSettled();
     // Settling only guarantees the first row. When a scenario needs more than
-    // one, wait for that row specifically instead of counting straight away —
+    // one, wait for that row specifically instead of counting straight away -
     // rows stream in and an immediate count can catch the grid mid-render.
     if (minimum > 1) {
       await this.gridRow

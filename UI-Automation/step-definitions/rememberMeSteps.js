@@ -1,10 +1,10 @@
-﻿import { createBdd } from 'playwright-bdd';
+import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// â”€â”€ Given â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Given ---
 
 Given('the user is on the login page', async ({ page, rememberMePage }) => {
   await page.setViewportSize({ width: 1536, height: 720 });
@@ -41,7 +41,7 @@ Given('the user navigates back to the login page with pre-filled credentials', a
  * Stand-in for the account whose saved credentials get superseded.
  *
  * It is seeded directly into localStorage and never submitted to the login
- * form, so it needs no password and must never be a real address â€” `.invalid`
+ * form, so it needs no password and must never be a real address - `.invalid`
  * is reserved by RFC 2606 precisely for this. The only account this feature
  * authenticates with is the configured test user.
  */
@@ -67,7 +67,7 @@ Given('the user has pre-filled credentials saved via Remember Me', async ({ page
   await rememberMePage.logout();
 });
 
-// â”€â”€ When â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- When ---
 
 When('the user enters a valid email address', async ({ rememberMePage, testUsers }) => {
   await rememberMePage.enterEmail(testUsers.username);
@@ -120,7 +120,7 @@ When('the user clears the Email field and enters a different email', async ({ re
 
 When('a new user logs in with Remember Me enabled using different credentials', async ({ rememberMePage, testUsers }) => {
   // Logs in as the configured test user, which is a different identity from the
-  // seeded SUPERSEDED_USER above â€” that is the "different credentials" the
+  // seeded SUPERSEDED_USER above - that is the "different credentials" the
   // scenario means. This previously used a hardcoded colleague's address paired
   // with this user's password, a combination that could never authenticate.
   await rememberMePage.loginWith(testUsers.username, testUsers.password, true);
@@ -138,7 +138,7 @@ When('the user logs in again', async ({ rememberMePage, testUsers }) => {
   await rememberMePage.loginWith(testUsers.username, testUsers.password, false);
 });
 
-// â”€â”€ Then â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Then ---
 
 Then('the Remember Me checkbox should be visible on the login form', async ({ rememberMePage }) => {
   await rememberMePage.isRememberMeVisible();

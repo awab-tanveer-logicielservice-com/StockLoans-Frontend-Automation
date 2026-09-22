@@ -22,7 +22,7 @@ export class RememberMePage {
     await this.usernameInput.waitFor({ state: 'visible', timeout: this.defaultTimeout });
   }
 
-  // ── Remember Me checkbox ──────────────────────────────
+  // --- Remember Me checkbox ---
 
   async isRememberMeVisible() {
     await this.rememberMeCheckbox.waitFor({ state: 'visible', timeout: this.defaultTimeout });
@@ -51,7 +51,7 @@ export class RememberMePage {
     if (checked) await this.rememberMeCheckbox.uncheck();
   }
 
-  // ── Credentials entry ────────────────────────────────
+  // --- Credentials entry ---
 
   async enterEmail(email) {
     await this.usernameInput.waitFor({ state: 'visible', timeout: this.defaultTimeout });
@@ -98,7 +98,7 @@ export class RememberMePage {
     await this.clickLogin();
   }
 
-  // ── Logout ────────────────────────────────────────────
+  // --- Logout ---
 
   async logout() {
     await this.userMenuButton.waitFor({ state: 'visible', timeout: this.defaultTimeout });
@@ -113,7 +113,7 @@ export class RememberMePage {
     await this.usernameInput.waitFor({ state: 'visible', timeout: this.defaultTimeout });
   }
 
-  // ── Field state assertions ────────────────────────────
+  // --- Field state assertions ---
 
   async assertEmailFieldValue(expected) {
     const value = await this.usernameInput.inputValue();
@@ -170,7 +170,7 @@ export class RememberMePage {
     await expect(this.errorMessage).toBeVisible();
   }
 
-  // ── localStorage helpers ─────────────────────────────
+  // --- localStorage helpers ---
 
   async assertCredentialsInLocalStorage() {
     const stored = await this.page.evaluate(() => {

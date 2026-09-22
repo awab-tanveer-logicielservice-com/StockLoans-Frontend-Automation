@@ -126,7 +126,7 @@ export class FPLAccountPage {
         await this.centerColsViewport.click({ force: true });
       }
     } catch (e) {
-      // No floating filter available — data already loaded, continue
+      // No floating filter available - data already loaded, continue
     }
   }
 
@@ -210,7 +210,7 @@ export class FPLAccountPage {
     await this.centerColsViewport.click();
   }
 
-  // ── SLL-234: SLS Account editable dropdown ──────────────────────────────
+  // --- SLL-234: SLS Account editable dropdown ---
 
   async clickSLSAccountCell(nth = 0) {
     const cell = LOCATORS.FPLAccountPage.slsAccountCell(this.page).nth(nth);
@@ -220,7 +220,7 @@ export class FPLAccountPage {
     } catch (e) {
       await cell.click({ force: true });
     }
-    // The AG-Grid cell editor renders a closed mat-select — it doesn't auto-open its
+    // The AG-Grid cell editor renders a closed mat-select - it doesn't auto-open its
     // options panel, so the trigger itself needs an explicit click to reveal mat-options.
     const dropdown = LOCATORS.FPLAccountPage.slsAccountDropdown(this.page);
     const visible = await dropdown.waitFor({ state: 'visible', timeout: this.defaultTimeout }).then(() => true).catch(() => false);

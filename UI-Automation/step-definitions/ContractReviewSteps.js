@@ -1,4 +1,4 @@
-﻿// NOTE: 'When the user selects multiple contract rows' is intentionally NOT re-defined here.
+// NOTE: 'When the user selects multiple contract rows' is intentionally NOT re-defined here.
 // It is already defined in ContractDetailsSteps.js using generic ag-grid locators that work
 // on any ag-grid page, including Contract Review.
 
@@ -7,7 +7,7 @@ import { test } from './fixtures.js';
 
 const { Given, When, Then } = createBdd(test);
 
-// â”€â”€ Permission-scoped login (maps to the standard test user in QA) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Permission-scoped login (maps to the standard test user in QA) ---
 
 Given('the user is logged in with contract review permissions', async ({ page, loginPage, testUsers }) => {
   await page.setViewportSize({ width: 1536, height: 720 });
@@ -21,13 +21,13 @@ Given('the user is logged in without contract review permissions', async ({ page
   await loginPage.login(testUsers.username, testUsers.password);
 });
 
-// â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Navigation ---
 
 When('the user navigates to the Contract Review page', async ({ contractReviewPage }) => {
   await contractReviewPage.navigate();
 });
 
-// â”€â”€ Setup / precondition steps used as And â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Setup / precondition steps used as And ---
 
 Given('the user loads contracts for a reviewable date', async ({ contractReviewPage }) => {
   await contractReviewPage.loadContractsForReviewableDate();
@@ -41,7 +41,7 @@ Given('the user selects contract rows', async ({ contractReviewPage }) => {
   await contractReviewPage.selectContractRows();
 });
 
-// â”€â”€ Date selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Date selection ---
 
 When('the user selects a specific date', async ({ contractReviewPage }) => {
   await contractReviewPage.selectDate();
@@ -59,17 +59,17 @@ When('the user enters an invalid date in the date selector', async ({ contractRe
   await contractReviewPage.enterInvalidDate();
 });
 
-// â”€â”€ Row selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Row selection ---
 
 When('the user selects one or more contract rows', async ({ contractReviewPage }) => {
   await contractReviewPage.selectOneOrMoreRows();
 });
 
 When('the user does not select any contract rows', async ({}) => {
-  // Intentional no-op â€” rows are deliberately left unselected for this scenario
+  // Intentional no-op - rows are deliberately left unselected for this scenario
 });
 
-// â”€â”€ Comment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Comment ---
 
 When('the user enters a review comment', async ({ contractReviewPage }) => {
   await contractReviewPage.enterComment();
@@ -79,13 +79,13 @@ When('the user enters a comment and then edits it before submitting', async ({ c
   await contractReviewPage.enterAndEditComment();
 });
 
-// â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Submit ---
 
 When('the user submits the review', async ({ contractReviewPage }) => {
   await contractReviewPage.submitReview();
 });
 
-// â”€â”€ Assertions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Assertions ---
 
 Then('reviewable contracts for the chosen date should be displayed in the grid', async ({ contractReviewPage }) => {
   await contractReviewPage.hasGridRowsOrEmpty();

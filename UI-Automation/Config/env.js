@@ -20,7 +20,7 @@ export const ENV = {
   },
   // Reports and Short (Interest) Rate Adjustment pages are only exercised against
   // the fixed dev-upgrade deployment, independent of whatever BASE_URL the rest
-  // of the suite targets — restored after being dropped when baseURL/etc. above
+  // of the suite targets - restored after being dropped when baseURL/etc. above
   // became BASE_URL-driven getters.
   devBaseURL: 'https://vcl-stockloan-dev-upgrade.web.app/login',
   devDashboardURL: 'https://vcl-stockloan-dev-upgrade.web.app/contract-summary',

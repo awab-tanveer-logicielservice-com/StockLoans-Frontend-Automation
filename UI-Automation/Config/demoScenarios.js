@@ -5,7 +5,7 @@
 // carry a tag that only exists to serve a demo. Selection is by exact scenario
 // title, turned into a Playwright `grep` regex in playwright.config.js.
 //
-// To change what the demo runs, edit the lists below — nothing else.
+// To change what the demo runs, edit the lists below - nothing else.
 
 export const DEMO_SCENARIOS = {
   // Runs in the 'demo-login' project: drives the real login form from a
@@ -15,7 +15,7 @@ export const DEMO_SCENARIOS = {
   ],
 
   // Runs in the 'demo-trade' project: replays the session captured by
-  // 'auth setup'. Mix is intentional — happy paths, negative/validation
+  // 'auth setup'. Mix is intentional - happy paths, negative/validation
   // paths, and one end-to-end scenario that ties the journey together.
   trade: [
     // Happy paths

@@ -9,8 +9,8 @@
  *                             failure screenshot/video/trace capture)
  *
  * Target environment (QA by default):
- *   npm run demo                        QA   — https://qa-sls-v2.web.app/login
- *   npm run demo -- --dev               dev  — vcl-stockloan-dev-upgrade
+ *   npm run demo                        QA   - https://qa-sls-v2.web.app/login
+ *   npm run demo -- --dev               dev  - vcl-stockloan-dev-upgrade
  *   npm run demo -- --base-url=<url>    anything else
  * An explicit BASE_URL in the environment wins over all of these.
  *
@@ -21,13 +21,13 @@
  * Any other argument is forwarded straight to `playwright test`
  * (e.g. `npm run demo -- --workers=2`).
  *
- * Scenarios are selected by title from UI-Automation/Config/demoScenarios.js —
+ * Scenarios are selected by title from UI-Automation/Config/demoScenarios.js -
  * edit that file to change what runs; the .feature files stay untouched. The
  * run is split across two Playwright projects because the Login scenario has to
  * start from a logged-out state while the Trade scenarios replay the session
  * captured by 'auth setup'.
  *
- * The Allure report is generated even when scenarios fail — a red report is
+ * The Allure report is generated even when scenarios fail - a red report is
  * still the thing you want to walk a lead through.
  */
 import { spawnSync } from 'node:child_process';
@@ -88,7 +88,7 @@ console.log(
   `  browser     ${singleBrowser ? 'single window reused across all scenarios' : 'fresh context per scenario'}`,
 );
 
-// ── 1. Clean slate, but keep the trend history ──────────────────────────────
+// --- 1. Clean slate, but keep the trend history ---
 // Allure builds its Trend/History widgets from allure-report/history, so carry
 // it into the fresh results dir before wiping the previous run's raw results.
 step('Cleaning previous Allure results');
@@ -108,11 +108,11 @@ if (carriedHistory) {
   console.log('  carried trend history forward from the previous report');
 }
 
-// ── 2. Regenerate the Playwright specs from the .feature files ──────────────
+// --- 2. Regenerate the Playwright specs from the .feature files ---
 step('Generating test specs from feature files (bddgen)');
 run('npx', ['bddgen']);
 
-// ── 3. Run the demo scenarios ───────────────────────────────────────────────
+// --- 3. Run the demo scenarios ---
 step('Running Login + Trade demo scenarios');
 const testStatus = run(
   'npx',
@@ -128,7 +128,7 @@ const testStatus = run(
   { allowFailure: true },
 );
 
-// ── 4. Metadata that makes the report presentable ───────────────────────────
+// --- 4. Metadata that makes the report presentable ---
 step('Writing Allure run metadata');
 writeFileSync(
   resolve(RESULTS, 'environment.properties'),
@@ -173,7 +173,7 @@ writeFileSync(
   'utf8',
 );
 
-// ── 5. Build and open the report ────────────────────────────────────────────
+// --- 5. Build and open the report ---
 step('Generating the Allure report');
 const genStatus = run('npx', ['allure', 'generate', 'allure-results', '--clean', '-o', 'allure-report'], {
   allowFailure: true,

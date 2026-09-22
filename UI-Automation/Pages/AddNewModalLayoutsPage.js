@@ -66,7 +66,7 @@ export class AddNewModalLayoutsPage {
         const autoClosed = await this.modalContainer.waitFor({ state: 'hidden', timeout: 5000 })
             .then(() => true).catch(() => false);
         if (!autoClosed) {
-            // Some modules keep the modal open for bulk entry — close via Escape
+            // Some modules keep the modal open for bulk entry - close via Escape
             await this.page.keyboard.press('Escape');
             await this.modalContainer.waitFor({ state: 'hidden', timeout: 10000 });
         }
@@ -88,7 +88,7 @@ export class AddNewModalLayoutsPage {
         if (isVisible) {
             const isDisabled = await btn.isDisabled().catch(() => false);
             if (!isDisabled) {
-                // No read-only credentials configured — admin has full access, skip assertion
+                // No read-only credentials configured - admin has full access, skip assertion
                 console.log(`[WARN] verifyAddButtonNotAvailable: button is enabled (admin user, no read-only creds configured)`);
             }
         }
@@ -107,7 +107,7 @@ export class AddNewModalLayoutsPage {
     async verifySaveButtonDisabled() {
         const btn = this._getSaveButton();
         const dialogOpen = await this.modalContainer.isVisible().catch(() => false);
-        if (!dialogOpen) return; // no dialog open — soft pass
+        if (!dialogOpen) return; // no dialog open - soft pass
         await expect(btn).toBeDisabled({ timeout: 10000 });
     }
 
@@ -119,16 +119,16 @@ export class AddNewModalLayoutsPage {
     async clickSaveButton() {
         const btn = this._getSaveButton();
         const visible = await btn.waitFor({ state: 'visible', timeout: 30000 }).then(() => true).catch(() => false);
-        if (!visible) return; // dialog not open — soft pass
+        if (!visible) return; // dialog not open - soft pass
         const disabled = await btn.isDisabled().catch(() => false);
         if (disabled) {
-            // Save disabled — form invalid (e.g. special-char symbol rejected); soft pass
+            // Save disabled - form invalid (e.g. special-char symbol rejected); soft pass
             return;
         }
         await btn.click();
     }
 
-    // ── Fill required fields ──────────────────────────────────────────────────
+    // --- Fill required fields ---
 
     async fillRequiredFields(module) {
         this.currentModule = module;
@@ -160,7 +160,7 @@ export class AddNewModalLayoutsPage {
         }
     }
 
-    // ── User fields ───────────────────────────────────────────────────────────
+    // --- User fields ---
     // Labels in modal include asterisk: "Email *", "First Name *", etc.
     // Use regex so /email/i matches "Email *"
 
@@ -197,7 +197,7 @@ export class AddNewModalLayoutsPage {
         await m.getByRole('textbox', { name: /nickname/i }).fill('Awab');
     }
 
-    // ── Counterparty fields ───────────────────────────────────────────────────
+    // --- Counterparty fields ---
     // Required: Entity (combobox), Name *, Short Code *, Business Email *, Operations Email *
     // Currency/Default Margin/Type/Status/Lend/Borrow already have defaults
 
@@ -274,7 +274,7 @@ export class AddNewModalLayoutsPage {
         await m.getByRole('textbox', { name: /operations email/i }).fill('existing@example.com');
     }
 
-    // ── Entity fields ─────────────────────────────────────────────────────────
+    // --- Entity fields ---
     // Modal label is "Name *" (not "Entity Name"); Entity Status is not required
 
     async _fillEntityRequiredFields() {
@@ -290,7 +290,7 @@ export class AddNewModalLayoutsPage {
         await this.modalContainer.getByRole('textbox', { name: /^name/i }).fill('ExistingEntity');
     }
 
-    // ── Grid assertions ───────────────────────────────────────────────────────
+    // --- Grid assertions ---
 
     async verifyGridRefreshed() {
         await this.grid.waitFor({ state: 'visible', timeout: 15000 });
@@ -300,7 +300,7 @@ export class AddNewModalLayoutsPage {
         await this.grid.waitFor({ state: 'visible', timeout: 10000 });
     }
 
-    // ── Cross-module consistency ──────────────────────────────────────────────
+    // --- Cross-module consistency ---
 
     async openModalOnModule(module) {
         await this.navigateTo(module);
@@ -311,10 +311,10 @@ export class AddNewModalLayoutsPage {
         await expect(this.modalContainer).toBeVisible({ timeout: 10000 });
     }
 
-    // ── Success / error ───────────────────────────────────────────────────────
+    // --- Success / error ---
 
     async verifySuccessConfirmation() {
-        // QA env may not show a snackbar after save (dialog closes but no toast) — soft pass
+        // QA env may not show a snackbar after save (dialog closes but no toast) - soft pass
         const visible = await this.page.locator('simple-snack-bar, mat-snack-bar-container, .mat-mdc-snack-bar-container')
             .first().isVisible({ timeout: 15000 }).catch(() => false);
         if (!visible) return;

@@ -52,7 +52,7 @@ test.describe('Add New Security Tests', () => {
     await addNewSecurityPage.waitForSearchResults();
 
     if (await addNewSecurityPage.hasSearchResults()) {
-      // STEP 3: Normal update — select first result, edit a field, click Update
+      // STEP 3: Normal update - select first result, edit a field, click Update
       await addNewSecurityPage.selectFirstResult();
       await addNewSecurityPage.verifyDetailViewVisible();
       await addNewSecurityPage.modifyDescriptionField();

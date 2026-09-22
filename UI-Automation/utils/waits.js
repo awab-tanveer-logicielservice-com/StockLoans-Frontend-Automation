@@ -7,11 +7,11 @@
  * before being swallowed by a `.catch(() => {})`. Measured over a full suite
  * run: 239 calls, 21.7s average, ~86 minutes of the ~291 minute total.
  *
- * Nothing depended on networkidle actually firing — every call site is followed
+ * Nothing depended on networkidle actually firing - every call site is followed
  * by a splash dismissal, an element wait, or a `waitForURL`, which is what
  * genuinely gates the next action. They were replaced with `domcontentloaded`
  * (already satisfied after `goto`, so effectively free), except where the caller
- * needed to know which route it landed on — that case is what this file covers.
+ * needed to know which route it landed on - that case is what this file covers.
  *
  * Related gotcha when writing these waits: `locator.isVisible()` returns
  * immediately and never waits, so a page object must leave the page genuinely
