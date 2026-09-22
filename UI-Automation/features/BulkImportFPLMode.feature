@@ -107,7 +107,7 @@ Feature: Bulk Import FPL Mode Workflow (SLL-232)
     Given the user is logged in to the application
     And the user navigates to the Bulk Import page
     When the user activates FPL Mode
-    And the user enters "AAPL" as the FPL symbol
+    And the user enters "GOOGL" as the FPL symbol
     And the user clicks the FPL import button
     Then a validation error for the FPL Quantity field should be displayed
 
@@ -188,11 +188,11 @@ Feature: Bulk Import FPL Mode Workflow (SLL-232)
 
     Examples:
       | symbol | qty          | outcome          |
-      | AAPL   | 1000         | success          |
-      | MSFT   | 500          | success          |
-      | TSLA   | 250          | success          |
+      | GOOGL  | 1000         | success          |
+      | NVDA   | 500          | success          |
+      | AMZN   | 250          | success          |
       |        | 100          | validation error |
-      | GOOG   | -50          | validation error |
+      | TSM    | -50          | validation error |
 
   # --- End-to-End ---
 

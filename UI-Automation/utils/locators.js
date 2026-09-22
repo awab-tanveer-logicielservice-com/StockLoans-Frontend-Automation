@@ -511,6 +511,33 @@ export const LOCATORS = {
     /** Status column header in Grid 1 - visible in FPL Mode for allocation status tracking */
     fplStatusColumnHeader: (page) =>
       page.locator('ag-grid-angular').first().locator('.ag-header-cell-text').filter({ hasText: /status/i }).first(),
+
+    /**
+     * ARIA grid root of Grid 1 / Grid 2.
+     *
+     * ag-Grid publishes the TOTAL row count here as `aria-rowcount`, which is
+     * the only reliable count available: the grid virtualises, so counting
+     * `.ag-row` returns just the rendered window (measured 2026-09-18: 24
+     * rendered out of 43 actual rows). See BulkImportPage._gridRowCount().
+     */
+    grid1AriaRoot: (page) =>
+      page.locator('ag-grid-angular').first().locator('[role="grid"], [role="treegrid"]').first(),
+    grid2AriaRoot: (page) =>
+      page.locator('ag-grid-angular').nth(1).locator('[role="grid"], [role="treegrid"]').first(),
+
+    /**
+     * Header cell of a Grid 1 column, by its visible text.
+     *
+     * Used to read the column's `col-id` at runtime rather than hardcoding one:
+     * the cell selector then cannot drift from the header, and a renamed or
+     * missing column fails as "column not found" instead of silently matching
+     * nothing. See BulkImportPage._grid1CellByHeader().
+     */
+    grid1HeaderCell: (page, headerText) =>
+      page.locator('ag-grid-angular').first()
+        .locator('.ag-header-cell')
+        .filter({ hasText: headerText })
+        .first(),
   },
 
   // ============================================
@@ -1286,72 +1313,167 @@ export const LOCATORS = {
   // ============================================
   // ACCESS REVIEW PAGE LOCATORS (SLL-236)
   // ============================================
-  // The Access Review screen is not built yet (SLL-236 is To Do), so every
-  // selector below is a role/label-first best guess derived from the ticket and
-  // from how the rest of this Angular Material + AG-Grid app is structured.
-  // TODO(SLL-236): confirm each one against the built UI before enabling the
-  // feature file in playwright.config.js.
+  // Verified against the built screen on QA (https://qa-sls-v2.web.app).
+  // The feature is an access *certification*: a snapshot of every user's roles
+  // is flagged by Reviewer 1, agreed by Reviewer 2, applied by an Admin who
+  // generates a Final Snapshot, then confirmed. Landing = /access-reviews,
+  // detail = /access-reviews/{id}.
   AccessReviewPage: {
-    pageHeading: (page) => page.getByRole('heading', { name: /access review/i }),
+    pageHeading: (page) => page.getByRole('heading', { name: 'Access Reviews' }),
+    /** Sidebar nav link - rendered as "verified_userAccess Reviews" (icon ligature + label) */
+    navLink: (page) => page.getByRole('link', { name: /access reviews/i }),
+    /** Slides the collapsed sidebar in; the nav link is unclickable until it does */
+    menuButton: (page) => page.locator('.sidebar-menu-toggle'),
+    /** Status legend chips above the grid */
+    legendChip: (page, label) => page.getByText(label, { exact: true }),
 
-    // --- Request form ---
-    /** Opens the new access review request form */
-    initiateRequestButton: (page) => page.getByRole('button', { name: /initiate|new access review|raise request/i }).first(),
-    /** User whose role is being changed */
-    targetUserInput: (page) => page.getByLabel(/target user|user/i).first(),
-    /** Role being granted or revoked */
-    roleSelect: (page) => page.getByLabel(/role/i).first(),
-    firstApproverInput: (page) => page.getByLabel(/first approver|approver 1/i).first(),
-    secondApproverInput: (page) => page.getByLabel(/second approver|approver 2/i).first(),
-    /** Chips or list showing the approvers currently attached to the request */
-    selectedApproversList: (page) => page.locator('[class*="approver"]').first(),
-    justificationInput: (page) => page.getByLabel(/justification|reason|comments/i).first(),
-    submitRequestButton: (page) => page.getByRole('button', { name: /^submit/i }).first(),
-
-    // --- Grid / queues ---
+    // --- Landing grid ---
     requestsGrid: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
     gridRows: (page) => page.locator('.ag-center-cols-container .ag-row'),
+    /** Real AG-Grid col-ids on the landing grid */
+    gridCell: (page, rowIndex, colId) =>
+      page.locator(`.ag-center-cols-container .ag-row[row-index="${rowIndex}"] .ag-cell[col-id="${colId}"]`),
+    rowByReviewId: (page, id) =>
+      page.locator('.ag-center-cols-container .ag-row').filter({
+        has: page.locator(`.ag-cell[col-id="reviewId"]:text-is("${id}")`),
+      }),
     emptyGridOverlay: (page) => page.locator('.ag-overlay-no-rows-wrapper').first(),
-    statusFilter: (page) => page.getByLabel(/status/i).first(),
-    myRequestsTab: (page) => page.getByRole('tab', { name: /my requests/i }),
-    pendingApprovalsTab: (page) => page.getByRole('tab', { name: /pending approval/i }),
-    allRequestsTab: (page) => page.getByRole('tab', { name: /all requests/i }),
+    /** Per-column filter input in the grid's floating filter row */
+    columnFilterInput: (page, colId) =>
+      page.locator(`.ag-floating-filter[col-id="${colId}"] input`).first(),
 
-    // --- Request details ---
-    detailsPanel: (page) => page.locator('mat-dialog-container, [class*="details-panel"]').first(),
-    requestStatus: (page) => page.locator('[class*="status"]').first(),
-    auditTrail: (page) => page.locator('[class*="audit"], [class*="history"]').first(),
-    /** "first" / "second" approver section inside the details panel */
-    approverTab: (page, which) => page.getByRole('tab', { name: new RegExp(`${which} approver`, 'i') }),
+    // --- Initiate dialog ---
+    newAccessReviewButton: (page) =>
+      page.locator('button').filter({ hasText: /new access review/i }).first(),
+    initiateDialog: (page) => page.locator('mat-dialog-container').first(),
+    initiateDialogHeading: (page) => page.getByRole('heading', { name: /initiate access review/i }),
+    /** Spinner shown while the Reviewer dropdowns are populated */
+    loadingUsers: (page) => page.getByText(/loading users/i),
+    /**
+     * Reviewer 1* / Reviewer 2* - Material selects inside the dialog
+     * (formcontrolname reviewer1LoginId / reviewer2LoginId). Scoping to the
+     * dialog matters: the app has a global Trade panel carrying its own hidden
+     * mat-select, so an unscoped .nth(0) picks that one instead.
+     */
+    reviewerSelect: (page, index) => page.locator('mat-dialog-container mat-select').nth(index),
+    reviewerOption: (page, name) => page.getByRole('option', { name }).first(),
+    notesInput: (page) => page.locator('mat-dialog-container textarea').first(),
+    initiateReviewButton: (page) => page.getByRole('button', { name: /^initiate review$/i }),
+    cancelButton: (page) => page.getByRole('button', { name: /^cancel$/i }),
 
-    // --- Decision actions ---
-    acceptButton: (page) => page.getByRole('button', { name: /^accept$/i }),
+    // --- Detail page ---
+    detailHeading: (page) => page.getByRole('heading', { name: /access review #\d+/i }),
+    /** Status badge next to the "Access Review #N" heading */
+    detailStatusBadge: (page) =>
+      page.locator('h1, h2').filter({ hasText: /access review #/i }).locator('..')
+        .getByText(/PENDING REVIEW|AWAITING SECOND REVIEW|AWAITING ADMIN ACTION|AWAITING CONFIRMATION|COMPLETE/),
+    /** "Your turn (Reviewer 1): ..." instruction banner - tells us whose action is due */
+    turnBanner: (page) => page.getByText(/your turn/i).first(),
+    backButton: (page) => page.getByRole('button', { name: 'arrow_back' }),
+    exportButton: (page) => page.locator('button').filter({ hasText: /export/i }).first(),
+    generateFinalSnapshotButton: (page) =>
+      page.getByRole('button', { name: /generate final snapshot/i }),
+
+    // --- Detail tabs (which ones render depends on the stage) ---
+    tab: (page, name) => page.getByRole('tab', { name }),
+    userSnapshotTab: (page) => page.getByRole('tab', { name: /user snapshot/i }),
+    flagsActionsTab: (page) => page.getByRole('tab', { name: /flags & actions/i }),
+    finalSnapshotTab: (page) => page.getByRole('tab', { name: /final snapshot/i }),
+    signOffHistoryTab: (page) => page.getByRole('tab', { name: /sign-off history/i }),
+
+    // --- User Snapshot tab ---
+    /** Row in the user-snapshot grid for a given display name */
+    snapshotRowByName: (page, name) =>
+      page.locator('.ag-center-cols-container .ag-row').filter({
+        has: page.locator(`.ag-cell:text-is("${name}")`),
+      }).first(),
+    /** MODIFY button inside a snapshot row */
+    modifyButtonInRow: (page, name) =>
+      LOCATORS.AccessReviewPage.snapshotRowByName(page, name)
+        .locator('button', { hasText: /modify/i }).first(),
+    anyModifyButton: (page) => page.locator('button').filter({ hasText: /^modify$/i }),
+
+    // --- MODIFY side panel ("Review and modify roles") ---
+    modifyPanel: (page) => page.getByText('Review and modify roles').locator('../..'),
+    modifyPanelTitle: (page) => page.getByText('Review and modify roles'),
+    disableUserToggle: (page) => page.getByRole('switch').first(),
+    /** Role toggle by its human label - same 14 role names as the Users screen */
+    roleToggle: (page, roleLabel) =>
+      page.locator('[class*="role"], div').filter({ hasText: roleLabel })
+        .getByRole('switch').first(),
+    // Every comment box on this screen is a mat-form-field with a <mat-label>,
+    // NOT a placeholder - getByPlaceholder finds none of them.
+    modifyCommentInput: (page) => page.getByLabel(/comment \(optional\)/i).first(),
+    applyChangesButton: (page) => page.getByRole('button', { name: /apply changes/i }),
+    modifyPanelClose: (page) => page.getByRole('button', { name: 'close' }).first(),
+
+    // --- Flag submission (Reviewer 1) ---
+    submitFlagsButton: (page) => page.getByRole('button', { name: /submit flags/i }),
+
+    // --- Flags & Actions tab (Reviewer 2) ---
+    flagsGrid: (page) => page.locator('ag-grid-angular, .ag-root-wrapper').first(),
+    flagsGridRows: (page) => page.locator('.ag-center-cols-container .ag-row'),
+    /** "Review Flags" panel below the grid - scope root for the per-flag controls */
+    reviewFlagsPanel: (page) => page.getByText(/Review each flag below/i).locator('../..'),
+    /** Agree/Disagree toggle for a flag row (label flips between the two words) */
+    agreeToggle: (page, index = 0) =>
+      LOCATORS.AccessReviewPage.reviewFlagsPanel(page).getByRole('switch').nth(index),
+    /**
+     * Per-flag comment. Must stay scoped to the Review Flags panel: the global
+     * Trade panel carries a second input also labelled "Comment"
+     * (formcontrolname="publicComment"), so an unscoped lookup is ambiguous.
+     */
+    flagCommentInput: (page, index = 0) =>
+      LOCATORS.AccessReviewPage.reviewFlagsPanel(page)
+        .getByLabel('Comment', { exact: true }).nth(index),
+    /** Unique on the page, so it needs no scoping */
+    overallSignOffCommentInput: (page) => page.getByLabel(/overall sign-off comment/i).first(),
+    signOffButton: (page) => page.getByRole('button', { name: /^sign off$/i }),
+
+    // --- Final Snapshot tab / Confirm Final State ---
+    confirmFinalStatePanel: (page) => page.getByText('Confirm Final State').locator('../..'),
+    /** Scoped for the same reason as flagCommentInput - the Trade panel also has a "Comment". */
+    confirmCommentInput: (page) =>
+      LOCATORS.AccessReviewPage.confirmFinalStatePanel(page)
+        .getByLabel('Comment', { exact: true }).first(),
+    confirmButton: (page) => page.getByRole('button', { name: /^confirm$/i }),
     rejectButton: (page) => page.getByRole('button', { name: /^reject$/i }),
-    rejectionReasonInput: (page) => page.getByLabel(/rejection reason|reason/i).first(),
-    finalApprovalButton: (page) => page.getByRole('button', { name: /final approval|approve request/i }),
-    finalRejectButton: (page) => page.getByRole('button', { name: /final reject|decline request/i }),
-    /** Confirmation dialog that some Material flows put behind a decision */
-    confirmDialogButton: (page) => page.getByRole('button', { name: /^(confirm|yes|ok)$/i }).first(),
-
-    // --- Export ---
-    exportButton: (page) => page.getByRole('button', { name: /export/i }).first(),
-    exportFormatOption: (page, format) => page.getByRole('menuitem', { name: new RegExp(format, 'i') }),
 
     // --- Feedback ---
     snackBar: (page) => page.locator('mat-snack-bar-container'),
     validationError: (page) => page.locator('mat-error'),
 
-    /** Form values the scenarios fill in. Override per environment via env vars. */
+    /**
+     * Workflow statuses exactly as the grid and detail badge render them.
+     * The ticket description stops at "Admin provides the final approval"; the
+     * build adds AWAITING CONFIRMATION after the Final Snapshot is generated.
+     */
+    STATUS: {
+      pendingReview: 'PENDING REVIEW',
+      awaitingSecondReview: 'AWAITING SECOND REVIEW',
+      awaitingAdminAction: 'AWAITING ADMIN ACTION',
+      awaitingConfirmation: 'AWAITING CONFIRMATION',
+      complete: 'COMPLETE',
+    },
+
+    /** Data the scenarios drive. Override per environment via env vars. */
     defaults: {
-      requester: process.env.AR_REQUESTER || 'awab.tanveer@vcttechnologiesllc.com',
-      targetUser: process.env.AR_TARGET_USER || 'hussain.raza@logicielservice.com',
-      role: process.env.AR_ROLE || 'Can approve contracts',
-      approvers: [
-        process.env.AR_APPROVER_1 || 'approver.one@logicielservice.com',
-        process.env.AR_APPROVER_2 || 'approver.two@logicielservice.com',
-      ],
-      justification: 'Role change required for desk transfer — raised by automation.',
-      rejectionReason: 'Rejected by automated regression check.',
+      /** Display names as they appear in the Reviewer dropdowns and grid */
+      reviewer1: process.env.AR_REVIEWER_1 || 'Myadmin',
+      reviewer2: process.env.AR_REVIEWER_2 || 'Awab',
+      /**
+       * User whose roles get flagged, and the role to toggle. betaFeatures is
+       * deliberate: it is the least consequential of the 14 roles, so a run that
+       * completes the workflow (which really applies the change) cannot lock the
+       * suite out of the app. Matches the flag in the reference screenshots.
+       */
+      flagTargetUser: process.env.AR_FLAG_USER || 'Myadmin',
+      flagRole: process.env.AR_FLAG_ROLE || 'Reveal beta features on the website',
+      notes: 'Initiated by automated regression run (SLL-236).',
+      flagComment: 'Flagged by automation.',
+      agreeComment: 'Agreed by automation.',
+      signOffComment: 'Signed off by automation.',
+      confirmComment: 'Confirmed by automation.',
     },
   },
 };

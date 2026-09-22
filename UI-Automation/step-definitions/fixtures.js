@@ -61,7 +61,7 @@ const singleBrowserFixtures = !SINGLE_BROWSER
             // Matches VIEWPORT_DEFAULT in playwright.config.js. This context is
             // built by hand rather than from the project's `use`, so it does not
             // inherit that setting and has to state the size itself.
-            viewport: { width: 1536, height: 720 },
+            viewport: { width: 1900, height: 1080 },
             ignoreHTTPSErrors: true,
             baseURL: ENV.baseURL,
           });
@@ -133,7 +133,10 @@ export const test = base.extend({
   context: async ({ context }, use, testInfo) => {
     // Login/Remember-Me scenarios assert on the logged-out state ("Precondition:
     // User is not logged in"), so they must NOT get a replayed session.
-    const needsLoggedOut = /LoginFunctionality|RememberMe/i.test(testInfo.file);
+    // AccessReview joins them for a different reason: it signs in and out as two
+    // specific people ("Awab", "Myadmin"), so a replayed session for a third
+    // account would put the workflow on the wrong turn.
+    const needsLoggedOut = /LoginFunctionality|RememberMe|AccessReview/i.test(testInfo.file);
     if (authRecords && !needsLoggedOut) await injectFirebaseAuth(context, authRecords);
     await suppressSplashOverlay(context);
     await use(context);
@@ -207,9 +210,9 @@ export const test = base.extend({
   testUsers: async ({}, use) => {
     await use(ENV.baseURL.includes('dev') ? devUsers : users);
   },
-  // Requester / approver / admin identities for the SLL-236 access review flow.
-  accessReviewUsers: async ({ testUsers }, use) => {
-    await use(accessReviewRoleUsers(testUsers));
+  // Initiator / reviewer / admin identities for the SLL-236 Access Reviews flow.
+  accessReviewUsers: async ({}, use) => {
+    await use(accessReviewRoleUsers());
   },
   // Spread last so its page/context overrides win when the flag is on. Empty
   // object - and therefore a no-op - for every normal run.

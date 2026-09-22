@@ -137,13 +137,13 @@ When('the user attempts to navigate to the User Roles sub-page', async ({ userRo
 // --- Admin access steps ---
 
 Given('the user is logged in as an administrator', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });
 
 Given('the user is logged in without administrator privileges', async ({ page, loginPage }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   // Attempt with a restricted account - skip gracefully if no restricted user is configured
   // This step is a placeholder: configure E2E_READONLY_USER / E2E_READONLY_PWD env vars for full coverage
@@ -250,13 +250,13 @@ Then('the role list should indicate no roles are currently assigned', async ({ u
   const rolesPanel = userRolesPage.page.getByRole('tabpanel', { name: 'Roles' });
   const panelVisible = await rolesPanel.isVisible({ timeout: 5000 }).catch(() => false);
   if (!panelVisible) {
-    console.warn('[WARN] Roles tabpanel not visible — soft-passing "no roles" scenario');
+    console.warn('[WARN] Roles tabpanel not visible - soft-passing "no roles" scenario');
     return;
   }
   const firstSwitch = rolesPanel.getByRole('switch').first();
   const ariaChecked = await firstSwitch.getAttribute('aria-checked').catch(() => null);
   if (ariaChecked === 'true') {
-    console.warn('[WARN] No user with zero roles found in test environment — soft-passing');
+    console.warn('[WARN] No user with zero roles found in test environment - soft-passing');
     return;
   }
   for (const role of UserRolesPage.allRoles) {

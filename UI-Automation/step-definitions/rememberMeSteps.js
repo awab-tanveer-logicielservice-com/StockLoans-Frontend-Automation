@@ -7,26 +7,26 @@ const { Given, When, Then } = createBdd(test);
 // --- Given ---
 
 Given('the user is on the login page', async ({ page, rememberMePage }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await rememberMePage.navigate();
 });
 
 Given('the user previously logged in with Remember Me enabled', async ({ page, rememberMePage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await rememberMePage.navigate();
   await rememberMePage.loginWith(testUsers.username, testUsers.password, true);
   await rememberMePage.logout();
 });
 
 Given('the user previously logged in without enabling Remember Me', async ({ page, rememberMePage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await rememberMePage.navigate();
   await rememberMePage.loginWith(testUsers.username, testUsers.password, false);
   await rememberMePage.logout();
 });
 
 Given('the user navigates to the login page with pre-filled credentials from a previous Remember Me session', async ({ page, rememberMePage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   // Seed localStorage with saved credentials to simulate a prior Remember Me login
   await rememberMePage.navigate();
   await rememberMePage.loginWith(testUsers.username, testUsers.password, true);
@@ -51,7 +51,7 @@ const SUPERSEDED_USER = {
 };
 
 Given("a previous user's credentials are saved in localStorage via Remember Me", async ({ page, rememberMePage }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await rememberMePage.navigate();
   // Seeded rather than logged in: Remember Me only has to have *stored* this
   // user for the overwrite to be meaningful, and seeding keeps the scenario to
@@ -61,7 +61,7 @@ Given("a previous user's credentials are saved in localStorage via Remember Me",
 });
 
 Given('the user has pre-filled credentials saved via Remember Me', async ({ page, rememberMePage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await rememberMePage.navigate();
   await rememberMePage.loginWith(testUsers.username, testUsers.password, true);
   await rememberMePage.logout();

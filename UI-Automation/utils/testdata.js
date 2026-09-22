@@ -13,32 +13,57 @@ export const devUsers = {
 };
 
 /**
- * Identities for the SLL-236 access review workflow (requester -> two approvers
- * -> admin). There are no dedicated accounts on the test environments yet, so
- * each role falls back to the primary account unless its env vars are set.
- * Until real accounts exist, the role-restriction scenarios exercise what the
- * primary account is allowed to see rather than a genuinely separate identity -
- * set these before trusting those results.
+ * Identities for the SLL-236 Access Reviews workflow.
+ *
+ * These are QA accounts - the workflow needs two real, distinct logins and both
+ * only exist in the QA Firebase project, so this feature must run with
+ * BASE_URL=https://qa-sls-v2.web.app/login. On dev the logins return HTTP 400
+ * from identitytoolkit.
+ *
+ * The display names ("Awab", "Myadmin") are what the Reviewer dropdowns and the
+ * grid's Reviewer 1 / Reviewer 2 columns show, so scenarios refer to people by
+ * those names and this map resolves them to credentials.
  */
-export function accessReviewRoleUsers(fallback) {
-  const fromEnv = (userVar, pwdVar) =>
-    process.env[userVar] && process.env[pwdVar]
-      ? { username: process.env[userVar], password: process.env[pwdVar] }
-      : { ...fallback, isFallback: true };
+const ACCESS_REVIEW_ACCOUNTS = {
+  awab: {
+    displayName: 'Awab',
+    username: process.env.AR_AWAB_USER || 'awab.tanveer@logicielservice.com',
+    password: process.env.AR_AWAB_PWD || 'Testing@123@!',
+  },
+  myadmin: {
+    displayName: 'Myadmin',
+    username: process.env.AR_MYADMIN_USER || 'adminuser@yopmail.com',
+    password: process.env.AR_MYADMIN_PWD || 'Test@12345@!',
+  },
+};
 
-  const byRole = {
-    requester: fromEnv('AR_REQUESTER_USER', 'AR_REQUESTER_PWD'),
-    'approver one': fromEnv('AR_APPROVER1_USER', 'AR_APPROVER1_PWD'),
-    'approver two': fromEnv('AR_APPROVER2_USER', 'AR_APPROVER2_PWD'),
-    admin: fromEnv('AR_ADMIN_USER', 'AR_ADMIN_PWD'),
-  };
+// Workflow roles map onto those two accounts. Awab initiates, acts as Reviewer 2,
+// and also performs the last two stages: whoever STARTS a review COMPLETES it, so
+// "admin" here is the initiator, not the adminuser@ account. The app shows
+// "Your turn (Admin)" only to the initiator and only enables Generate Final
+// Snapshot for them (verified on QA review #30).
+const ROLE_ALIASES = {
+  awab: 'awab',
+  myadmin: 'myadmin',
+  initiator: 'awab',
+  'reviewer 1': 'myadmin',
+  'reviewer one': 'myadmin',
+  'reviewer 2': 'awab',
+  'reviewer two': 'awab',
+  admin: 'awab',
+};
 
+export function accessReviewRoleUsers() {
   return {
-    ...byRole,
+    accounts: ACCESS_REVIEW_ACCOUNTS,
     forRole(role) {
-      const creds = byRole[String(role).trim().toLowerCase()];
-      if (!creds) throw new Error(`Unknown access review role: "${role}"`);
-      return creds;
+      const key = ROLE_ALIASES[String(role).trim().toLowerCase()];
+      if (!key) {
+        throw new Error(
+          `Unknown access review identity: "${role}". Known: ${Object.keys(ROLE_ALIASES).join(', ')}`
+        );
+      }
+      return ACCESS_REVIEW_ACCOUNTS[key];
     },
   };
 }

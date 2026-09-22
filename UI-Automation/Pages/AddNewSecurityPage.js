@@ -118,6 +118,33 @@ export class AddNewSecurityPage {
         }
     }
 
+    async clearCloseDate() {
+        // The app pre-fills Close Date with today's date, so a scenario that
+        // wants it "missing" has to clear it: merely skipping the field leaves a
+        // valid value in place and Save stays - correctly - enabled.
+        await this.closeDateInput.click();
+        try {
+            await this.closeDateInput.fill('');
+        } catch {
+            await this.closeDateInput.evaluate((el) => {
+                Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, '');
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+                el.dispatchEvent(new Event('blur', { bubbles: true }));
+            });
+        }
+        // Fail loudly rather than asserting against a field that is still
+        // populated - that is what made this scenario look like an app bug.
+        const value = await this.closeDateInput.inputValue().catch(() => '');
+        if (value) {
+            throw new Error(
+                `Close Date could not be cleared (still "${value}"). The app defaults it to ` +
+                `today, so "Save disabled when Close Date is missing" cannot be reached ` +
+                `through the UI — confirm the expected behaviour before asserting on it.`
+            );
+        }
+    }
+
     async fillStatus(status) {
         await this.statusInput.click();
         await this.statusInput.fill(status);
@@ -307,6 +334,7 @@ export class AddNewSecurityPage {
         if (fieldName !== 'description') await this.fillDescription(`Test Security ${ts}`);
         if (fieldName !== 'closePrice') await this.fillClosePrice('100.00');
         if (fieldName !== 'closeDate') await this.fillCloseDate('2026-12-31');
+        else await this.clearCloseDate(); // pre-filled by the app; skipping is not enough
     }
 
     async fillFieldWithValue(fieldName, value) {

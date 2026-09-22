@@ -158,7 +158,7 @@ Then('the Add New button should be visible and enabled on the toolbar', async ({
 // --- Read-only access ---
 
 Given('the user is logged in with read-only permissions', async ({ page, loginPage, testUsers }) => {
-    await page.setViewportSize({ width: 1536, height: 720 });
+    await page.setViewportSize({ width: 1900, height: 1080 });
     await loginPage.navigate();
     await loginPage.login(
         testUsers.readOnlyUsername || testUsers.username,

@@ -254,13 +254,81 @@ export class BulkImportPage {
   async selectFirstRowGrid1() {
     await expect(this.grid1Row).not.toHaveCount(0, { timeout: 20000 });
     await this._hideGridOverlays();
-    const cb = this.grid1FirstRowCheckbox;
+
+    // "The first row" means the first row belonging to this scenario. Index 0 is
+    // whatever the shared grid happens to show, which on a parallel run is
+    // another feature's leftover - so prefer a row carrying the symbol this
+    // scenario imported, and fall back to index 0 only if nothing was imported.
+    const row = await this._ownedGrid1Row();
+
+    // Remember which row this is so isGrid1RecordGone() can assert that this
+    // row left the grid, rather than that no row like it remains - Grid 1 holds
+    // several rows per symbol.
+    await this._rememberSelectedGrid1Row(row);
+
+    const cb = row.getByRole('checkbox', { name: /Press Space to toggle row selection/ }).first();
     if (await cb.count() > 0) {
       await cb.click(); // overlay is hidden, no force needed
     } else {
-      await this.grid1Row.first().click({ force: true });
+      await row.click({ force: true });
     }
     await this.page.waitForTimeout(300);
+  }
+
+  /** The Grid 1 row this scenario imported, or the first row if it imported none. */
+  async _ownedGrid1Row() {
+    const mine = this._lastImportedSymbol
+      ? this.grid1Row.filter({ hasText: this._lastImportedSymbol })
+      : null;
+    if (mine && (await mine.count()) > 0) return mine.first();
+    return this.grid1Row.first();
+  }
+
+  /**
+   * Captures the identity of the Grid 1 row about to be submitted.
+   *
+   * ag-Grid only emits a meaningful `row-id` when the grid is configured with
+   * getRowId; otherwise it falls back to the row index, which renumbers as soon
+   * as a row is removed and so cannot identify anything. Both cases are
+   * recorded, and isGrid1RecordGone() picks its assertion accordingly.
+   */
+  async _rememberSelectedGrid1Row(row) {
+    // Read the symbol off the row actually being submitted rather than trusting
+    // _lastImportedSymbol, so the diagnostics name the right record even when
+    // this scenario imported nothing.
+    const symbolCell = await this._grid1CellInRow(row, 'Symbol').catch(() => null);
+    const cellText = symbolCell ? await symbolCell.textContent().catch(() => null) : null;
+    this._submittedRowSymbol = (cellText || '').trim() || null;
+
+    this._grid1TotalBeforeSubmit = await this._gridRowCount(1).catch(() => null);
+  }
+
+  /**
+   * Exact row count for Grid 1 or Grid 2.
+   *
+   * Counting `.ag-row` does NOT work on these grids: ag-Grid virtualises, so the
+   * DOM holds only the rendered window. Measured on QA 2026-09-18, Grid 1 had
+   * 43 rows and rendered 24 of them, and the rendered count stayed pinned at 24
+   * while rows were added - which is why the count-based assertions here read
+   * "12 before, 12 after" and concluded nothing had changed.
+   *
+   * `aria-rowcount` is ag-Grid's own total and is unaffected by virtualisation.
+   * It includes the header rows, so those are subtracted.
+   */
+  async _gridRowCount(which = 1) {
+    const grid = which === 1 ? this.grid1 : this.grid2;
+    const root =
+      which === 1
+        ? LOCATORS.BulkImportPage.grid1AriaRoot(this.page)
+        : LOCATORS.BulkImportPage.grid2AriaRoot(this.page);
+    await root.waitFor({ state: 'attached', timeout: 15000 });
+    const raw = await root.getAttribute('aria-rowcount');
+    const total = Number(raw);
+    if (!Number.isFinite(total)) {
+      throw new Error(`Grid ${which} has no usable aria-rowcount (got "${raw}")`);
+    }
+    const headerRows = await grid.locator('.ag-header-row').count().catch(() => 1);
+    return Math.max(0, total - (headerRows || 1));
   }
 
   async selectAllRowsGrid1() {
@@ -344,6 +412,15 @@ export class BulkImportPage {
     return (text || '').trim();
   }
 
+  /** Waits out any open snackbar so the next read isn't the previous verdict. */
+  async _waitForFeedbackToClear() {
+    await this.page
+      .locator('simple-snack-bar, mat-snack-bar-container, .mat-mdc-snack-bar-container')
+      .first()
+      .waitFor({ state: 'detached', timeout: 8000 })
+      .catch(() => {});
+  }
+
   /** Fails naming the import outcome, so the report says why the row is missing. */
   async _failMissingGrid1Row(context) {
     const feedback = await this._importFeedbackText();
@@ -352,7 +429,7 @@ export class BulkImportPage {
     // look identical from the grid, and only the second leaves no feedback.
     const importEnabled = await this.importButton.isEnabled().catch(() => null);
     throw new Error(
-      `Precondition failed: ${context} did not produce a row in Grid 1 within 20s — ` +
+      `Precondition failed: ${context} did not produce a row in Grid 1 within 45s — ` +
       (feedback ? `app reported: "${feedback}"` : 'no snackbar or validation message was shown') +
       `. Import button was ${importEnabled === null ? 'not found' : importEnabled ? 'enabled' : 'DISABLED (the form did not validate, so nothing was submitted)'}.`
     );
@@ -370,13 +447,16 @@ export class BulkImportPage {
     // which re-imported DEFAULTS.symbol each pass - could never reach two
     // records, and reported success anyway because it never checked the count.
     for (const symbol of [DEFAULTS.symbol, DEFAULTS.secondSymbol]) {
-      const before = await this.grid1Row.count();
+      // Counted via aria-rowcount, not `.ag-row`: the grid virtualises, so a
+      // rendered count saturates at the viewport and `.nth(before)` would wait
+      // on a row index that is never rendered. See _gridRowCount().
+      const before = await this._gridRowCount(1);
       if (before >= 2) return;
       await this._doOneImport(symbol);
-      // Waiting on the row at index `before` is a wait for the count to grow.
-      const grew = await this.grid1Row
-        .nth(before)
-        .waitFor({ state: 'attached', timeout: 45000 })
+      const grew = await expect(async () => {
+        expect(await this._gridRowCount(1)).toBeGreaterThan(before);
+      })
+        .toPass({ timeout: 45000 })
         .then(() => true)
         .catch(() => false);
       if (!grew) await this._failMissingGrid1Row(`import of ${symbol}`);
@@ -400,15 +480,61 @@ export class BulkImportPage {
     if (!hasRows) return;
   }
 
+  /**
+   * "Grid 1 should no longer contain the submitted record."
+   *
+   * Two earlier versions of this could not express that claim. The first
+   * asserted the whole grid was empty; the second asserted no row matching the
+   * symbol remained. Both fail on state they don't own: Grid 1 is shared,
+   * persistent backend state, and it routinely holds several rows for the same
+   * symbol left by other scenarios and by the standard/FPL features running in
+   * parallel. Submitting one of them can never drive that count to zero.
+   *
+   * So this asserts that Grid 1's total row count dropped, using ag-Grid's
+   * aria-rowcount rather than rendered rows - see _gridRowCount().
+   *
+   * Row identity via `row-id` was tried and rejected: this grid is not
+   * configured with getRowId, so ag-Grid falls back to the row index, and a
+   * `.ag-row[row-id="N"]` lookup returns 0 matches simply because the row is
+   * virtualised out of the rendered window. That assertion passed whether or
+   * not the row was removed.
+   */
   async isGrid1RecordGone(symbol) {
-    // The step reads "Grid 1 should no longer contain the submitted record", but
-    // this asserted the entire grid was empty. Grid 1 is shared, persistent
-    // backend state - other scenarios, and the standard/FPL features running in
-    // parallel across workers, legitimately leave rows behind - so an empty-grid
-    // assertion fails for reasons that have nothing to do with this submission.
-    // Scope it to the record actually submitted, which is what the step claims.
-    const target = symbol || this._lastImportedSymbol || DEFAULTS.symbol;
-    await expect(this.grid1Row.filter({ hasText: target })).toHaveCount(0, { timeout: 15000 });
+    const target =
+      symbol || this._submittedRowSymbol || this._lastImportedSymbol || DEFAULTS.symbol;
+    const before = this._grid1TotalBeforeSubmit;
+    if (before === null || before === undefined) {
+      throw new Error(
+        'isGrid1RecordGone() needs the pre-submit row count captured by ' +
+        'selectFirstRowGrid1(); the scenario submitted without selecting a row.'
+      );
+    }
+
+    let after = before;
+    const removed = await expect(async () => {
+      after = await this._gridRowCount(1);
+      expect(after).toBeLessThan(before);
+    })
+      .toPass({ timeout: 20000 })
+      .then(() => true)
+      .catch(() => false);
+    if (removed) return;
+
+    // Whether anything reached Grid 2 separates "the submission failed" from
+    // "the submission succeeded but Grid 1 never refreshed" - the two look
+    // identical from Grid 1 alone, and it is the first thing worth knowing.
+    const grid2 = await this._gridRowCount(2).catch(() => null);
+    throw new Error(
+      `Grid 1 holds ${after} row(s) after submitting the "${target}" row; it held ` +
+      `${before} before, so the submitted row was not removed. Grid 2 ` +
+      (grid2 === null
+        ? 'could not be read'
+        : `holds ${grid2} row(s), so the submission ` +
+          (grid2 > 0
+            ? 'reached the backend and only Grid 1 failed to refresh'
+            : 'appears not to have been accepted at all')) +
+      '.'
+    );
   }
 
   async isGrid1EmptyState() {
@@ -506,7 +632,16 @@ export class BulkImportPage {
 
   // --- FPL Mode ---
 
-  _fplSymbol = 'AAPL';
+  /**
+   * The only symbols the FPL Mode scenarios use, in order of preference.
+   *
+   * Confirmed present in this environment; the previous default (AAPL) is left
+   * to the standard-mode flows so the two features don't pile rows onto the
+   * same shared Grid 1 symbol.
+   */
+  static FPL_SYMBOLS = ['GOOGL', 'NVDA', 'AMZN', 'NVA', 'TSM'];
+
+  _fplSymbol = BulkImportPage.FPL_SYMBOLS[0];
   _fplQty    = '100';
   _fplRate   = DEFAULTS.rate;
 
@@ -543,20 +678,90 @@ export class BulkImportPage {
     await expect(this.importButton).toBeEnabled({ timeout: 10000 });
   }
 
+  /**
+   * SLL-232: "FPL Mode uses system-driven pricing and rate entry is not required".
+   *
+   * What "rate entry is not required" means here is the absence of a standalone
+   * Rate *form field*. FPL Mode's import panel exposes one control - the
+   * composed paste box, whose own placeholder documents the required format as
+   * `SYMBOL QTY RATE`. The rate travels inside that line; there is no separate
+   * rate input to fill, and omitting the third token is correctly rejected with
+   * "Each line must be: SYMBOL QTY RATE" (verified 2026-09-17 against all five
+   * configured symbols). So this asserts the panel's actual shape.
+   *
+   * It does NOT query `getByRole('spinbutton', {name:/rate/i})` page-wide as it
+   * used to: that matched the Trade drawer's "Rebate Rate *", a different
+   * component present in the DOM at the same time, and failed the scenario on
+   * every run for a reason that was never in FPL Mode. The same trap is
+   * documented for Counterparty in utils/locators.js.
+   */
   async isFPLRateFieldAbsent() {
-    // In FPL Mode the rate is system-driven; if a rate input exists it should not be required
-    const rateInput = this.page.getByRole('spinbutton', { name: /rate/i });
-    const isVisible = await rateInput.isVisible({ timeout: 3000 }).catch(() => false);
-    if (isVisible) {
-      const required = await rateInput.getAttribute('required');
-      if (required !== null) throw new Error('Rate field must not be required in FPL Mode');
-    }
-    // If not visible, system-driven pricing is confirmed - pass silently
+    // The composed box is the panel's only entry point, and its placeholder is
+    // the contract. Asserting on it means a change to the accepted format
+    // surfaces here rather than as a puzzling rejection three scenarios later.
+    await expect(this.symbolCusipQtyRateTextbox).toBeVisible({ timeout: 10000 });
+    // Asserted on the accessible name, not `placeholder`: the app renders the
+    // format as a floating <mat-label>, so both placeholder and aria-label come
+    // back empty.
+    await expect(this.symbolCusipQtyRateTextbox).toHaveAccessibleName(
+      /symbol\s*\/?\s*(cusip)?\s*qty\s*rate/i,
+      { timeout: 10000 }
+    );
+
+    await this._assertNoStandaloneRateInputInFPLPanel();
   }
 
+  /**
+   * Asserts the FPL panel exposes no standalone rate input, scoped to the panel.
+   *
+   * Scoped via the paste box's nearest form/card ancestor so the Trade drawer's
+   * rate field cannot be picked up. If no such ancestor exists the check is
+   * skipped rather than guessed at - guessing the DOM shape is what produced
+   * the original false positive.
+   */
+  async _assertNoStandaloneRateInputInFPLPanel() {
+    const panel = this.symbolCusipQtyRateTextbox.locator(
+      'xpath=ancestor::*[self::form or self::mat-card or contains(@class,"card")][1]'
+    );
+    if ((await panel.count()) === 0) return;
+
+    const rateInput = panel.locator(
+      'input[type="number"][name*="rate" i], input[placeholder*="rate" i]'
+    );
+    const count = await rateInput.count();
+    if (count > 0) {
+      throw new Error(
+        `FPL Mode's import panel exposes ${count} standalone rate input(s), but ` +
+        'SLL-232 specifies system-driven pricing with the rate supplied inside ' +
+        'the composed SYMBOL QTY RATE line rather than as its own field.'
+      );
+    }
+  }
+
+  /**
+   * Resolves a Grid 1 cell by its column's header text.
+   *
+   * The `col-id` is read from the header at runtime instead of being hardcoded,
+   * so the cell selector cannot drift from the column and a renamed or missing
+   * column fails as "column not found" rather than matching nothing.
+   */
+  async _grid1CellByHeader(headerText, rowIndex = 0) {
+    return this._grid1CellInRow(this.grid1Row.nth(rowIndex), headerText);
+  }
+
+  /** As _grid1CellByHeader, for a row locator already in hand. */
+  async _grid1CellInRow(row, headerText) {
+    const header = LOCATORS.BulkImportPage.grid1HeaderCell(this.page, headerText);
+    await header.waitFor({ state: 'visible', timeout: 15000 });
+    const colId = await header.getAttribute('col-id');
+    if (!colId) {
+      throw new Error(`Grid 1 column "${headerText}" has no col-id attribute`);
+    }
+    return row.locator(`.ag-cell[col-id="${colId}"]`);
+  }
+
+  /** Fills the composed paste box in the documented SYMBOL QTY RATE format. */
   async _fillFPLComposedInput() {
-    // Despite the "system-driven pricing" label, the composed-line parser still
-    // requires 3 tokens ("Each line must be: SYMBOL QTY RATE") in FPL Mode too.
     this._lastImportedSymbol = this._fplSymbol;
     const text = `${this._fplSymbol} ${this._fplQty} ${this._fplRate}`.trim();
     await this.symbolCusipQtyRateTextbox.click();
@@ -572,22 +777,46 @@ export class BulkImportPage {
     await this.page.waitForTimeout(3000);
   }
 
+  /**
+   * "At least one FPL allocation record exists in Grid 1."
+   *
+   * Imports unconditionally rather than only when the grid is empty. Grid 1 is
+   * shared state, so a non-empty grid is usually non-empty because of the
+   * standard-mode feature running on another worker - and a standard Borrow row
+   * is not an FPL allocation, which is what this precondition promises. Taking
+   * whatever row happened to be sitting there meant the following steps selected
+   * and submitted another feature's record: the 2026-09-18 run submitted an
+   * AAPL row from Bulkimport.feature and then asserted on FPL behaviour.
+   */
   async ensureGrid1HasFPLRecord() {
-    const count = await this.grid1Row.count();
-    if (count === 0) {
-      this._fplSymbol = 'AAPL';
-      this._fplQty    = '100';
-      await this.clickFPLImport();
-    }
+    this._fplSymbol = BulkImportPage.FPL_SYMBOLS[0];
+    this._fplQty    = '100';
+    await this.clickFPLImport();
+    const landed = await this.grid1Row
+      .filter({ hasText: this._fplSymbol })
+      .first()
+      .waitFor({ state: 'attached', timeout: 45000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!landed) await this._failMissingGrid1Row(`FPL import of ${this._fplSymbol}`);
   }
 
   async isGrid1FPLRecordVisible() {
     await expect(this.grid1Row).not.toHaveCount(0, { timeout: 30000 });
   }
 
+  /**
+   * "System-driven pricing" is the Price column being filled in by the backend:
+   * the composed line carries SYMBOL QTY RATE, never a price, so any value in
+   * that cell came from the system.
+   *
+   * Previously this only asserted Grid 1 had a row, which the preceding step
+   * already asserts - it could not fail for the reason it claimed to check.
+   */
   async isFPLSystemPricingApplied() {
-    // System-driven pricing: the record exists in Grid 1 (price populated by backend)
     await expect(this.grid1Row).not.toHaveCount(0, { timeout: 30000 });
+    const priceCell = await this._grid1CellByHeader('Price');
+    await expect(priceCell).toHaveText(/\d/, { timeout: 30000 });
   }
 
   async isFPLStatusColumnVisible() {
