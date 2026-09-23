@@ -125,6 +125,18 @@ const accessReviewBddConfig = defineBddConfig({
   outputDir: 'UI-Automation/.features-gen-access-review',
 });
 
+// Velocity JSON API suite (API-Automation/). Entirely separate from the UI
+// configs above: its own features, its own step definitions, its own fixtures.
+// Nothing here touches a browser - no step uses the `page` fixture, so the
+// `api` project below runs at HTTP speed and needs no 'auth setup' dependency
+// (it acquires its own token per worker, see API-Automation/step-definitions/
+// fixtures.js).
+const apiBddConfig = defineBddConfig({
+  features: ['API-Automation/features/*.feature'],
+  steps: 'API-Automation/step-definitions/**/*.js',
+  outputDir: 'API-Automation/.features-gen',
+});
+
 export default defineConfig({
   testDir: 'UI-Automation/tests',
   // Was 240s to absorb the old networkidle/grid-overlay stalls. Most scenarios
@@ -208,6 +220,34 @@ export default defineConfig({
       timeout: 600_000,
       workers: 1,
       use: { ...bddUse, ...demoArtifacts },
+    },
+    // --- Velocity JSON API (API-Automation/) ---
+    //   npx playwright test --project=api
+    //   npx playwright test --project=api-smoke
+    // Credentials come from the environment and have no defaults; without them
+    // the authenticated scenarios skip rather than fail. See
+    // API-Automation/README.md.
+    //
+    // No `use: bddUse` - that block is browser launch options and would be
+    // dead weight here. The per-request timeout is set by API_TIMEOUT_MS in
+    // API-Automation/Config/env.js, not by Playwright's `use`.
+    //
+    // Serial by default: these place real locate orders against dev
+    // inventory, and parallel workers competing for the same symbol turn a
+    // legitimate fill into an intermittent No Inventory. Override with
+    // API_WORKERS once a scenario set is known to be independent.
+    {
+      name: 'api',
+      testDir: apiBddConfig,
+      workers: Number(process.env.API_WORKERS) || 1,
+      timeout: 60_000,
+    },
+    {
+      name: 'api-smoke',
+      testDir: apiBddConfig,
+      grep: /@Smoke\b/,
+      workers: Number(process.env.API_WORKERS) || 1,
+      timeout: 60_000,
     },
     // --- Demo ---
     // `npm run demo` runs both demo projects in one shot (see scripts/run-demo.mjs).
