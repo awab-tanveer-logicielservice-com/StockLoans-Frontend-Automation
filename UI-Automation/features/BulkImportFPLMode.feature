@@ -80,7 +80,8 @@ Feature: Bulk Import FPL Mode Workflow (SLL-232)
   # Precondition: User is authenticated; FPL Mode is active; at least one allocation record exists in Grid 1
   @Smoke @Regression @SLL-232 @SLL-C1578
   Scenario: After successful FPL submission Grid 1 rows are cleared and record appears in Grid 2 history
-    Given the user is logged in to the application
+    Given the market is open for bulk import submissions
+    And the user is logged in to the application
     And the user navigates to the Bulk Import page
     And the user activates FPL Mode
     And at least one FPL allocation record exists in Grid 1

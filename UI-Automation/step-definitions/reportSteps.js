@@ -54,6 +54,14 @@ When('the user selects a From Date several months before the To Date', async ({ 
   await reportPage.selectWideDateRange();
 });
 
+When('the user selects a From Date and opens the To Date picker', async ({ reportPage }) => {
+  await reportPage.openToDatePickerWithFromDate();
+});
+
+Then('dates before the From Date should be disabled in the To Date picker', async ({ reportPage }) => {
+  await reportPage.verifyToDatePickerBlocksEarlierDates();
+});
+
 When('the user selects a From Date that is after the To Date', async ({ reportPage }) => {
   await reportPage.selectReversedDateRange();
 });

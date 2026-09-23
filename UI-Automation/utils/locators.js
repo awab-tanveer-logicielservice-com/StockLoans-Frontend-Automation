@@ -1232,6 +1232,23 @@ export const LOCATORS = {
     validationError:     (page) => page.locator('mat-error, [class*="error"]').first(),
     fromDateError:       (page) => page.locator('mat-error').first(),
     toDateError:         (page) => page.locator('mat-error').first(),
+    // Date-picker guard. The To Date calendar disables every day before the
+    // selected From Date - that is the app's real validation for an inverted
+    // range, so it is what the reversed-range scenario asserts. The toggle is
+    // scoped to the field that holds the To Date input rather than picked by
+    // index, so it cannot drift onto the From Date's calendar.
+    fromDateFieldToggle: (page) =>
+      page.locator('mat-form-field')
+        .filter({ has: page.getByRole('textbox', { name: 'From Date' }) })
+        .locator('mat-datepicker-toggle button, button[aria-label*="calendar" i]')
+        .first(),
+    toDateFieldToggle:   (page) =>
+      page.locator('mat-form-field')
+        .filter({ has: page.getByRole('textbox', { name: 'To Date' }) })
+        .locator('mat-datepicker-toggle button, button[aria-label*="calendar" i]')
+        .first(),
+    openCalendar:        (page) => page.locator('mat-calendar').first(),
+    calendarDayCells:    (page) => page.locator('mat-calendar .mat-calendar-body-cell'),
     pageHeading:         (page) => page.locator('h1, h2').filter({ hasText: /report/i }).first(),
     getGroupRowByText:   (page, text) => page.locator('.ag-row-group').filter({ hasText: text }).first(),
     getOptionByText:     (page, text) => page.getByRole('option', { name: text }),

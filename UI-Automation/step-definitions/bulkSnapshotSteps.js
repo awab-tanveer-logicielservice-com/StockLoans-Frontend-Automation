@@ -78,6 +78,10 @@ Then('the Bulk Snapshot Ag-Grid should display the empty state overlay', async (
   await bulkSnapshotPage.verifyEmptyStateOverlay();
 });
 
+Then('the Bulk Snapshot grid should show no rate data for {string}', async ({ bulkSnapshotPage }, symbol) => {
+  await bulkSnapshotPage.verifyNoRateDataForSymbol(symbol);
+});
+
 Then('the Bulk Snapshot grid should display the empty state overlay or a validation message', async ({ bulkSnapshotPage }) => {
   await bulkSnapshotPage.verifyEmptyStateOrValidation();
 });

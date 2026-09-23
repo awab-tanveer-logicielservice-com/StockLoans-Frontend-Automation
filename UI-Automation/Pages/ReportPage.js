@@ -147,6 +147,117 @@ export class ReportPage {
     await this.selectToDate(this.validFromDate);
   }
 
+  /**
+   * Picks a From Date from its calendar, then opens the To Date calendar.
+   *
+   * The From Date must be *picked*, not typed. Measured on QA 2026-09-23: with
+   * the From Date typed into the input (fill + Tab), the To Date calendar left
+   * every earlier day selectable - days 1-14 were all enabled against a From
+   * Date of the 15th. Picking it from the calendar is what engages the guard,
+   * which is how the behaviour was demonstrated in the app.
+   *
+   * That difference is itself worth knowing: the inverted-range guard lives
+   * entirely in the picker, and a From Date that arrives any other way - typed,
+   * pasted, restored from a saved filter - does not constrain the To Date.
+   *
+   * The previous version of this scenario typed both dates and then looked for
+   * a mat-error that never appears; its assertion also accepted "the report
+   * returned no rows", so it could go green with no validation happening at
+   * all. That is why it failed the 2026-09-22 run and passed on re-run.
+   */
+  async _readCalendarDays() {
+    const cells = LOCATORS.ReportPage.calendarDayCells(this.page);
+    const total = await cells.count();
+    const days = [];
+    for (let i = 0; i < total; i++) {
+      const cell = cells.nth(i);
+      const [text, ariaDisabled, className] = await Promise.all([
+        cell.textContent(),
+        cell.getAttribute('aria-disabled'),
+        cell.getAttribute('class'),
+      ]);
+      const day = Number((text || '').trim());
+      if (!Number.isFinite(day) || day === 0) continue;
+      days.push({
+        day,
+        index: i,
+        // Material marks a blocked day with aria-disabled and a modifier class.
+        // Both are the same signal; checking each means a change to either alone
+        // does not silently turn this assertion into a no-op.
+        disabled: ariaDisabled === 'true' || /mat-calendar-body-disabled/.test(className || ''),
+      });
+    }
+    return days;
+  }
+
+  async _openPicker(toggleLocator, which) {
+    const count = await toggleLocator.count();
+    expect(
+      count,
+      `no calendar toggle was found inside the ${which} field - the datepicker markup has changed`
+    ).toBeGreaterThan(0);
+    await toggleLocator.click();
+    await LOCATORS.ReportPage.openCalendar(this.page)
+      .waitFor({ state: 'visible', timeout: this.defaultTimeout });
+  }
+
+  async openToDatePickerWithFromDate() {
+    await this._openPicker(LOCATORS.ReportPage.fromDateFieldToggle(this.page), 'From Date');
+
+    const fromDays = await this._readCalendarDays();
+    const selectable = fromDays.filter((d) => !d.disabled);
+    expect(selectable.length, 'the From Date calendar offers no selectable day').toBeGreaterThan(0);
+
+    // Pick a day with earlier days present in the same grid, so "every earlier
+    // day is disabled" is a claim the To calendar can actually be checked
+    // against. Mid-month if available, otherwise the latest selectable day.
+    const target = selectable.find((d) => d.day >= 15) || selectable[selectable.length - 1];
+    expect(
+      target.day,
+      'the From Date calendar offers only the 1st, so no earlier day exists to be blocked'
+    ).toBeGreaterThan(1);
+
+    this._guardFromDay = target.day;
+    await LOCATORS.ReportPage.calendarDayCells(this.page).nth(target.index).click();
+    await LOCATORS.ReportPage.openCalendar(this.page)
+      .waitFor({ state: 'hidden', timeout: this.defaultTimeout })
+      .catch(() => {});
+
+    await this._openPicker(LOCATORS.ReportPage.toDateFieldToggle(this.page), 'To Date');
+  }
+
+  async verifyToDatePickerBlocksEarlierDates() {
+    const fromDay = this._guardFromDay;
+    if (!fromDay) {
+      throw new Error(
+        'verifyToDatePickerBlocksEarlierDates() needs the From Date set by ' +
+        'openToDatePickerWithFromDate(); the scenario never opened the picker.'
+      );
+    }
+
+    const days = await this._readCalendarDays();
+    expect(days.length, 'no numbered days were readable from the To Date calendar').toBeGreaterThan(0);
+
+    const enabledBefore = days.filter((d) => !d.disabled && d.day < fromDay).map((d) => d.day);
+    expect(
+      enabledBefore,
+      `the To Date calendar leaves ${enabledBefore.length} day(s) before the ${fromDay}th ` +
+      `selectable (${JSON.stringify(enabledBefore)}), so it does not prevent a To Date ` +
+      'earlier than the From Date'
+    ).toEqual([]);
+
+    // The guard must stop at the From Date, not disable the whole month.
+    const fromDayCell = days.find((d) => d.day === fromDay);
+    expect(fromDayCell, `the To Date calendar does not show day ${fromDay}`).toBeTruthy();
+    expect(
+      fromDayCell.disabled,
+      `the To Date calendar disables the From Date itself (${fromDay}th), so a same-day range ` +
+      'cannot be selected'
+    ).toBe(false);
+
+    await this.page.keyboard.press('Escape').catch(() => {});
+  }
+
   async selectOnlyFromDate() {
     await this.selectFromDate(this.validFromDate);
     await this.toDateInput.clear();

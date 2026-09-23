@@ -39,6 +39,9 @@ allure-report/
 allure-results-*/
 allure-report-*/
 
+# Per-batch JSON stats written by scripts/run-by-feature.mjs
+.run-by-feature/
+
 # Captured Firebase session from the auth setup project
 UI-Automation/.auth/
 

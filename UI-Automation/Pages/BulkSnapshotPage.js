@@ -227,6 +227,59 @@ export class BulkSnapshotPage {
         expect(shown, 'no empty-state indicator visible on Bulk Snapshot').toBe(true);
     }
 
+    /**
+     * An unknown symbol returned no rate data.
+     *
+     * NOT an empty-state overlay: verified on QA 2026-09-23 by searching
+     * ZZZZINVALID, the symbol this scenario uses. The app echoes the requested
+     * symbol back as a grid row with every data column blank and reports
+     * "1 Rates Loaded" - it does not render a no-rows overlay. The scenario
+     * previously asserted the overlay and passed only when it happened to catch
+     * the grid mid-load, which is why it failed the 2026-09-22 suite run and
+     * passed on re-run.
+     *
+     * The invariant that actually holds either way is "no rate data came back
+     * for this symbol", so that is what is asserted: the echoed row exists and
+     * its data cells are blank, or the grid has no rows at all.
+     */
+    async verifyNoRateDataForSymbol(symbol) {
+        const grid = this.page.locator('ag-grid-angular').first();
+        await grid.locator('.ag-overlay-loading-wrapper')
+            .waitFor({ state: 'hidden', timeout: 20000 })
+            .catch(() => {});
+
+        const rows = grid.locator('.ag-center-cols-container .ag-row');
+        const echoedRow = rows
+            .filter({ has: this.page.getByRole('gridcell', { name: symbol, exact: true }) })
+            .first();
+
+        const hasEchoedRow = await echoedRow
+            .waitFor({ state: 'visible', timeout: 15000 })
+            .then(() => true)
+            .catch(() => false);
+
+        if (!hasEchoedRow) {
+            // No row for the symbol at all is also "no data returned", but only
+            // if the grid is genuinely empty - rows for other symbols would mean
+            // the search did not apply.
+            const rowCount = await rows.count().catch(() => 0);
+            expect(
+                rowCount,
+                `searched "${symbol}" and the grid holds ${rowCount} row(s), none of them for that symbol`
+            ).toBe(0);
+            return;
+        }
+
+        const cellTexts = await echoedRow.locator('.ag-cell').allTextContents();
+        const dataCells = cellTexts.filter((t) => t.trim() !== symbol);
+        const populated = dataCells.filter((t) => t.trim() !== '');
+        expect(
+            populated,
+            `"${symbol}" is unknown, so its row should carry no rate data, but ` +
+            `${populated.length} cell(s) are populated: ${JSON.stringify(populated)}`
+        ).toEqual([]);
+    }
+
     async verifyEmptyStateOrValidation() {
         const customEmpty = LOCATORS.BulkSnapshotPage.emptyStateHeading(this.page);
         const agOverlay = this.page.locator('.ag-overlay-no-rows-wrapper');

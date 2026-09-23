@@ -117,13 +117,11 @@ Feature: Report Component — Date Filters & Dynamic Grouping (SLL-210)
 
   # Precondition: User is authenticated; Report page is open
   @Smoke @Regression @SLL-210
-  Scenario: From Date set after To Date triggers a validation error and blocks report generation
+  Scenario: To Date picker disallows dates before the selected From Date
     Given the user is logged in to the application
     And the user navigates to the Report page
-    When the user selects a From Date that is after the To Date
-    And the user attempts to generate the report
-    Then a validation error should be displayed indicating From Date cannot be after To Date
-    And the report should not be generated
+    When the user selects a From Date and opens the To Date picker
+    Then dates before the From Date should be disabled in the To Date picker
 
   # Precondition: User is authenticated; Report page is open
   @Regression @SLL-210

@@ -1,7 +1,21 @@
 import { createBdd } from 'playwright-bdd';
 import { test } from './fixtures.js';
+import { getMarketStatus } from '../utils/marketHours.js';
 
 const { Given, When, Then } = createBdd(test);
+
+// --- Preconditions ---
+
+/**
+ * Skips rather than fails when the market is shut. Submitting needs the live
+ * price data that only populates during market hours - see utils/marketHours.js.
+ * Skipped (not soft-passed) so a closed-market run reports honestly instead of
+ * claiming the submit path was verified.
+ */
+Given('the market is open for bulk import submissions', async () => {
+  const { isOpen, reason } = getMarketStatus();
+  test.skip(!isOpen, `Bulk Import submissions need live prices: ${reason}`);
+});
 
 // --- Navigation ---
 

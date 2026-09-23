@@ -270,7 +270,8 @@ Feature: Bulk Import Component for Contract Management (SLL-205)
   # Precondition: User is authenticated; multiple records exist in Grid 1
   @Regression @SLL-205
   Scenario: User selects all rows in Grid 1 and submits in bulk — all records move to Grid 2
-    Given the user is logged in to the application
+    Given the market is open for bulk import submissions
+    And the user is logged in to the application
     And the user navigates to the Bulk Import page
     And multiple imported records exist in Grid 1
     When the user selects all rows in Grid 1

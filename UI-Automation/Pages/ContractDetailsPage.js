@@ -50,11 +50,22 @@ export class ContractDetailsPage {
     await expect(this.grid).toBeVisible();
   }
 
+  /**
+   * Waits for the Contract Details grid to hold at least one row.
+   *
+   * The waits were 20s/30s and failed in the 2026-09-22 full-suite run with
+   * "waiting for .ag-center-cols-container .ag-row to be visible", while the
+   * same scenario passed standalone - QA was confirmed to hold contracts for
+   * the default depository and effective date, so the premise was met and only
+   * the budget was short. The grid is the heaviest on the app (the run's
+   * slowest feature at 54 minutes), and it loads more slowly under a serial
+   * headless run than on its own, so both waits are widened rather than the
+   * assertion weakened - an empty grid here is still a real failure.
+   */
   async hasGridRows() {
-    // Wait for loading overlay to clear before checking for rows
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: 30000 });
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 45000 }).catch(() => {});
+    await this.gridRow.first().waitFor({ state: 'visible', timeout: 60000 });
     expect(await this.gridRow.count()).toBeGreaterThan(0);
   }
 
