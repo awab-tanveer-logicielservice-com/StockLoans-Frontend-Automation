@@ -1,6 +1,5 @@
 pipeline {
     agent { label "FCM_QA_173" }
-    // agent { label "Vflux_Automation_QA" }
 
     environment {
         PLAYWRIGHT_BROWSERS_PATH = "0"
