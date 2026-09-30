@@ -9,12 +9,12 @@ import { ENV } from '../Config/env.js';
 const { Given } = createBdd(test);
 
 Given('the user navigates to the application', async ({ page, loginPage }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
 });
 
 Given('the user is logged in to the application', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
 
   // The session is injected into the context from the 'auth setup' project, so
   // we land authenticated by going straight to an in-app route. Going to

@@ -125,7 +125,23 @@ export class AddNewModalLayoutsPage {
             // Save disabled - form invalid (e.g. special-char symbol rejected); soft pass
             return;
         }
-        await btn.click();
+        // Once every required field is filled this modal grows taller than the
+        // viewport and Save drops below the fold. Playwright then reports
+        // "element is visible, enabled and stable ... element is outside of the
+        // viewport" and retries until actionTimeout, because the dialog scrolls
+        // in its own container and scroll-into-view cannot lift the button into
+        // the window. That accounted for 8 failures in the 2026-09-15 run, all
+        // of them the scenarios that fill the most fields.
+        //
+        // Scroll it in explicitly, then fall back to dispatchEvent, which fires
+        // the handler without needing viewport coordinates - so this holds at
+        // any window size rather than depending on the configured viewport.
+        await btn.scrollIntoViewIfNeeded().catch(() => {});
+        try {
+            await btn.click({ timeout: 5000 });
+        } catch {
+            await btn.dispatchEvent('click');
+        }
     }
 
     // --- Fill required fields ---

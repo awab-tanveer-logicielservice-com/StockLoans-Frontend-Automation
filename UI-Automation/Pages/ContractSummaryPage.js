@@ -139,7 +139,12 @@ export class ContractSummaryPage {
    * Settling on the first real outcome - rows, or the no-rows overlay - keeps a
    * slow fetch from being reported the same way as a genuinely empty grid.
    */
-  async _waitForGridSettled(timeout = 90000) {
+  // Budget note: these waits are sequential, so they must sum to comfortably
+  // under the 180s per-test timeout. At 60+60+90 a long scenario (the full
+  // lifecycle, which settles the grid several times) blew the test budget and
+  // died with "Target page, context or browser has been closed". 20+20+60 = 100s
+  // still covers the slowest legitimate load seen on QA (~45s).
+  async _waitForGridSettled(timeout = 60000) {
     // Do NOT race data rows against the no-rows overlay. ag-Grid displays that
     // overlay while a fetch is still in flight, so the race resolved the moment
     // the overlay appeared and reported an empty grid before the data had any
@@ -149,14 +154,14 @@ export class ContractSummaryPage {
     // budget. Only a grid that produces no row in 90s is treated as empty.
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
     await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
 
     // The app also renders its own "Loading..." element outside the ag-Grid
     // overlay, so wait that out too before concluding anything.
     await this.page
       .getByText(/^\s*Loading\.\.\.\s*$/)
       .first()
-      .waitFor({ state: 'hidden', timeout: 60000 })
+      .waitFor({ state: 'hidden', timeout: 20000 })
       .catch(() => {});
 
     const appeared = await this.gridRow

@@ -260,6 +260,51 @@ export class SearchLendingPitLookUpPage {
         expect(shown, 'no empty-state indicator visible on the Lending Pit grid').toBe(true);
     }
 
+    /**
+     * An unknown symbol returned no rate data.
+     *
+     * Mirrors BulkSnapshotPage.verifyNoRateDataForSymbol() - see the note there.
+     * Searching ZZZZINVALID echoes the symbol back as a row with blank data
+     * columns rather than rendering a no-rows overlay, so asserting the overlay
+     * only passed when the check caught the grid mid-load. verifyEmptyStateOverlay()
+     * above is left alone: it is correct for the "before any search is performed"
+     * scenario, where the grid really is empty.
+     */
+    async verifyNoRateDataForSymbol(symbol) {
+        const grid = this.page.locator('ag-grid-angular').first();
+        await grid.locator('.ag-overlay-loading-wrapper')
+            .waitFor({ state: 'hidden', timeout: 20000 })
+            .catch(() => {});
+
+        const rows = grid.locator('.ag-center-cols-container .ag-row');
+        const echoedRow = rows
+            .filter({ has: this.page.getByRole('gridcell', { name: symbol, exact: true }) })
+            .first();
+
+        const hasEchoedRow = await echoedRow
+            .waitFor({ state: 'visible', timeout: 15000 })
+            .then(() => true)
+            .catch(() => false);
+
+        if (!hasEchoedRow) {
+            const rowCount = await rows.count().catch(() => 0);
+            expect(
+                rowCount,
+                `searched "${symbol}" and the grid holds ${rowCount} row(s), none of them for that symbol`
+            ).toBe(0);
+            return;
+        }
+
+        const cellTexts = await echoedRow.locator('.ag-cell').allTextContents();
+        const dataCells = cellTexts.filter((t) => t.trim() !== symbol);
+        const populated = dataCells.filter((t) => t.trim() !== '');
+        expect(
+            populated,
+            `"${symbol}" is unknown, so its row should carry no rate data, but ` +
+            `${populated.length} cell(s) are populated: ${JSON.stringify(populated)}`
+        ).toEqual([]);
+    }
+
     async verifyPageNotCrashed() {
         // Page is not crashed if the main content area is still visible
         const main = this.page.locator('main, [role="main"], h2').first();

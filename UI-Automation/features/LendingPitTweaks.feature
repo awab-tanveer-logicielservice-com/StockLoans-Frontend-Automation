@@ -111,12 +111,12 @@ Feature: Lending Pit UI Tweaks and Ag-Grid Migration (SLL-206)
 
   # Precondition: User is authenticated; Lending Pit page is open
   @Regression @SLL-206
-  Scenario: Search with an unknown symbol — Ag-Grid shows empty no-results overlay
+  Scenario: Search with an unknown symbol — Ag-Grid returns no rate data for that symbol
     Given the user is logged in to the application
     When the user navigates to the Lending Pit Lookup page
     When the user enters "ZZZZINVALID" in the Lending Pit search field
     And the user clicks the submit button
-    Then the Lending Pit Ag-Grid should display the empty state overlay
+    Then the Lending Pit grid should show no rate data for "ZZZZINVALID"
 
   # Precondition: User is authenticated; Lending Pit page is open
   @Regression @SLL-206

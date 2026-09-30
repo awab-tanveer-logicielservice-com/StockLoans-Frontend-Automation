@@ -330,7 +330,11 @@ Feature: Security Master - Search, Edit & Contract Updates (SLL-188)
   # --- End-to-End ---
 
   # Precondition: Fresh session; valid credentials; Security Master accessible
-  @Smoke @Regression @SLL-188
+  # @slow triples the 180s suite timeout. This scenario is not hanging: measured
+  # on QA 2026-09-23 it completes in 186s, six seconds past the limit, so it
+  # failed the full-suite run purely on budget. It is the longest scenario in the
+  # suite - search, edit, toggle contract update, commit, then verify the grid.
+  @Smoke @Regression @SLL-188 @slow
   Scenario: Full lifecycle — search security, edit fields, enable contract update, commit update, verify grid
     Given the user navigates to the application
     When the user logs in with valid credentials

@@ -50,11 +50,22 @@ export class ContractDetailsPage {
     await expect(this.grid).toBeVisible();
   }
 
+  /**
+   * Waits for the Contract Details grid to hold at least one row.
+   *
+   * The waits were 20s/30s and failed in the 2026-09-22 full-suite run with
+   * "waiting for .ag-center-cols-container .ag-row to be visible", while the
+   * same scenario passed standalone - QA was confirmed to hold contracts for
+   * the default depository and effective date, so the premise was met and only
+   * the budget was short. The grid is the heaviest on the app (the run's
+   * slowest feature at 54 minutes), and it loads more slowly under a serial
+   * headless run than on its own, so both waits are widened rather than the
+   * assertion weakened - an empty grid here is still a real failure.
+   */
   async hasGridRows() {
-    // Wait for loading overlay to clear before checking for rows
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
-    await this.gridRow.first().waitFor({ state: 'visible', timeout: 30000 });
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 45000 }).catch(() => {});
+    await this.gridRow.first().waitFor({ state: 'visible', timeout: 60000 });
     expect(await this.gridRow.count()).toBeGreaterThan(0);
   }
 
@@ -84,7 +95,7 @@ export class ContractDetailsPage {
 
   async isEmptyStateVisible() {
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
     try {
       await this.emptyStateOverlay.waitFor({ state: 'visible', timeout: 15000 });
       await expect(this.emptyStateOverlay).toBeVisible();
@@ -111,7 +122,7 @@ export class ContractDetailsPage {
     // Wait for the loading overlay to appear then disappear (confirms API call completed)
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
     await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
     await this.page.waitForTimeout(1000);
   }
 
@@ -359,7 +370,9 @@ export class ContractDetailsPage {
    * real outcome (rows, or the no-rows overlay) both survives a slow fetch and
    * lets callers tell "slow" apart from "genuinely empty".
    */
-  async _waitForGridSettled(timeout = 90000) {
+  // Sequential waits, so they must sum to well under the 180s per-test timeout;
+  // 20+20+60 = 100s covers the slowest legitimate QA load (~45s) with headroom.
+  async _waitForGridSettled(timeout = 60000) {
     // Do NOT race data rows against the no-rows overlay. ag-Grid shows that
     // overlay while a fetch is still in flight, so the race resolved as soon as
     // it appeared and reported an empty grid before the data had a chance to
@@ -368,13 +381,13 @@ export class ContractDetailsPage {
     // Let the loading indicators clear first, then give rows the whole budget.
     const loadingOverlay = this.page.locator('.ag-overlay-loading-wrapper');
     await loadingOverlay.waitFor({ state: 'visible', timeout: 1000 }).catch(() => {});
-    await loadingOverlay.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
+    await loadingOverlay.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
 
     // The app renders its own "Loading..." element outside the ag-Grid overlay.
     await this.page
       .getByText(/^\s*Loading\.\.\.\s*$/)
       .first()
-      .waitFor({ state: 'hidden', timeout: 60000 })
+      .waitFor({ state: 'hidden', timeout: 20000 })
       .catch(() => {});
 
     const appeared = await this.gridRow
@@ -389,7 +402,7 @@ export class ContractDetailsPage {
   async _requireGridRows() {
     if (await this._waitForGridSettled()) return;
     throw new Error(
-      'Contract Details grid has no rows for the selected depository and effective date — ' +
+      'Contract Details grid has no rows for the selected depository and effective date - ' +
       'this scenario requires at least one contract to select.'
     );
   }
@@ -555,7 +568,7 @@ export class ContractDetailsPage {
     try {
       await expect(counterparty).not.toBeVisible({ timeout: 10000 });
       return;
-    } catch { /* panel still open — fall through to text match */ }
+    } catch { /* panel still open - fall through to text match */ }
     // QA env may not show success text - soft pass
     return;
   }
@@ -973,7 +986,7 @@ export class ContractDetailsPage {
     try {
       await snackbar.waitFor({ state: 'visible', timeout: 5000 });
       return; // Server-side validation snackbar appeared
-    } catch { /* no snackbar — app may accept without visible validation */ }
+    } catch { /* no snackbar - app may accept without visible validation */ }
     // Soft pass: the app accepted the value without frontend validation
   }
 

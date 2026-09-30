@@ -16,7 +16,7 @@ const BRAVE_PATH =
   process.env.BRAVE_PATH ||
   'C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe';
 
-// The size every project renders the app at. 1536x720 is the suite standard;
+// The size every project renders the app at. 1900x1080 is the suite standard;
 // override for a one-off run with e.g. VIEWPORT=1920x1080.
 //
 // The browser window is sized to match (and --start-maximized dropped), so a
@@ -24,7 +24,7 @@ const BRAVE_PATH =
 // with a smaller viewport inside it. The step definitions call setViewportSize
 // with the same dimensions - keep them in step with VIEWPORT_DEFAULT if this
 // changes, or they will override it per scenario.
-const VIEWPORT_DEFAULT = '1536x720';
+const VIEWPORT_DEFAULT = '1900x1080';
 
 // Local runs are headed so the browser is visible while tests execute; CI stays
 // headless. Force either way with HEADLESS=1 / HEADLESS=0.
@@ -92,11 +92,8 @@ const bddConfig = defineBddConfig({
     'UI-Automation/features/BulkImportFPLMode.feature',
     'UI-Automation/features/BulkSnapshot.feature',
     'UI-Automation/features/FplAccount.feature',
-    // SLL-236 Access Review. Deliberately not registered yet: the screen is not
-    // built (ticket is To Do) and the locators in LOCATORS.AccessReviewPage are
-    // unconfirmed guesses, so enabling this now would add ~43 failing scenarios
-    // to a green suite. Uncomment once the UI lands and the locators are verified.
-    // 'UI-Automation/features/AccessReview.feature',
+    // SLL-236 Access Reviews is deliberately NOT here - it has its own project
+    // below, because it only runs against QA. See accessReviewBddConfig.
   ],
   steps: 'UI-Automation/step-definitions/**/*.js',
   outputDir: 'UI-Automation/.features-gen',
@@ -112,6 +109,20 @@ const loginBddConfig = defineBddConfig({
   ],
   steps: 'UI-Automation/step-definitions/**/*.js',
   outputDir: 'UI-Automation/.features-gen-login',
+});
+
+// SLL-236 Access Reviews. Isolated in its own config/project for two reasons:
+//  1. Environment - the workflow needs two distinct real logins ("Awab" and
+//     "Myadmin"), and both accounts only exist in the QA Firebase project. On
+//     dev they get HTTP 400 from identitytoolkit, so this must run with
+//     BASE_URL=https://qa-sls-v2.web.app/login and must not be swept into the
+//     default dev `bdd` run.
+//  2. Identity - the scenarios sign in and out as specific people, so they must
+//     not receive the session replayed by 'auth setup' (hence no dependency).
+const accessReviewBddConfig = defineBddConfig({
+  features: ['UI-Automation/features/AccessReview.feature'],
+  steps: 'UI-Automation/step-definitions/**/*.js',
+  outputDir: 'UI-Automation/.features-gen-access-review',
 });
 
 export default defineConfig({
@@ -185,6 +196,18 @@ export default defineConfig({
       name: 'login',
       testDir: loginBddConfig,
       use: bddUse,
+    },
+    {
+      // SLL-236 Access Reviews - QA only. See accessReviewBddConfig above.
+      //   BASE_URL=https://qa-sls-v2.web.app/login npx playwright test --project=access-review
+      // The lifecycle scenario walks five workflow stages across four logins,
+      // each a server round-trip, so it needs more than the 180s default.
+      // Serial: the scenarios share the one Access Reviews grid on a live env.
+      name: 'access-review',
+      testDir: accessReviewBddConfig,
+      timeout: 600_000,
+      workers: 1,
+      use: { ...bddUse, ...demoArtifacts },
     },
     // --- Demo ---
     // `npm run demo` runs both demo projects in one shot (see scripts/run-demo.mjs).

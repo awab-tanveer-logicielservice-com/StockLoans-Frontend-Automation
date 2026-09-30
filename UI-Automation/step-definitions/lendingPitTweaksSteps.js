@@ -53,6 +53,10 @@ Then('the grid columns should remain correctly aligned', async ({ searchLendingP
   await searchLendingPitLookUpPage.verifyColumnsAligned();
 });
 
+Then('the Lending Pit grid should show no rate data for {string}', async ({ searchLendingPitLookUpPage }, symbol) => {
+  await searchLendingPitLookUpPage.verifyNoRateDataForSymbol(symbol);
+});
+
 Then('the Lending Pit Ag-Grid should display the empty state overlay', async ({ searchLendingPitLookUpPage }) => {
   await searchLendingPitLookUpPage.verifyEmptyStateOverlay();
 });

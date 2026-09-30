@@ -7,25 +7,25 @@ const { Given, When, Then } = createBdd(test);
 // In QA, all users share the same credentials; permission checks are soft-assertions.
 
 Given('the user is logged in with contract approval permissions', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });
 
 Given('the user is logged in with DTC update permissions', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });
 
 Given('the user is logged in without contract approval permissions', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });
 
 Given('the user is logged in without DTC update permissions', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });

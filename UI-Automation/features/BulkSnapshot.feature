@@ -110,12 +110,12 @@ Feature: Bulk Snapshot Screen — Renamed from Lending Pit Lookup (SLL-232)
 
   # Precondition: User is authenticated; Bulk Snapshot page is open
   @Regression @SLL-232
-  Scenario: Searching an unknown symbol shows the empty state or no-results overlay
+  Scenario: Searching an unknown symbol returns no rate data for that symbol
     Given the user is logged in to the application
     When the user navigates to the Bulk Snapshot page
     When the user enters "ZZZZINVALID" in the Bulk Snapshot search field
     And the user clicks the Bulk Snapshot Fetch Rates button
-    Then the Bulk Snapshot Ag-Grid should display the empty state overlay
+    Then the Bulk Snapshot grid should show no rate data for "ZZZZINVALID"
 
   # Precondition: User is authenticated; Bulk Snapshot page is open
   @Regression @SLL-232

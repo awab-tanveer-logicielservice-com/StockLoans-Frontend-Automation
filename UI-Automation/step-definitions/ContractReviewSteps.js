@@ -10,13 +10,13 @@ const { Given, When, Then } = createBdd(test);
 // --- Permission-scoped login (maps to the standard test user in QA) ---
 
 Given('the user is logged in with contract review permissions', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });
 
 Given('the user is logged in without contract review permissions', async ({ page, loginPage, testUsers }) => {
-  await page.setViewportSize({ width: 1536, height: 720 });
+  await page.setViewportSize({ width: 1900, height: 1080 });
   await loginPage.navigate();
   await loginPage.login(testUsers.username, testUsers.password);
 });
