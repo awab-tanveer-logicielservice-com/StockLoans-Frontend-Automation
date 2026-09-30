@@ -39,6 +39,9 @@ allure-report/
 allure-results-*/
 allure-report-*/
 
+# CI report outputs (junit.xml, results.json, summary/email/Teams card)
+/reports/
+
 # Per-batch JSON stats written by scripts/run-by-feature.mjs
 .run-by-feature/
 

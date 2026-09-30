@@ -150,7 +150,19 @@ export default defineConfig({
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 4 : Number(process.env.PW_WORKERS) || 4,
-  reporter: [['list'], ['allure-playwright']],
+  // CI adds the machine-readable outputs the pipeline consumes: junit.xml for
+  // the Jenkins `junit` step (trends, per-test history) and results.json for
+  // scripts/ci-report.mjs (summary email, Teams card, coverage). Passing
+  // --reporter on the command line replaces this whole list.
+  reporter: process.env.CI
+    ? [
+        ['list'],
+        ['html', { open: 'never', outputFolder: 'playwright-report' }],
+        ['junit', { outputFile: 'reports/junit.xml' }],
+        ['json', { outputFile: 'reports/results.json' }],
+        ['allure-playwright'],
+      ]
+    : [['list'], ['allure-playwright']],
   use: {
     baseURL: ENV.baseURL,
     headless: HEADLESS,

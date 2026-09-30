@@ -21,6 +21,7 @@
     "playwright:install": "npx playwright install --with-deps",
     "test:e2e:ci": "npm run playwright:install && npx playwright test --reporter=list,allure-playwright --workers=auto",
     "bdd:gen": "bddgen",
+    "report:ci": "node scripts/ci-report.mjs",
     "test:bdd": "bddgen && playwright test --project=bdd",
     "test:bdd:ci": "bddgen && playwright test --project=bdd --reporter=list,allure-playwright",
     "test:smoke": "bddgen && playwright test --project=smoke",
