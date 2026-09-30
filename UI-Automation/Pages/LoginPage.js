@@ -36,14 +36,14 @@ export class LoginPage {
     await this.page.goto(`${origin}/combined-contracts`);
   }
 
+  // Logs in as exactly the account passed in. E2E_USER / E2E_PWD are applied in
+  // utils/testdata.js, not here: overriding here made every caller log in as the
+  // E2E user, so Access Review's "sign in as Myadmin" stayed signed in as Awab.
   async login(username, password) {
-    const user = process.env.E2E_USER || username;
-    const pwd = process.env.E2E_PWD || password;
-
     await this.usernameInput.click();
-    await this.usernameInput.fill(user);
+    await this.usernameInput.fill(username);
     await this.usernameInput.click();
-    await this.passwordInput.fill(pwd);
+    await this.passwordInput.fill(password);
     await this.loginButton.click();
     await this.page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 60000 });
   }

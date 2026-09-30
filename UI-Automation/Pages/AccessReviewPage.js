@@ -429,11 +429,35 @@ export class AccessReviewPage {
 
   // --- Reviewer 1: flag role changes ---
 
+  /**
+   * AG Grid only renders the rows that fit in its viewport, so a user sorted
+   * below the fold has no DOM node and scrollIntoViewIfNeeded() cannot reach it.
+   * On QA, "Myadmin" fell just past the rendered window once more users were
+   * added. Page the grid's own viewport down until the row is rendered.
+   */
+  async scrollSnapshotUntilRendered(row) {
+    await this.page.locator('.ag-center-cols-container .ag-row').first()
+      .waitFor({ state: 'visible', timeout: this.gridTimeout });
+    const viewport = this.page.locator('.ag-body-viewport:visible').first();
+    for (let i = 0; i < 50; i++) {
+      if (await row.isVisible().catch(() => false)) return;
+      const atBottom = await viewport.evaluate((el) => {
+        const before = el.scrollTop;
+        el.scrollTop += Math.max(el.clientHeight - 40, 100);
+        return el.scrollTop === before;
+      });
+      // Give AG Grid a frame to render the rows it just scrolled into view.
+      await this.page.waitForTimeout(250);
+      if (atBottom) break;
+    }
+    await row.waitFor({ state: 'visible', timeout: this.defaultTimeout });
+  }
+
   async openModifyPanelFor(userName) {
     const name = userName || AR().defaults.flagTargetUser;
     await this.openTab(/user snapshot/i);
     const row = AR().snapshotRowByName(this.page, name);
-    await row.waitFor({ state: 'visible', timeout: this.gridTimeout });
+    await this.scrollSnapshotUntilRendered(row);
     await row.scrollIntoViewIfNeeded().catch(() => {});
     const modify = AR().modifyButtonInRow(this.page, name);
     await modify.waitFor({ state: 'visible', timeout: this.defaultTimeout });
