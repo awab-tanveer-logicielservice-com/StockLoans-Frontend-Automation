@@ -34,8 +34,23 @@ export class ReportPage {
   sameDayDate   = '01/15/2025';
   wideFromDate  = '07/01/2024';
   invalidDate   = '99/99/9999';
-  emptyRangeFrom = '01/01/2000';
-  emptyRangeTo   = '01/02/2000';
+  // A fixed past "known empty" range (01/01/2000) turned out not to be empty on
+  // QA - its data apparently goes back further than dev's. A far-future range
+  // is a safer bet for "no contracts exist here yet" than guessing another
+  // past date, since no contract can be dated before it is created. Computed
+  // rather than hardcoded so it never drifts back into range as years pass.
+  get emptyRangeFrom() {
+    return this._farFutureDate(25, 1);
+  }
+  get emptyRangeTo() {
+    return this._farFutureDate(25, 2);
+  }
+
+  _farFutureDate(yearsAhead, day) {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + yearsAhead, 0, day);
+    return d.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+  }
 
   async _dismissSplashScreen() {
     try {
@@ -431,8 +446,22 @@ export class ReportPage {
     await this.page.keyboard.press('Escape');
   }
 
+  // The ag-overlay-loading-wrapper sits on top of the grid body and intercepts
+  // clicks (same issue BulkImportPage._hideGridOverlays works around) - a row
+  // can be visible but still swallow the click, which showed up here as a
+  // click timeout rather than a "no rows" failure.
+  async _hideGridOverlays() {
+    await this.page.evaluate(() => {
+      document.querySelectorAll('ag-grid-angular .ag-overlay-loading-wrapper, ag-grid-angular .ag-overlay').forEach(el => {
+        el.style.pointerEvents = 'none';
+        el.style.display = 'none';
+      });
+    });
+  }
+
   async expandFirstGroupRow() {
     const hasGroupRows = await this.groupRow.first().isVisible({ timeout: 5000 }).catch(() => false);
+    await this._hideGridOverlays();
     if (hasGroupRows) {
       const firstGroupRow = this.groupRow.first();
       const expandToggle = firstGroupRow.locator('.ag-group-expanded, .ag-group-value, .ag-cell-expandable').first();

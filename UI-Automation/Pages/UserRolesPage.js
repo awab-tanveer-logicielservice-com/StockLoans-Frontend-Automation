@@ -172,6 +172,10 @@ export class UserRolesPage {
   }
 
   async verifyRoleAssigned(roleName) {
+    // Wait for any active snack bar to dismiss - ensures the save round-trip is complete
+    // and the component has re-rendered from the Firebase response before we read state.
+    // Mirrors verifyRoleNotAssigned below; without it this read can race the save.
+    await this.page.locator('mat-snack-bar-container').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
     const assigned = await this.isRoleAssigned(roleName);
     if (!assigned) {
       throw new Error(`Expected role "${roleName}" to be assigned but it is not`);

@@ -398,12 +398,31 @@ export class ContractDetailsPage {
     return appeared && (await this.gridRow.count()) > 0;
   }
 
-  /** Settles the grid, failing with a data-specific message when it is empty. */
+  /**
+   * Settles the grid, failing with a data-specific message when it is empty.
+   *
+   * The default depository can simply have no contracts for the current
+   * effective date on a given environment (QA's data differs from dev's).
+   * These scenarios only need *some* selectable contract, not a specific
+   * depository, so before failing, cycle through the other depository
+   * toggles and retry - whichever one has data lets the scenario proceed.
+   */
   async _requireGridRows() {
     if (await this._waitForGridSettled()) return;
+
+    const radios = LOCATORS.ContractDetailsPage.depositoryButtons(this.page);
+    const count = await radios.count();
+    for (let i = 1; i < count; i++) {
+      await radios.nth(i).click();
+      await this.applyButton.click();
+      await this.page.waitForTimeout(2000);
+      if (await this._waitForGridSettled()) return;
+    }
+
     throw new Error(
-      'Contract Details grid has no rows for the selected depository and effective date - ' +
-      'this scenario requires at least one contract to select.'
+      'Contract Details grid has no rows for the selected depository and effective date' +
+      (count > 1 ? `, and none of the other ${count - 1} depositories had rows either` : '') +
+      ' - this scenario requires at least one contract to select.'
     );
   }
 

@@ -172,23 +172,47 @@ export class ContractSummaryPage {
     return appeared && (await this.gridRow.count()) > 0;
   }
 
-  /** Settles the grid, failing with a data-specific message when it is empty. */
+  /**
+   * Settles the grid, failing with a data-specific message when it is empty.
+   *
+   * The default depository can simply have no contracts for the current
+   * effective date on a given environment (QA's data differs from dev's).
+   * These scenarios only need *some* selectable row(s), not a specific
+   * depository, so before failing, cycle through the other depository
+   * toggles and retry - whichever one has data lets the scenario proceed.
+   */
   async _requireGridRows(minimum = 1) {
-    await this._waitForGridSettled();
-    // Settling only guarantees the first row. When a scenario needs more than
-    // one, wait for that row specifically instead of counting straight away -
-    // rows stream in and an immediate count can catch the grid mid-render.
-    if (minimum > 1) {
-      await this.gridRow
-        .nth(minimum - 1)
-        .waitFor({ state: 'visible', timeout: 30000 })
-        .catch(() => {});
-    }
-    const count = await this.gridRow.count();
+    const settle = async () => {
+      await this._waitForGridSettled();
+      // Settling only guarantees the first row. When a scenario needs more than
+      // one, wait for that row specifically instead of counting straight away -
+      // rows stream in and an immediate count can catch the grid mid-render.
+      if (minimum > 1) {
+        await this.gridRow
+          .nth(minimum - 1)
+          .waitFor({ state: 'visible', timeout: 30000 })
+          .catch(() => {});
+      }
+      return this.gridRow.count();
+    };
+
+    let count = await settle();
     if (count >= minimum) return;
+
+    const buttons = LOCATORS.ContractSummaryPage.depositoryButtons(this.page);
+    const depositoryCount = await buttons.count();
+    for (let i = 1; i < depositoryCount; i++) {
+      await buttons.nth(i).click();
+      await this.applyButton.click();
+      await this.page.waitForTimeout(2000);
+      count = await settle();
+      if (count >= minimum) return;
+    }
+
     throw new Error(
       `Contract Summary grid has ${count} row(s) for the selected depository and effective date, ` +
-      `but this scenario needs at least ${minimum}.`
+      `but this scenario needs at least ${minimum}` +
+      (depositoryCount > 1 ? `, and none of the other ${depositoryCount - 1} depositories had enough rows either.` : '.')
     );
   }
 
