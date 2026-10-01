@@ -6,13 +6,10 @@
  *                             flaky tests and feature-file coverage
  *   reports/email.html      - Outlook-safe HTML body (tables + inline styles)
  *   reports/subject.txt     - one-line email subject with status and pass rate
- *   reports/teams-card.json - Adaptive Card payload for a Teams Workflows webhook
  *
- * and, with --notify, posts the card to TEAMS_WEBHOOK_URL.
+ *   node scripts/ci-report.mjs [--results reports/results.json] [--out reports]
  *
- *   node scripts/ci-report.mjs [--results reports/results.json] [--out reports] [--notify]
- *
- * Links in the email/card are built from the Jenkins env (BUILD_URL, JOB_NAME,
+ * Links in the email are built from the Jenkins env (BUILD_URL, JOB_NAME,
  * BUILD_NUMBER); REPORT_NAME must match the publishHTML reportName. Missing
  * results (a crash before the reporter flushed) still produce a report, with
  * status NO RESULTS, so the team hears about it. Never exits non-zero on a
@@ -30,12 +27,10 @@ const argValue = (name, fallback) => {
 const ROOT = process.cwd();
 const RESULTS = path.resolve(ROOT, argValue('--results', 'reports/results.json'));
 const OUT = path.resolve(ROOT, argValue('--out', 'reports'));
-const NOTIFY = args.includes('--notify');
 const CONFIG_FILE = path.resolve(ROOT, 'playwright.config.js');
 const FEATURE_DIRS = ['UI-Automation/features', 'API-Automation/features'];
 
 const MAX_FAILURES_EMAIL = 50;
-const MAX_FAILURES_CARD = 10;
 
 const env = process.env;
 const BUILD_URL = (env.BUILD_URL || '').replace(/\/?$/, env.BUILD_URL ? '/' : '');
@@ -475,90 +470,16 @@ function emailHtml(s) {
 </body></html>`;
 }
 
-// Adaptive Card for a Teams "Post to a channel when a webhook request is
-// received" Workflow (the replacement for retired Office 365 connectors).
-function teamsPayload(s) {
-  const t = s.totals;
-  const colorName = { PASSED: 'Good', 'PASSED WITH FLAKY': 'Warning', FAILED: 'Attention' }[s.status] || 'Default';
-  const facts = t
-    ? [
-        ['Passed', `${t.passed + t.flaky} / ${t.total - t.skipped} (${t.passRate}%)`],
-        ['Failed', String(t.failed)],
-        ['Flaky', String(t.flaky)],
-        ['Skipped', String(t.skipped)],
-        ['Duration', fmtDuration(t.durationMs)],
-        ['Coverage', `${s.coverage.executedTests} / ${s.coverage.authoredTests} authored (${s.coverage.coverageOfAuthored}%)`],
-      ]
-    : [['Result', 'No test results produced - see console log']];
-  if (s.meta.branch) facts.push(['Branch / tag', s.meta.branch]);
-  if (s.meta.baseUrl) facts.push(['Environment', s.meta.baseUrl]);
-
-  const body = [
-    { type: 'TextBlock', text: 'Stock Loan Automation', size: 'Small', isSubtle: true },
-    { type: 'TextBlock', text: `${s.status} - ${[s.meta.job, s.meta.build && `#${s.meta.build}`].filter(Boolean).join(' ')}`, weight: 'Bolder', size: 'Large', color: colorName, wrap: true },
-    { type: 'FactSet', facts: facts.map(([title, value]) => ({ title, value })) },
-  ];
-
-  if (s.errors.length) {
-    body.push({ type: 'TextBlock', text: s.errors.slice(0, 3).join('\n\n'), color: 'Attention', wrap: true, spacing: 'Medium' });
-  }
-  if (s.failures.length) {
-    body.push({ type: 'TextBlock', text: `Failed scenarios (${s.failures.length})`, weight: 'Bolder', spacing: 'Medium' });
-    for (const f of s.failures.slice(0, MAX_FAILURES_CARD)) {
-      body.push({ type: 'TextBlock', text: `**${f.feature}** - ${f.scenario}`, wrap: true, spacing: 'Small' });
-      if (f.error) body.push({ type: 'TextBlock', text: f.error, wrap: true, isSubtle: true, size: 'Small', spacing: 'None', maxLines: 3 });
-    }
-    if (s.failures.length > MAX_FAILURES_CARD) {
-      body.push({ type: 'TextBlock', text: `...and ${s.failures.length - MAX_FAILURES_CARD} more`, isSubtle: true, spacing: 'Small' });
-    }
-  }
-
-  const actions = [
-    LINKS.report && { type: 'Action.OpenUrl', title: 'Full report', url: LINKS.report },
-    LINKS.tests && { type: 'Action.OpenUrl', title: 'Test results', url: LINKS.tests },
-    LINKS.console && { type: 'Action.OpenUrl', title: 'Console', url: LINKS.console },
-  ].filter(Boolean);
-
-  return {
-    type: 'message',
-    attachments: [
-      {
-        contentType: 'application/vnd.microsoft.card.adaptive',
-        contentUrl: null,
-        content: { $schema: 'http://adaptivecards.io/schemas/adaptive-card.json', type: 'AdaptiveCard', version: '1.4', msteams: { width: 'Full' }, body, actions },
-      },
-    ],
-  };
-}
-
-async function postToTeams(payload) {
-  const url = env.TEAMS_WEBHOOK_URL;
-  if (!url) {
-    console.log('[ci-report] TEAMS_WEBHOOK_URL not set - skipping Teams notification.');
-    return;
-  }
-  try {
-    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if (res.ok) console.log(`[ci-report] Teams notification sent (HTTP ${res.status}).`);
-    else console.warn(`[ci-report] Teams webhook returned HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
-  } catch (e) {
-    console.warn(`[ci-report] Teams notification failed: ${e.message}`);
-  }
-}
-
 // ---------------------------------------------------------------------------
 
 async function main() {
   const summary = buildSummary(readResults());
   fs.mkdirSync(OUT, { recursive: true });
-  const card = teamsPayload(summary);
   fs.writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 2));
   fs.writeFileSync(path.join(OUT, 'email.html'), emailHtml(summary));
   fs.writeFileSync(path.join(OUT, 'subject.txt'), subjectLine(summary));
-  fs.writeFileSync(path.join(OUT, 'teams-card.json'), JSON.stringify(card, null, 2));
   console.log(`[ci-report] ${subjectLine(summary)}`);
-  console.log(`[ci-report] Wrote summary.json, email.html, subject.txt, teams-card.json to ${OUT}`);
-  if (NOTIFY) await postToTeams(card);
+  console.log(`[ci-report] Wrote summary.json, email.html, subject.txt to ${OUT}`);
 }
 
 main().catch((e) => {

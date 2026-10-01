@@ -9,6 +9,12 @@ pipeline {
         // report link from it.
         REPORT_NAME       = "Stock-Loan-Locate Automation Report"
         REPORT_RECIPIENTS = "awab.tanveer@logicielservice.com,kashaf.ali@logicielservice.com"
+        // Output paths for the reporters chosen in 'Run BDD Tests'. Set here
+        // rather than relying on playwright.config.js, so every branch/tag
+        // produces them - older refs have no CI reporter config.
+        PLAYWRIGHT_JUNIT_OUTPUT_FILE = "reports/junit.xml"
+        PLAYWRIGHT_JSON_OUTPUT_FILE  = "reports/results.json"
+        PLAYWRIGHT_HTML_OPEN         = "never"
     }
 
     tools {
@@ -81,27 +87,51 @@ pipeline {
         stage('Run BDD Tests') {
             steps {
                 script {
-                    if (!params.E2E_USER?.trim() || !params.E2E_PWD?.toString()) {
-                        error "E2E_USER and E2E_PWD must be supplied via Build with Parameters"
-                    }
-
                     def suite = params.suite ?: 'all'
                     def projects = suite == 'all'
                         ? '--project=bdd --project=login --project=access-review'
                         : "--project=${suite}"
 
-                    withEnv([
-                        "E2E_USER=${params.E2E_USER}",
-                        "E2E_PWD=${params.E2E_PWD}"
-                    ]) {
-                        echo "Running suite '${suite}' as ${params.E2E_USER}: ${projects}"
-                        // No --reporter flag: with CI=true, playwright.config.js writes
-                        // playwright-report/, reports/junit.xml and reports/results.json.
-                        // Passing --reporter would replace that list and drop the last two.
+                    // html -> playwright-report/, junit/json -> the paths set in
+                    // environment. Named here so the output does not depend on
+                    // the reporter list in the checked-out ref's config.
+                    def runTests = {
                         bat """
                             cd frontend_Checkout
-                            npx playwright test ${projects}
+                            npx playwright test ${projects} --reporter=list,html,junit,json
                         """
+                    }
+
+                    // Login account, first match wins:
+                    //  1. E2E_USER / E2E_PWD typed into Build with Parameters
+                    //  2. the stored 'qa-e2e-credentials' Jenkins credential
+                    //  3. the default QA account in UI-Automation/utils/testdata.js
+                    // A wrong typed password fails 'auth setup', which skips the
+                    // whole bdd project - so blank is the safe default.
+                    def typedUser = params.E2E_USER?.trim()
+                    def typedPwd  = params.E2E_PWD?.toString()
+                    if (typedUser && typedPwd) {
+                        echo "Running suite '${suite}' as ${typedUser} (Build with Parameters): ${projects}"
+                        withEnv(["E2E_USER=${typedUser}", "E2E_PWD=${typedPwd}"]) { runTests() }
+                    } else {
+                        // Set once the credential resolves, so a test failure inside
+                        // the block is rethrown instead of re-running the suite.
+                        def credentialFound = false
+                        try {
+                            withCredentials([usernamePassword(
+                                credentialsId   : 'qa-e2e-credentials',
+                                usernameVariable: 'E2E_USER',
+                                passwordVariable: 'E2E_PWD'
+                            )]) {
+                                credentialFound = true
+                                echo "Running suite '${suite}' as the 'qa-e2e-credentials' account: ${projects}"
+                                runTests()
+                            }
+                        } catch (err) {
+                            if (credentialFound) throw err
+                            echo "No 'qa-e2e-credentials' credential (${err.message}) - running suite '${suite}' as the default QA account in testdata.js: ${projects}"
+                            runTests()
+                        }
                     }
                 }
             }
@@ -123,18 +153,20 @@ pipeline {
             // the "Test Result" failure list on the build page.
             junit(testResults: 'frontend_Checkout/reports/junit.xml', allowEmptyResults: true)
 
-            // Summary email body, subject and Teams card. The Teams post is
-            // skipped when the 'teams-webhook-url' credential does not exist.
+            // Failure evidence - screenshots, videos, traces and error-context.md
+            // page snapshots - so a failed run can be diagnosed from the build
+            // page instead of from the agent's disk.
+            archiveArtifacts(artifacts: 'frontend_Checkout/test-results/**', allowEmptyArchive: true)
+
+            // Summary email body and subject. returnStatus keeps a report
+            // failure from failing the build.
             script {
-                withEnv(["REPORT_BRANCH=${env.GIT_REF ?: params.tagname}"]) {
-                    dir('frontend_Checkout') {
-                        try {
-                            withCredentials([string(credentialsId: 'teams-webhook-url', variable: 'TEAMS_WEBHOOK_URL')]) {
-                                bat 'node scripts/ci-report.mjs --notify'
-                            }
-                        } catch (err) {
-                            echo "Teams notification skipped (${err.message}) - generating the email report only."
-                            bat 'node scripts/ci-report.mjs'
+                if (!fileExists('frontend_Checkout/scripts/ci-report.mjs')) {
+                    echo "scripts/ci-report.mjs is not on '${env.GIT_REF ?: params.tagname}' - skipping the summary report. Build master to get it."
+                } else {
+                    withEnv(["REPORT_BRANCH=${env.GIT_REF ?: params.tagname}"]) {
+                        dir('frontend_Checkout') {
+                            bat(returnStatus: true, script: 'node scripts/ci-report.mjs')
                         }
                     }
                 }
