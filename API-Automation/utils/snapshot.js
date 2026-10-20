@@ -1,22 +1,15 @@
 /**
  * Locates the quote list inside a /snapshot response.
  *
- * Why this exists: the spec's printed sample for 1.10 shows an unnamed
- * `{ "symbol": "", "offerPx": 0.000 }` object sitting inside `data` with no
- * key, which is not valid JSON and so cannot be taken literally. The server
- * must be doing one of these instead:
- *
- *   A. a named array   -> data.quotes | data.quoteList | data.symbols | data.list
- *   B. an unnamed array-valued property, whatever it is called
- *   C. a single entry inlined next to the header fields
- *
- * Rather than guess and have every snapshot assertion break on the first real
- * response, this accepts any of them and reports which one was found. The
- * `shape` it returns is asserted in the feature file, so the first real run
- * documents the server's actual contract instead of silently passing.
+ * Confirmed 2026-10-14 against the full Velocity Clearing JSON API
+ * Specification 1.4 PDF: the key is `data.items`, a plain array of
+ * `{ symbol, offerPx }` entries. This used to guess between several possible
+ * shapes because an earlier partial read of the spec's printed sample looked
+ * unnamed/ambiguous - it was not; the document prints valid JSON. Kept a
+ * fallback search for an array of entry-shaped objects under any key, in
+ * case a future dev-host response ever drifts from the documented key, so a
+ * shape change is reported rather than silently returning no entries.
  */
-
-const KNOWN_KEYS = ['quotes', 'quoteList', 'quoteslist', 'symbols', 'list', 'data', 'items'];
 
 function looksLikeEntry(value) {
   return (
@@ -38,34 +31,18 @@ export function extractSnapshotEntries(body) {
     return { entries: [], shape: 'missing-data', key: null };
   }
 
-  // A. a named array of entries, under one of the usual names
-  for (const key of KNOWN_KEYS) {
-    const value = data[key];
-    if (Array.isArray(value) && value.every(looksLikeEntry)) {
-      return { entries: value, shape: 'named-array', key };
-    }
+  // Spec 1.10: data.items is the documented key.
+  if (Array.isArray(data.items)) {
+    return { entries: data.items, shape: 'items', key: 'items' };
   }
 
-  // B. any array-valued property whose members look like entries
+  // Fallback: any array-valued property whose members look like entries.
+  // Not expected on a spec-conformant server; kept so a key rename is
+  // reported as "found under an unexpected key" instead of "nothing found".
   for (const [key, value] of Object.entries(data)) {
     if (Array.isArray(value) && value.length && value.every(looksLikeEntry)) {
       return { entries: value, shape: 'array-under-unexpected-key', key };
     }
-  }
-
-  // C. a single entry inlined alongside the header fields
-  if (looksLikeEntry(data)) {
-    return {
-      entries: [{ symbol: data.symbol, offerPx: data.offerPx }],
-      shape: 'inlined-single-entry',
-      key: null,
-    };
-  }
-
-  // An empty inventory is a legitimate outcome, not a shape problem.
-  const emptyArray = Object.entries(data).find(([, v]) => Array.isArray(v) && v.length === 0);
-  if (emptyArray) {
-    return { entries: [], shape: 'named-array', key: emptyArray[0] };
   }
 
   return { entries: [], shape: 'unrecognised', key: null };

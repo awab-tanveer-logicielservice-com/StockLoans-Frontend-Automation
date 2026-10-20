@@ -78,12 +78,13 @@ export const ORDER_RESPONSE = {
 /**
  * 1.10 Quote List Snapshot.
  *
- * The spec's printed sample shows an unnamed `{ symbol, offerPx }` object
- * nested inside `data` with no key, which cannot be literal JSON. The two
- * plausible readings are a named array of quotes, or the quotes inlined
- * alongside the header fields. Only the header fields are asserted here; the
- * quote list itself is located at runtime by utils/snapshot.js, which accepts
- * either reading and reports which one the server actually uses.
+ * Confirmed 2026-10-14 against the full spec PDF: `data.items` is a named
+ * array of `{ symbol, offerPx }` entries. An earlier partial read of the
+ * printed sample made this look like unnamed/ambiguous JSON - it is not; the
+ * document prints valid JSON with `items` as the key. Per-entry shape is
+ * still checked separately via SNAPSHOT_ENTRY (items can be large, and a
+ * malformed entry should be reported by index, not fail the whole shape
+ * check at once).
  */
 export const SNAPSHOT_RESPONSE = {
   data: {
@@ -91,6 +92,7 @@ export const SNAPSHOT_RESPONSE = {
     mpid: 'string',
     transactTime: 'string',
     symbol: 'string',
+    items: 'array',
   },
   status: STATUS_SCHEMA,
 };

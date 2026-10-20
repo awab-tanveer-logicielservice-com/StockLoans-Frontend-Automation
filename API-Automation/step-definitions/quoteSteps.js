@@ -180,9 +180,9 @@ Then('the snapshot should echo back the symbol {string}', async ({ world }, expe
 Then('the snapshot should contain a price list', async ({ world }) => {
   const res = requireResponse(world);
   const { entries, shape, key } = extractSnapshotEntries(res.body);
-  // The spec's printed sample is not literal JSON (see utils/snapshot.js), so
-  // failing here means the response matched none of the readings - report what
-  // arrived rather than asserting on a guessed key.
+  // Spec 1.10 confirmed key is data.items (see utils/snapshot.js). Failing
+  // here means the live response used some other key - report what arrived
+  // rather than asserting on a guessed one.
   expect(
     shape,
     `could not find a quote list in the snapshot response. data was:\n` +

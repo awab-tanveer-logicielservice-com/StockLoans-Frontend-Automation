@@ -8,11 +8,9 @@ Feature: Velocity JSON API - Quote List Snapshot (spec 1.10)
   # in inventory simply does not appear in the list - its absence is not an
   # error.
   #
-  # Shape caveat: the spec's printed response sample shows an unnamed
-  # { symbol, offerPx } object inside `data`, which is not valid JSON, so the
-  # real key is unknown until a live response is seen. The steps locate the
-  # price list by structure and report which shape the server actually uses -
-  # see API-Automation/utils/snapshot.js.
+  # Shape: confirmed 2026-10-14 against the full spec PDF. The price list is
+  # data.items, an array of { symbol, offerPx } entries - see
+  # API-Automation/utils/snapshot.js.
   # Environment: Dev/Test only - see API-Automation/Config/env.js
 
   # --- Happy Path ---

@@ -1,0 +1,590 @@
+Total blocks parsed: 77, failed: 50
+
+===== #1 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:6:3 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › Responses use application/json with no media type parameters @Smoke @Regression @API @Contract (3.0s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2669ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"029071a627e0224dab2a0c32e9eeea3f60bf","time":"2026-10-19T08:54:25.082","status":{"code":0,"message":"Logon Successful"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #7 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:49:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › Every endpoint carries a status object › Example #1 @Regression @API @Contract (932ms)
+--- requests/responses ---
+[api] POST /quote -> 401 in 917ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+[api] POST /logout -> 500 in 1266ms
+      req: {"user":"atanveer","token":"e976...d974"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #8 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:55:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › Every endpoint carries a status object › Example #2 @Regression @API @Contract (3.8s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2653ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"b99f000e20181245d62bfc122d8c8467598d","time":"2026-10-19T08:54:41.188","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /limit -> 401 in 920ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+[api] POST /logout -> 500 in 1081ms
+      req: {"user":"atanveer","token":"b99f...598d"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #9 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:61:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › Every endpoint carries a status object › Example #3 @Regression @API @Contract (3.8s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2680ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"499472872460a2466d2b3e320bc9270343f4","time":"2026-10-19T08:54:47.440","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /overnight -> 401 in 944ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+[api] POST /logout -> 500 in 1085ms
+      req: {"user":"atanveer","token":"4994...43f4"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #10 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:67:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › Every endpoint carries a status object › Example #4 @Regression @API @Contract (3.8s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2684ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"67a9ed082ca2e245b62ba542416a84c5c04a","time":"2026-10-19T08:54:53.703","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /locate -> 401 in 947ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+[api] POST /logout -> 500 in 1117ms
+      req: {"user":"atanveer","token":"67a9...c04a"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #11 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:73:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › Every endpoint carries a status object › Example #5 @Regression @API @Contract (3.8s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2746ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"30f2563c23a50247272b22c267723b88c75c","time":"2026-10-19T08:54:59.999","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /snapshot -> 401 in 938ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+[api] POST /logout -> 500 in 1113ms
+      req: {"user":"atanveer","token":"30f2...c75c"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #12 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:83:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › A malformed document returns 400 Bad Request › Example #1 @Regression @API @Contract @Negative (2.8s)
+--- requests/responses ---
+[api] POST /logon -> 401 in 2651ms
+      req: "{\"token\": \"abc\", \"symbol\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #13 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:88:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › A malformed document returns 400 Bad Request › Example #2 @Regression @API @Contract @Negative (2.6s)
+--- requests/responses ---
+[api] POST /logout -> 401 in 2471ms
+      req: "{\"token\": \"abc\", \"symbol\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #14 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:93:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › A malformed document returns 400 Bad Request › Example #3 @Regression @API @Contract @Negative (2.6s)
+--- requests/responses ---
+[api] POST /quote -> 401 in 2440ms
+      req: "{\"token\": \"abc\", \"symbol\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #15 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:98:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › A malformed document returns 400 Bad Request › Example #4 @Regression @API @Contract @Negative (2.6s)
+--- requests/responses ---
+[api] POST /limit -> 401 in 2470ms
+      req: "{\"token\": \"abc\", \"symbol\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #16 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:103:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › A malformed document returns 400 Bad Request › Example #5 @Regression @API @Contract @Negative (2.6s)
+--- requests/responses ---
+[api] POST /overnight -> 401 in 2487ms
+      req: "{\"token\": \"abc\", \"symbol\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #17 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:108:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › A malformed document returns 400 Bad Request › Example #6 @Regression @API @Contract @Negative (2.6s)
+--- requests/responses ---
+[api] POST /locate -> 401 in 2488ms
+      req: "{\"token\": \"abc\", \"symbol\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #18 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:113:5 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › A malformed document returns 400 Bad Request › Example #7 @Regression @API @Contract @Negative (2.6s)
+--- requests/responses ---
+[api] POST /snapshot -> 401 in 2443ms
+      req: "{\"token\": \"abc\", \"symbol\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #25 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\ApiContract.feature.spec.js:161:3 › Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11) › The documented workflow runs end to end on a single session @Smoke @Regression @API @Contract @Workflow (3.8s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 1126ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"ad8d2aac23417246d72bbab266ce7fe1a87f","time":"2026-10-19T08:55:41.292","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /quote -> 200 in 1298ms
+      req: {"token":"ad8d...a87f","quoteReqId":"QR-mvf0rksu-24356-0002-8af4","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0rksu-24356-0002-8af4","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"offerSize":100,"offerPx":0.007,"transactTime":"2026-10-19T08:55:42.579"},"status":{"code":0,"message":""}}
+[api] POST /limit -> 200 in 1354ms
+      req: {"token":"ad8d...a87f","cliOrdId":"CO-mvf0rlt2-24356-0003-e7c3","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007}
+      res: {"data":{"cliOrdId":"CO-mvf0rlt2-24356-0003-e7c3","locateId":25074143,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:55:43.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1115ms
+      req: {"user":"atanveer","token":"bc9e...1696"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #26 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LimitLocateOrder.feature.spec.js:6:3 › Velocity JSON API - Limit-Locate-Order (spec 1.6) › A locate priced from a fresh quote is filled @Smoke @Regression @API @Limit (5.5s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2636ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"3ad14a4220cb42414c2ba2529c40713ff18a","time":"2026-10-19T08:55:49.203","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /quote -> 200 in 1294ms
+      req: {"token":"3ad1...f18a","quoteReqId":"QR-mvf0rqx7-15872-0001-a5a1","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0rqx7-15872-0001-a5a1","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"offerSize":100,"offerPx":0.007,"transactTime":"2026-10-19T08:55:50.506"},"status":{"code":0,"message":""}}
+[api] POST /limit -> 200 in 1354ms
+      req: {"token":"3ad1...f18a","cliOrdId":"CO-mvf0rrxc-15872-0002-f5bd","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007}
+      res: {"data":{"cliOrdId":"CO-mvf0rrxc-15872-0002-f5bd","locateId":25074144,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:55:51.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1108ms
+      req: {"user":"atanveer","token":"3ad1...f18a"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #27 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LimitLocateOrder.feature.spec.js:18:3 › Velocity JSON API - Limit-Locate-Order (spec 1.6) › A filled locate returns an identifiable order @Smoke @Regression @API @Limit (6.1s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 3262ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"bc7d8ffd28d8624dd628ebe2cebe5ff9195e","time":"2026-10-19T08:55:57.928","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /quote -> 200 in 1303ms
+      req: {"token":"bc7d...195e","quoteReqId":"QR-mvf0rxnq-17240-0001-113b","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0rxnq-17240-0001-113b","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"offerSize":100,"offerPx":0.007,"transactTime":"2026-10-19T08:55:59.237"},"status":{"code":0,"message":""}}
+[api] POST /limit -> 200 in 1345ms
+      req: {"token":"bc7d...195e","cliOrdId":"CO-mvf0ryo4-17240-0002-dee3","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007}
+      res: {"data":{"cliOrdId":"CO-mvf0ryo4-17240-0002-dee3","locateId":25074145,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:56:00.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1090ms
+      req: {"user":"atanveer","token":"bc7d...195e"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #29 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LimitLocateOrder.feature.spec.js:40:3 › Velocity JSON API - Limit-Locate-Order (spec 1.6) › A generously priced locate fills the full quantity @Regression @API @Limit (1.4s)
+--- requests/responses ---
+[api] POST /limit -> 200 in 1362ms
+      req: {"token":"351a...866c","cliOrdId":"CO-mvf0s5uq-30424-0003-dc60","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999}
+      res: {"data":{"cliOrdId":"CO-mvf0s5uq-30424-0003-dc60","locateId":25074147,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999.0,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:56:09.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1099ms
+      req: {"user":"atanveer","token":"351a...866c"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #30 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LimitLocateOrder.feature.spec.js:49:3 › Velocity JSON API - Limit-Locate-Order (spec 1.6) › A locate priced below the market is reported as Price Too Low @Regression @API @Limit @Negative (4.2s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2686ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"b512ee162de2d243ea2a59129d054b75b182","time":"2026-10-19T08:56:15.234","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /limit -> 200 in 1340ms
+      req: {"token":"b512...b182","cliOrdId":"CO-mvf0sb04-30256-0001-c771","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.0001}
+      res: {"data":{"cliOrdId":"CO-mvf0sb04-30256-0001-c771","locateId":25074148,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.001,"execQty":0,"execPx":0.0,"tif":4,"transactTime":"2026-10-19T08:56:16.000","orderStatus":8},"status":{"code":2,"message":""}}
+[api] POST /logout -> 500 in 1106ms
+      req: {"user":"atanveer","token":"b512...b182"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #31 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LimitLocateOrder.feature.spec.js:57:3 › Velocity JSON API - Limit-Locate-Order (spec 1.6) › A locate for an unrecognised symbol is reported as Unknown Symbol @Regression @API @Limit @Negative (4.2s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2651ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"7fca8a962d24c247f028277294de303016db","time":"2026-10-19T08:56:21.954","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /limit -> 200 in 1320ms
+      req: {"token":"7fca...16db","cliOrdId":"CO-mvf0sg75-24032-0001-0640","mpid":"AVTR","trader":"t-avatar-api","symbol":"ZZZZQQ","orderQty":100,"orderPx":999}
+      res: {"data":{"cliOrdId":"CO-mvf0sg75-24032-0001-0640","locateId":25074149,"mpid":"AVTR","trader":"t-avatar-api","symbol":"ZZZZQQ","orderQty":100,"orderPx":999.0,"execQty":0,"execPx":0.0,"tif":4,"transactTime":"2026-10-19T08:56:23.000","orderStatus":8},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1101ms
+      req: {"user":"atanveer","token":"7fca...16db"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #32 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LimitLocateOrder.feature.spec.js:64:3 › Velocity JSON API - Limit-Locate-Order (spec 1.6) › A quantity beyond what is permitted is refused @Regression @API @Limit @Negative (4.2s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2662ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"9793dacd27a2b24452282772ae2a4fdd0eb7","time":"2026-10-19T08:56:28.513","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /limit -> 200 in 1339ms
+      req: {"token":"9793...0eb7","cliOrdId":"CO-mvf0sl96-28544-0001-9a4c","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100000000,"orderPx":999}
+      res: {"data":{"cliOrdId":"CO-mvf0sl96-28544-0001-9a4c","locateId":25074150,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100000000,"orderPx":999.0,"execQty":0,"execPx":0.0,"tif":4,"transactTime":"2026-10-19T08:56:29.000","orderStatus":8},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1100ms
+      req: {"user":"atanveer","token":"9793...0eb7"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #33 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LimitLocateOrder.feature.spec.js:72:3 › Velocity JSON API - Limit-Locate-Order (spec 1.6) › A limit document missing required fields is rejected @Regression @API @Limit @Negative (2.6s)
+--- requests/responses ---
+[api] POST /limit -> 401 in 2481ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+--- failure detail ---
+(no Error: line found)
+
+===== #35 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LocateRestatement.feature.spec.js:6:3 › Velocity JSON API - Locate-Order Restatement (spec 1.9) › An order can be restated by the client-assigned cliOrdId @Smoke @Regression @API @Restatement (2.5s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 1089ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"5a76fab02b5ad247ef2aebc2388c3e189a19","time":"2026-10-19T08:56:40.423","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /limit -> 200 in 1346ms
+      req: {"token":"5a76...9a19","cliOrdId":"CO-mvf0suen-10176-0001-ad1f","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999}
+      res: {"data":{"cliOrdId":"CO-mvf0suen-10176-0001-ad1f","locateId":25074151,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999.0,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:56:41.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1101ms
+      req: {"user":"atanveer","token":"5a76...9a19"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #36 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LocateRestatement.feature.spec.js:17:3 › Velocity JSON API - Locate-Order Restatement (spec 1.9) › An order can be restated by the server-assigned locateId @Smoke @Regression @API @Restatement (4.2s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2635ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"f547f9d423efa2465c2adb0292badc681ae2","time":"2026-10-19T08:56:46.951","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /limit -> 200 in 1365ms
+      req: {"token":"f547...1ae2","cliOrdId":"CO-mvf0szh7-30596-0001-175b","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999}
+      res: {"data":{"cliOrdId":"CO-mvf0szh7-30596-0001-175b","locateId":25074152,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999.0,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:56:48.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1105ms
+      req: {"user":"atanveer","token":"f547...1ae2"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #37 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LocateRestatement.feature.spec.js:28:3 › Velocity JSON API - Locate-Order Restatement (spec 1.9) › An overnight order can also be restated @Regression @API @Restatement (4.1s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2643ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"9975a6562911f240042bc6f21787e0a432c3","time":"2026-10-19T08:56:53.510","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /overnight -> 200 in 1286ms
+      req: {"token":"9975...32c3","cliOrdId":"CO-mvf0t4j1-17364-0001-be0e","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"cliOrdId":null,"locateId":25074153,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.0,"execQty":0,"execPx":0.0,"tif":0,"transactTime":"2026-10-19T11:00:00.000","orderStatus":8},"status":{"code":96,"message":"No Prior Locate to Overnight"}}
+[api] POST /logout -> 500 in 1100ms
+      req: {"user":"atanveer","token":"9975...32c3"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #38 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LocateRestatement.feature.spec.js:39:3 › Velocity JSON API - Locate-Order Restatement (spec 1.9) › Restating twice returns a stable answer @Regression @API @Restatement (4.2s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2683ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"ab38d8fc2e5a1241472b59c20c393b6eca03","time":"2026-10-19T08:57:00.128","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /limit -> 200 in 1367ms
+      req: {"token":"ab38...ca03","cliOrdId":"CO-mvf0t9ne-17384-0001-b3f2","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999}
+      res: {"data":{"cliOrdId":"CO-mvf0t9ne-17384-0001-b3f2","locateId":25074154,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999.0,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:57:01.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1110ms
+      req: {"user":"atanveer","token":"ab38...ca03"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #40 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\LocateRestatement.feature.spec.js:57:3 › Velocity JSON API - Locate-Order Restatement (spec 1.9) › A restatement document missing required fields is rejected @Regression @API @Restatement @Negative (936ms)
+--- requests/responses ---
+[api] POST /locate -> 401 in 922ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+[api] POST /logout -> 500 in 1088ms
+      req: {"user":"atanveer","token":"b88b...e670"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #42 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logon.feature.spec.js:6:3 › Velocity JSON API - Logon (spec 1.3) › Valid credentials return a session token @Smoke @Regression @API @Logon (1.1s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 1107ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"402e6b6621cf224bc42a7e72dd9151f591ac","time":"2026-10-19T08:57:15.472","status":{"code":0,"message":"Logon Successful"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #43 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logon.feature.spec.js:16:3 › Velocity JSON API - Logon (spec 1.3) › Logon response carries the mandated JSON content type @Regression @API @Logon (2.8s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2669ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"1eb27c3a235b82469a2a2e22222e30147d36","time":"2026-10-19T08:57:19.601","status":{"code":0,"message":"Logon Successful"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #44 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logon.feature.spec.js:23:3 › Velocity JSON API - Logon (spec 1.3) › The optional callbackUrl field is accepted @Regression @API @Logon (2.8s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2668ms
+      req: {"user":"atanveer","password":"***","callbackUrl":"https://example.invalid/velocity-callback"}
+      res: {"user":"atanveer","token":"429f15182e53e2497e28a3625f7dba149dbc","time":"2026-10-19T08:57:23.706","status":{"code":0,"message":"Logon Successful"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #48 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logon.feature.spec.js:55:3 › Velocity JSON API - Logon (spec 1.3) › A logon document missing required fields is rejected @Regression @API @Logon @Negative (946ms)
+--- requests/responses ---
+[api] POST /logon -> 500 in 935ms
+      req: {}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #49 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logon.feature.spec.js:60:3 › Velocity JSON API - Logon (spec 1.3) › A malformed JSON document is rejected @Regression @API @Logon @Negative (2.6s)
+--- requests/responses ---
+[api] POST /logon -> 401 in 2501ms
+      req: "{\"user\": \"someone\", \"password\":}"
+      res: {"Status":401,"message":"class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonObject (com.google.gson.JsonPrimitive and com.google.gson.JsonObject are in unnamed module of loader com.google.apphosting.runtime.ApplicationClassLoader @71d44a3)"}
+--- failure detail ---
+(no Error: line found)
+
+===== #50 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logout.feature.spec.js:6:3 › Velocity JSON API - Logout (spec 1.4) › A logged-on client can log out @Smoke @Regression @API @Logout (3.9s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2669ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"a118c20d23555242102a5362ce1229d0d97d","time":"2026-10-19T08:57:40.483","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /logout -> 500 in 1109ms
+      req: {"user":"atanveer","token":"a118...d97d"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+--- failure detail ---
+(no Error: line found)
+
+===== #51 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logout.feature.spec.js:17:3 › Velocity JSON API - Logout (spec 1.4) › The token is genuinely invalidated, not just forgotten by the client @Regression @API @Logout (3.9s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2657ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"dd68bdae2aa2724b9b297a1201abfd1dec10","time":"2026-10-19T08:57:45.692","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /logout -> 500 in 1097ms
+      req: {"user":"atanveer","token":"dd68...ec10"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #52 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logout.feature.spec.js:26:3 › Velocity JSON API - Logout (spec 1.4) › Logging out a token the server never issued is refused @Regression @API @Logout @Negative (2.8s)
+--- requests/responses ---
+[api] POST /logout -> 401 in 2601ms
+      req: {"user":"atanveer","token":"not-...0000"}
+      res: {"Status":401,"message":"Invalid Token: Unauthroized:not-a-real-token-0000 {\"user\":\"atanveer\",\"token\":\"not-a-real-token-0000\"}"}
+
+===== #53 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\Logout.feature.spec.js:31:3 › Velocity JSON API - Logout (spec 1.4) › A logout document missing required fields is rejected @Regression @API @Logout @Negative (2.6s)
+--- requests/responses ---
+[api] POST /logout -> 401 in 2483ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+
+===== #54 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\OvernightLocateOrder.feature.spec.js:6:3 › Velocity JSON API - Overnight-Locate-Order (spec 1.8) › An overnight locate is accepted without a client price @Smoke @Regression @API @Overnight (4.1s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2665ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"f912c06724fcc24f61290ff2f09b797d8357","time":"2026-10-19T08:57:58.893","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /overnight -> 200 in 1299ms
+      req: {"token":"f912...8357","cliOrdId":"CO-mvf0uizq-25584-0001-e9cc","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"cliOrdId":null,"locateId":25074155,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.0,"execQty":0,"execPx":0.0,"tif":0,"transactTime":"2026-10-19T11:00:00.000","orderStatus":8},"status":{"code":96,"message":"No Prior Locate to Overnight"}}
+[api] POST /logout -> 500 in 1113ms
+      req: {"user":"atanveer","token":"f912...8357"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #55 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\OvernightLocateOrder.feature.spec.js:15:3 › Velocity JSON API - Overnight-Locate-Order (spec 1.8) › An overnight locate is marked with order type 5 @Smoke @Regression @API @Overnight (4.1s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2656ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"5b771ad92207d243e82b9ad22e2f0fc67e9c","time":"2026-10-19T08:58:05.429","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /overnight -> 200 in 1322ms
+      req: {"token":"5b77...7e9c","cliOrdId":"CO-mvf0uo14-1276-0001-44e2","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"cliOrdId":null,"locateId":25074156,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.0,"execQty":0,"execPx":0.0,"tif":0,"transactTime":"2026-10-19T11:00:00.000","orderStatus":8},"status":{"code":96,"message":"No Prior Locate to Overnight"}}
+[api] POST /logout -> 500 in 1101ms
+      req: {"user":"atanveer","token":"5b77...7e9c"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #56 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\OvernightLocateOrder.feature.spec.js:22:3 › Velocity JSON API - Overnight-Locate-Order (spec 1.8) › An overnight locate returns an identifiable order @Regression @API @Overnight (4.7s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2705ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"50d955e82a82d24c5e2ace22e8ac577b0a7a","time":"2026-10-19T08:58:12.049","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /overnight -> 200 in 1853ms
+      req: {"token":"50d9...0a7a","cliOrdId":"CO-mvf0ut57-7648-0001-e8a8","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"cliOrdId":null,"locateId":25074157,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.0,"execQty":0,"execPx":0.0,"tif":0,"transactTime":"2026-10-19T11:00:00.000","orderStatus":8},"status":{"code":96,"message":"No Prior Locate to Overnight"}}
+[api] POST /logout -> 500 in 1108ms
+      req: {"user":"atanveer","token":"50d9...0a7a"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #58 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\OvernightLocateOrder.feature.spec.js:38:3 › Velocity JSON API - Overnight-Locate-Order (spec 1.8) › A stray orderPx does not turn an overnight order into a limit order @Regression @API @Overnight (1.3s)
+--- requests/responses ---
+[api] POST /overnight -> 200 in 1292ms
+      req: {"token":"7b40...49b8","cliOrdId":"CO-mvf0uzn8-24504-0002-f135","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":999}
+      res: {"data":{"cliOrdId":null,"locateId":25074159,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.0,"execQty":0,"execPx":0.0,"tif":0,"transactTime":"2026-10-19T11:00:00.000","orderStatus":8},"status":{"code":96,"message":"No Prior Locate to Overnight"}}
+[api] POST /logout -> 500 in 1711ms
+      req: {"user":"atanveer","token":"7b40...49b8"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #59 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\OvernightLocateOrder.feature.spec.js:45:3 › Velocity JSON API - Overnight-Locate-Order (spec 1.8) › An overnight locate for an unrecognised symbol is reported as Unknown Symbol @Regression @API @Overnight @Negative (4.1s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2627ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"3a2931732ae0524ca22af0c22add3fdd042b","time":"2026-10-19T08:58:27.581","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /overnight -> 200 in 1306ms
+      req: {"token":"3a29...042b","cliOrdId":"CO-mvf0v54r-30552-0001-f47b","mpid":"AVTR","trader":"t-avatar-api","symbol":"ZZZZQQ","orderQty":100}
+      res: {"data":{"cliOrdId":null,"locateId":25074160,"mpid":"AVTR","trader":"t-avatar-api","symbol":"ZZZZQQ","orderQty":100,"orderPx":0.0,"execQty":0,"execPx":0.0,"tif":0,"transactTime":"2026-10-19T11:00:00.000","orderStatus":8},"status":{"code":96,"message":"No Prior Locate to Overnight"}}
+[api] POST /logout -> 500 in 1105ms
+      req: {"user":"atanveer","token":"3a29...042b"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #60 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\OvernightLocateOrder.feature.spec.js:52:3 › Velocity JSON API - Overnight-Locate-Order (spec 1.8) › An overnight document missing required fields is rejected @Regression @API @Overnight @Negative (2.7s)
+--- requests/responses ---
+[api] POST /overnight -> 401 in 2513ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+
+===== #63 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteListSnapshot.feature.spec.js:15:3 › Velocity JSON API - Quote List Snapshot (spec 1.10) › Every entry in the snapshot is a symbol with a positive price @Regression @API @Snapshot (2.0s)
+--- requests/responses ---
+[api] POST /snapshot -> 200 in 1958ms
+      req: {"token":"7c00...1768","quoteReqId":"QR-mvf0vgxg-16092-0002-ef09","mpid":"AVTR","symbol":"snapshot"}
+      res: {"data":{"quoteReqId":"QR-mvf0vgxg-16092-0002-ef09","mpid":"AVTR","symbol":"SNAPSHOT","transactTime":"2026-10-19T08:58:44.174","items":[{"symbol":"A","offerPx":0.004},{"symbol":"AA","offerPx":0.004},{"symbol":"AA-B","offerPx":0.01},{"symbol":"AAA","offerPx":0.02},{"symbol":"AAAA","offerPx":0.02},{"symbol":"AAAC","offerPx":0.02},{"symbol":"AAAP","offerPx":0.024},{"symbol":"AAAU","offerPx":0.03},{"symbol":"AABB","offerPx":0.004},{"symbol":"AABVF","offerPx":0.02},{"symbol":"AAC","offerPx":0.018},{"symbol":"AAC.U","offerPx":0.015},{"symbol":"AACAY","offerPx":0.012},{"symbol":"AACB","offerPx":0.02},{"symbol":"AACG","offerPx":0.022},{"symbol":"AACI","offerPx":0.02},{"symbol":"AACO","offerPx":0.02},{"symbol":"AACP","offerPx":0.02},{"symbol":"AACS","offerPx":0.02},{"symbol":"AACTF","offerPx":0.02}
+[api] POST /logout -> 500 in 1078ms
+      req: {"user":"atanveer","token":"7c00...1768"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #64 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteListSnapshot.feature.spec.js:23:3 › Velocity JSON API - Quote List Snapshot (spec 1.10) › The snapshot echoes back the request header fields @Regression @API @Snapshot (5.5s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 2636ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"a4fc427322996246bb2a8e22179ed4a4a564","time":"2026-10-19T08:58:50.080","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /snapshot -> 200 in 2679ms
+      req: {"token":"a4fc...a564","quoteReqId":"QR-mvf0vmh4-24460-0001-38ca","mpid":"AVTR","symbol":"snapshot"}
+      res: {"data":{"quoteReqId":"QR-mvf0vmh4-24460-0001-38ca","mpid":"AVTR","symbol":"SNAPSHOT","transactTime":"2026-10-19T08:58:51.365","items":[{"symbol":"A","offerPx":0.004},{"symbol":"AA","offerPx":0.004},{"symbol":"AA-B","offerPx":0.01},{"symbol":"AAA","offerPx":0.02},{"symbol":"AAAA","offerPx":0.02},{"symbol":"AAAC","offerPx":0.02},{"symbol":"AAAP","offerPx":0.024},{"symbol":"AAAU","offerPx":0.03},{"symbol":"AABB","offerPx":0.004},{"symbol":"AABVF","offerPx":0.02},{"symbol":"AAC","offerPx":0.018},{"symbol":"AAC.U","offerPx":0.015},{"symbol":"AACAY","offerPx":0.012},{"symbol":"AACB","offerPx":0.02},{"symbol":"AACG","offerPx":0.022},{"symbol":"AACI","offerPx":0.02},{"symbol":"AACO","offerPx":0.02},{"symbol":"AACP","offerPx":0.02},{"symbol":"AACS","offerPx":0.02},{"symbol":"AACTF","offerPx":0.02}
+[api] POST /logout -> 500 in 1105ms
+      req: {"user":"atanveer","token":"a4fc...a564"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #66 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteListSnapshot.feature.spec.js:38:3 › Velocity JSON API - Quote List Snapshot (spec 1.10) › A price taken from the snapshot is usable for a limit-locate-order @Regression @API @Snapshot (3.5s)
+--- requests/responses ---
+[api] POST /snapshot -> 200 in 2155ms
+      req: {"token":"6e5e...d085","quoteReqId":"QR-mvf0vuq8-25876-0002-7ff8","mpid":"AVTR","symbol":"snapshot"}
+      res: {"data":{"quoteReqId":"QR-mvf0vuq8-25876-0002-7ff8","mpid":"AVTR","symbol":"SNAPSHOT","transactTime":"2026-10-19T08:59:02.052","items":[{"symbol":"A","offerPx":0.004},{"symbol":"AA","offerPx":0.004},{"symbol":"AA-B","offerPx":0.01},{"symbol":"AAA","offerPx":0.02},{"symbol":"AAAA","offerPx":0.02},{"symbol":"AAAC","offerPx":0.02},{"symbol":"AAAP","offerPx":0.024},{"symbol":"AAAU","offerPx":0.03},{"symbol":"AABB","offerPx":0.004},{"symbol":"AABVF","offerPx":0.02},{"symbol":"AAC","offerPx":0.018},{"symbol":"AAC.U","offerPx":0.015},{"symbol":"AACAY","offerPx":0.012},{"symbol":"AACB","offerPx":0.02},{"symbol":"AACG","offerPx":0.022},{"symbol":"AACI","offerPx":0.02},{"symbol":"AACO","offerPx":0.02},{"symbol":"AACP","offerPx":0.02},{"symbol":"AACS","offerPx":0.02},{"symbol":"AACTF","offerPx":0.02}
+[api] POST /limit -> 200 in 1349ms
+      req: {"token":"6e5e...d085","cliOrdId":"CO-mvf0vwev-25876-0003-a899","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007}
+      res: {"data":{"cliOrdId":"CO-mvf0vwev-25876-0003-a899","locateId":25074161,"mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"orderPx":0.007,"execQty":100,"execPx":0.007,"tif":4,"transactTime":"2026-10-19T08:59:04.000","orderStatus":2},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1092ms
+      req: {"user":"atanveer","token":"6e5e...d085"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #67 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteListSnapshot.feature.spec.js:49:3 › Velocity JSON API - Quote List Snapshot (spec 1.10) › A snapshot document missing required fields is rejected @Regression @API @Snapshot @Negative (2.6s)
+--- requests/responses ---
+[api] POST /snapshot -> 401 in 2475ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+
+===== #69 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteRequest.feature.spec.js:6:3 › Velocity JSON API - Quote Request (spec 1.5) › A quote for an in-inventory symbol returns a price and a size @Smoke @Regression @API @Quote (2.4s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 1089ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"e536f92a2a02324b882aa9a232eff45f7095","time":"2026-10-19T08:59:14.541","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /quote -> 200 in 1307ms
+      req: {"token":"e536...7095","quoteReqId":"QR-mvf0w5bv-25204-0001-f450","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0w5bv-25204-0001-f450","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"offerSize":100,"offerPx":0.007,"transactTime":"2026-10-19T08:59:15.816"},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1104ms
+      req: {"user":"atanveer","token":"e536...7095"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #71 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteRequest.feature.spec.js:26:3 › Velocity JSON API - Quote Request (spec 1.5) › orderQty is optional on a quote request @Regression @API @Quote (1.3s)
+--- requests/responses ---
+[api] POST /quote -> 400 in 1260ms
+      req: {"token":"da32...0d5c","quoteReqId":"QR-mvf0wbfn-7568-0002-0a9f","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL"}
+      res: {"status":{"code":20,"message":"Missing orderQty"}}
+[api] POST /logout -> 500 in 1104ms
+      req: {"user":"atanveer","token":"da32...0d5c"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #73 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteRequest.feature.spec.js:40:3 › Velocity JSON API - Quote Request (spec 1.5) › Quoting repeatedly is allowed and each quote is distinct @Regression @API @Quote (3.9s)
+--- requests/responses ---
+[api] POST /quote -> 200 in 1299ms
+      req: {"token":"1566...db1a","quoteReqId":"QR-mvf0whgb-18328-0002-86b3","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0whgb-18328-0002-86b3","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"offerSize":100,"offerPx":0.007,"transactTime":"2026-10-19T08:59:31.518"},"status":{"code":0,"message":""}}
+[api] POST /quote -> 200 in 1296ms
+      req: {"token":"1566...db1a","quoteReqId":"QR-mvf0wigf-18328-0003-1227","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0wigf-18328-0003-1227","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"offerSize":100,"offerPx":0.007,"transactTime":"2026-10-19T08:59:32.816"},"status":{"code":0,"message":""}}
+[api] POST /quote -> 200 in 1271ms
+      req: {"token":"1566...db1a","quoteReqId":"QR-mvf0wjgg-18328-0004-66f7","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0wjgg-18328-0004-66f7","mpid":"AVTR","trader":"t-avatar-api","symbol":"AAPL","orderQty":100,"offerSize":100,"offerPx":0.007,"transactTime":"2026-10-19T08:59:34.099"},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1087ms
+      req: {"user":"atanveer","token":"1566...db1a"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #74 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteRequest.feature.spec.js:47:3 › Velocity JSON API - Quote Request (spec 1.5) › An unrecognised symbol is reported as Unknown Symbol @Regression @API @Quote @Negative (3.3s)
+--- requests/responses ---
+[api] POST /logon -> 200 in 1974ms
+      req: {"user":"atanveer","password":"***"}
+      res: {"user":"atanveer","token":"7a0699f6286112458e2b36d288605cd899db","time":"2026-10-19T08:59:38.789","status":{"code":0,"message":"Logon Successful"}}
+[api] POST /quote -> 200 in 1125ms
+      req: {"token":"7a06...99db","quoteReqId":"QR-mvf0wnxw-16560-0001-ad23","mpid":"AVTR","trader":"t-avatar-api","symbol":"ZZZZQQ","orderQty":100}
+      res: {"data":{"id":-1,"quoteReqId":"QR-mvf0wnxw-16560-0001-ad23","mpid":"AVTR","trader":"t-avatar-api","symbol":"ZZZZQQ","orderQty":100,"offerSize":0,"offerPx":0.0,"transactTime":"2026-10-19T08:59:39.933"},"status":{"code":0,"message":""}}
+[api] POST /logout -> 500 in 1096ms
+      req: {"user":"atanveer","token":"7a06...99db"}
+      res: {"status":{"code":3,"message":"Internal Processing Error"}}
+
+===== #77 FAILED =====
+[api] › API-Automation\.features-gen\API-Automation\features\QuoteRequest.feature.spec.js:67:3 › Velocity JSON API - Quote Request (spec 1.5) › A quote document missing required fields is rejected @Regression @API @Quote @Negative (1.1s)
+--- requests/responses ---
+[api] POST /quote -> 401 in 1078ms
+      req: {}
+      res: {"Status":401,"message":"Cannot invoke \"com.google.gson.JsonElement.getAsString()\" because the return value of \"com.google.gson.JsonObject.get(String)\" is null"}
+

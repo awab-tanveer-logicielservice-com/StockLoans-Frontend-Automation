@@ -136,17 +136,34 @@ same symbol turn a legitimate fill into an intermittent No Inventory, and the
 failure looks like a product bug. `API_WORKERS` raises it once a scenario set is
 known to be independent.
 
-**3. The `/snapshot` response shape is unconfirmed.**
+**3. The `/snapshot` response shape is confirmed: `data.items`.**
 
-The spec's printed sample for 1.10 shows an unnamed `{ symbol, offerPx }` object
-inside `data`, which is not valid JSON, so the real key is unknown until a live
-response is seen. `utils/snapshot.js` accepts any of the plausible readings and
-reports which one the server used. Once a real response confirms it, narrow that
-helper and tighten `SNAPSHOT_RESPONSE` in `schemas/responseSchemas.js`.
+Earlier revisions of this doc called the shape ambiguous, from a partial read
+of the spec's printed sample. A full read of the spec PDF on 2026-10-14
+confirmed it prints valid JSON: `data.items` is an array of
+`{ symbol, offerPx }` entries. `SNAPSHOT_RESPONSE` and `utils/snapshot.js`
+assert that key directly now, with a fallback search kept only in case a live
+response ever drifts from the documented key.
 
 ## Findings from the first live call
 
-Only one scenario has been run against dev so far — the credential-free
+**Update 2026-10-14:** the suite has since run full, with real dev
+credentials — 27 passed, 50 failed, 0 skipped. The failures are real
+server-side deviations from spec, verified against the full spec PDF, not
+framework defects. The assertions are left as the spec states; they stay red
+until the server matches it or Velocity confirms the spec is out of date, at
+which point the scenario changes. Full writeup, with request/response
+evidence for each: `API-Automation/VELOCITY_API_FINDINGS_2026-10-14.md`.
+Headline items: `/logout` returns HTTP 500 on every call, not just malformed
+ones; malformed/negative requests return 401 with a raw server exception
+instead of 400; responses use `time` where the spec says `transactTime`;
+`/overnight` responses omit `orderType` entirely.
+
+Below is the original note from the single credential-free scenario that ran
+on 2026-09-21, kept for history; see the findings doc above for everything
+since.
+
+Only one scenario had been run against dev so far — the credential-free
 `A logon document missing required fields is rejected`. It failed, and the
 failure is real, not a framework defect:
 
@@ -166,34 +183,33 @@ Two deviations from the specification in one response:
    Status Code list (0, 1, 2, 80, 93–99). It is mapped in `statusCodes.js` so
    failure messages read sensibly, flagged as observed-not-specified.
 
-The assertion has been left as the spec states. The suite's job is to hold the
-server to the documented contract, so this stays red until either the server
-returns 400 or Velocity confirms the spec is out of date — at which point the
-scenario, not the client, is what changes.
-
-The other 76 scenarios are unrun: they need credentials.
-
 ## Open questions for Velocity
 
 Carried out of the spec, worth confirming before treating any of these
 assertions as settled:
 
-- **400 vs 500 on a malformed or incomplete document**, and the meaning of
-  `status.code` 3 — see "Findings from the first live call" above. Applies to
-  every endpoint, so `ApiContract.feature` has a scenario outline covering all
-  seven.
-
+- **400 vs 401 on a malformed or incomplete document.** Confirmed on the full
+  live run, every endpoint: the dev host returns 401 with a raw server
+  exception instead of the spec'd 400. See
+  `VELOCITY_API_FINDINGS_2026-10-14.md` finding 4.
 - **`locateId` type.** 1.4 says it was unified to string across requests and
-  responses, previously mixed. The schema asserts `string`; a number is a
-  visible failure rather than a silent coercion.
+  responses, previously mixed. The schema asserts `string`; the live dev host
+  returns it as a number. Needs Velocity to confirm which is intended - see
+  the findings doc, item B.
 - **Status code 80, Unknown TIF.** The spec notes JSON requests carry no
   time-in-force field, so this should be unreachable over JSON. It is mapped in
-  `statusCodes.js` but no scenario provokes it.
+  `statusCodes.js` but no scenario provokes it. Still open.
 - **A stray `orderPx` on `/overnight`.** 1.8 says the request omits it; the
   spec does not say whether sending one is ignored or rejected. One scenario
   probes it and asserts only that the order still comes back as overnight.
-- **Which layer reports an invalidated token** — HTTP 401, or HTTP 200 with a
-  non-zero status code. The logout scenario accepts either.
+  Still open.
+- **Which layer reports an invalidated token.** Confirmed on the live run:
+  HTTP 401 on a bad token for `/logout` - but the body uses a non-spec
+  envelope (`{"Status": 401, "message": ...}` instead of
+  `{"status": {"code", "message"}}`). See the findings doc, finding 4.
+- **Does `/overnight` check symbol validity before prior-locate state?** An
+  unrecognized symbol returned "No Prior Locate to Overnight" (code 96), not
+  "Unknown Symbol" (code 1). See the findings doc, item A.
 
 ---
 
@@ -203,6 +219,17 @@ assertions as settled:
 - Tags: `@API` on everything, plus `@Smoke` / `@Regression`, an endpoint tag
   (`@Quote`, `@Limit`, ...) and `@Negative` on failure paths. `@Smoke` is the
   only tag that selects the smoke suite — the same rule as the UI suite.
+- `@RequiresPriorDayFill` marks the five `OvernightLocateOrder.feature`
+  happy-path scenarios. Confirmed 2026-10-20: `/overnight` is built from a
+  locate that filled on the *previous business day* for the same
+  MPID+trader+symbol+account (see `VELOCITY_API_FINDINGS_2026-10-14.md`,
+  "Resolved - not a bug", item A) - a precondition a same-day CI run cannot
+  satisfy on its own. `npm run test:api` / `test:api:smoke` / `test:api:ci`
+  exclude this tag (`--grep-invert @RequiresPriorDayFill`) so the regular
+  suite only reports on what it can actually control. Run them deliberately
+  with `npm run test:api:overnight`, the day after seeding a limit-locate on
+  `VELOCITY_TEST_SYMBOL` (via a `/limit` call - see LimitLocateOrder.feature).
+  No automated seeding job exists yet; this is a manual/scheduled step.
 - Re-run `bddgen` (or use the `npm run test:api*` scripts, which do) after
   editing a feature file or a tag. Stale generated specs are the usual cause of
   "my new scenario did not run".
