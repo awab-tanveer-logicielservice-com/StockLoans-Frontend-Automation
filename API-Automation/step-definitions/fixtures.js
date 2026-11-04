@@ -18,7 +18,7 @@ import { apiCredentials, apiParty, hasApiCredentials } from '../testdata/apiTest
  *
  *   authedApi - test-scoped client carrying a token from a worker-scoped logon.
  *              The token is acquired once per worker rather than once per
- *              scenario, because spec 1.3 says a new logon invalidates nothing
+ *              scenario, because spec section 3 says a new logon invalidates nothing
  *              but each one is still a round trip, and a suite that logs on per
  *              scenario spends most of its wall clock on /logon.
  *

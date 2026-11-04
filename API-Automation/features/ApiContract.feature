@@ -1,27 +1,26 @@
-Feature: Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7, 1.9, 1.11)
+Feature: Velocity JSON API - Transport contract and status codes (specification 1.5)
   As the team maintaining the Velocity JSON API integration
   I want the transport rules and status vocabulary honoured on every endpoint
   So that a client written to the specification keeps working
 
   # This file holds the cross-cutting rules that are not tied to one business
-  # flow: the HTTP contract from 1.1, the HTTP response codes from 1.11, and
-  # the status object from 1.9. Endpoint behaviour lives in the per-endpoint
+  # flow: HTTP response rules and status codes. Endpoint behaviour lives in the per-endpoint
   # feature files.
   # Environment: Dev/Test only - see API-Automation/Config/env.js
 
-  # --- 1.1 Transport rules ---
+  # --- Transport rules ---
 
-  @Smoke @Regression @API @Contract
-  Scenario: Responses use application/json with no media type parameters
+  @Smoke @Regression @API @Contract @SLL-C1644
+  Scenario: Responses use application/json with UTF-8 charset
     Given the client has no session token
     When the client logs on with valid credentials
     Then the HTTP response status should be 200
-    And the response Content-Type header should be "application/json"
+    And the response Content-Type header should be "application/json;charset=utf-8"
 
-  @Regression @API @Contract
+  @Regression @API @Contract @SLL-C1645
   Scenario Outline: Every entity URL answers a POST
     Given the client has a valid session token
-    When the client POSTs an empty document to "<entityUrl>"
+    When the client POSTs a document with only the session token to "<entityUrl>"
     Then the response should be valid JSON
 
     Examples:
@@ -32,12 +31,12 @@ Feature: Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7,
       | /locate    |
       | /snapshot  |
 
-  # --- 1.9 Status object ---
+  # --- Section 10 Status object ---
 
-  @Regression @API @Contract
+  @Regression @API @Contract @SLL-C1646
   Scenario Outline: Every endpoint carries a status object
     Given the client has a valid session token
-    When the client POSTs an empty document to "<entityUrl>"
+    When the client POSTs a document with only the session token to "<entityUrl>"
     Then the response should carry a status object
 
     Examples:
@@ -48,30 +47,19 @@ Feature: Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7,
       | /locate    |
       | /snapshot  |
 
-  # --- 1.11 HTTP response codes ---
-
-  # 400: "malformed syntax or missing fields. The client SHOULD NOT repeat the
-  # request without modifications."
-  @Regression @API @Contract @Negative
-  Scenario Outline: A malformed document returns 400 Bad Request
-    When the client POSTs the following document to "<entityUrl>":
+  # Invalid JSON is rejected by the authentication filter before endpoint
+  # processing; valid JSON with missing fields is covered per endpoint.
+  @Regression @API @Contract @Negative @SLL-C1647
+  Scenario: Invalid JSON returns the documented early-authentication error
+    When the client POSTs the following document to "/logon":
       """
-      {"token": "abc", "symbol":}
+      {"user": "invalid", "password":}
       """
-    Then the HTTP response status should be 400
-
-    Examples:
-      | entityUrl  |
-      | /logon     |
-      | /logout    |
-      | /quote     |
-      | /limit     |
-      | /overnight |
-      | /locate    |
-      | /snapshot  |
+    Then the HTTP response status should be 401
+    And the response should carry a status object
 
   # 401: "The request requires user authentication."
-  @Regression @API @Contract @Negative
+  @Regression @API @Contract @Negative @SLL-C1648
   Scenario Outline: An authenticated endpoint returns 401 without a valid token
     Given the client has an invalid session token "not-a-real-token-0000"
     When the client POSTs the following document to "<entityUrl>":
@@ -93,30 +81,23 @@ Feature: Velocity JSON API - Transport contract and status codes (spec 1.1, 1.7,
   # Not a spec requirement - a guard so a silently degraded environment shows
   # up as a failure instead of a slow green run. Raise the budget rather than
   # deleting the scenario if dev is legitimately slower.
-  @Regression @API @Contract
+  @Regression @API @Contract @SLL-C1649
   Scenario: A quote answers inside the latency budget
     Given the client has a valid session token
     When the client requests a quote for the test symbol
     Then the HTTP response status should be 200
     And the response should arrive within 5000 ms
 
-  # --- 1.2 End-to-end workflow ---
+  # --- Section 2 End-to-end workflow ---
 
-  # One session throughout - see step-definitions/workflowSteps.js for why
-  # these steps are phrased "the same session" rather than reusing the
-  # per-endpoint steps.
-  @Smoke @Regression @API @Contract @Workflow
-  Scenario: The documented workflow runs end to end on a single session
+  # One token and ordered endpoint calls; logout is the final API request.
+  @Smoke @Regression @API @Contract @Workflow @OrderedWorkflow @SLL-C1650
+  Scenario: The APIs run in the documented order on one session
     Given a session established by this scenario
     When the same session requests a quote for the test symbol
-    Then the HTTP response status should be 200
-    And the quote should offer a positive price
-    When the same session locates at the quoted price
-    Then the HTTP response status should be 200
-    And the order should carry a locateId
-    When the same session restates that order
-    Then the HTTP response status should be 200
-    When the same session logs out
-    Then the HTTP response status should be 200
-    And the whole workflow should have succeeded
-    And the invalidated token should be rejected on a subsequent request
+    And the same session requests a quote list snapshot
+    And the same session submits a limit order at the quoted price
+    And the same session restates that order
+    And the same session submits an overnight order for the test symbol
+    And the same session logs out
+    Then the ordered workflow should have succeeded

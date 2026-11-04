@@ -5,8 +5,8 @@ import { API_ENV } from '../Config/env.js';
  * Thin transport layer over Playwright's APIRequestContext.
  *
  * Responsibilities, and deliberately nothing more:
- *   - POST JSON to <baseURL><entityUrl> with exactly the header the spec
- *     mandates (Content-Type: application/json, no media type parameters)
+ *   - POST JSON to <baseURL><entityUrl> with the request header mandated by
+ *     the spec (Content-Type: application/json)
  *   - never throw on a non-2xx: 400/401/500 are expected outcomes the suite
  *     asserts on, so every call returns an envelope instead
  *   - record elapsed time per call, so latency assertions and any future
@@ -46,7 +46,7 @@ export class HttpClient {
    * @param {string} entityUrl e.g. '/quote' - appended to the base URL
    * @param {object|string} payload object to serialise, or a raw string for
    *        malformed-body negative tests
-   * @param {{ headers?: Record<string,string> }} [options]
+   * @param {{ headers?: Record<string,string>, params?: Record<string,string> }} [options]
    * @returns {Promise<ApiResponse>}
    */
   async post(entityUrl, payload, options = {}) {
@@ -58,6 +58,7 @@ export class HttpClient {
       // `data` with a string sends it byte-for-byte, which is what the
       // malformed-JSON scenarios need; with an object Playwright serialises it.
       data: isRaw ? payload : JSON.stringify(payload),
+      params: options.params,
       headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     });
 

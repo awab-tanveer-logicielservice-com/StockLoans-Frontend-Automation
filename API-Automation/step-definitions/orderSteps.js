@@ -1,8 +1,8 @@
 /**
- * Steps for the three order endpoints, which share one response shape:
- *   1.6  /limit     - limit-locate-order
- *   1.8  /overnight - overnight-locate-order
- *   1.9  /locate    - locate-order restatement
+ * Steps for the order endpoints, which share one response shape:
+ *   5  /limit     - limit-locate-order
+ *   7  /overnight - overnight-locate-order
+ *   8  /locate    - locate-order restatement
  */
 import { createBdd } from 'playwright-bdd';
 import { test, expect } from './fixtures.js';
@@ -11,7 +11,6 @@ import { ORDER_RESPONSE } from '../schemas/responseSchemas.js';
 import { assertShape } from '../utils/validate.js';
 import {
   ORD_STATUS,
-  ORDER_TYPE_OVERNIGHT,
   describeOrdStatus,
   interpretOrderStatus,
   isFill,
@@ -21,12 +20,12 @@ import { newCliOrdId, newUnknownId } from '../utils/ids.js';
 
 const { When, Then } = createBdd(test);
 
-// --- 1.6 Limit-Locate-Order ------------------------------------------------
+// --- 5 Limit-Locate-Order --------------------------------------------------
 
 When(
   'the client submits a limit-locate-order at the quoted price',
   async ({ authedApi, party, world }) => {
-    // Spec 1.2 workflow: quote first, then locate using the price it returned.
+    // Section 2 workflow: quote first, then locate using the price it returned.
     const orderPx = world.stash.quotedPx;
     expect(orderPx, 'no quoted price captured - the quote step must run first').toBeGreaterThan(0);
 
@@ -64,7 +63,7 @@ When(
 When(
   'the client submits a limit-locate-order at the snapshot price',
   async ({ authedApi, party, world }) => {
-    // Spec 1.10: "Then use the price acquired to request a limit-locate-order."
+    // Section 6: use a snapshot price to request a limit-locate-order.
     const orderPx = world.stash.snapshotPx;
     expect(
       orderPx,
@@ -108,7 +107,7 @@ When(
   }
 );
 
-// --- 1.8 Overnight-Locate-Order --------------------------------------------
+// --- 7 Overnight-Locate-Order ---------------------------------------------
 
 When(
   'the client submits an overnight-locate-order for the test symbol',
@@ -141,34 +140,16 @@ When(
   }
 );
 
-When(
-  'the client submits an overnight-locate-order carrying an orderPx',
-  async ({ authedApi, party, world }) => {
-    // Spec 1.8 says the request "omits orderPx". Sending one is a contract
-    // probe: the server should either ignore it or reject the document, and
-    // this scenario records which.
-    const cliOrdId = newCliOrdId();
-    world.ids.cliOrdId = cliOrdId;
-    world.response = await authedApi.raw('/overnight', {
-      token: authedApi.token,
-      cliOrdId,
-      mpid: party.mpid,
-      trader: party.trader,
-      symbol: SYMBOLS.liquid,
-      orderQty: QUANTITIES.standard,
-      orderPx: PRICES.generous,
-    });
-  }
-);
-
-// --- 1.9 Locate-Order Restatement ------------------------------------------
+// --- 8 Locate-Order Restatement -------------------------------------------
 
 When(
   'the client requests a restatement using the cliOrdId',
   async ({ authedApi, world }) => {
     const cliOrdId = world.ids.cliOrdId;
+    const locateId = world.order?.data?.locateId;
     expect(cliOrdId, 'no cliOrdId captured - an order step must run first').toBeTruthy();
-    world.response = await authedApi.locate({ cliOrdId });
+    expect(locateId, 'no locateId captured - an order step must run first').toBeTruthy();
+    world.response = await authedApi.locate({ cliOrdId, locateId });
     if (world.response.httpStatus === 200) world.stash.restatement = world.response.body;
   }
 );
@@ -178,7 +159,9 @@ When(
   async ({ authedApi, world }) => {
     const locateId = world.order?.data?.locateId;
     expect(locateId, 'no locateId captured - an order step must run first').toBeTruthy();
-    world.response = await authedApi.locate({ locateId });
+    const cliOrdId = world.order?.data?.cliOrdId;
+    expect(cliOrdId, 'no cliOrdId captured - an order step must run first').toBeTruthy();
+    world.response = await authedApi.locate({ cliOrdId, locateId });
     if (world.response.httpStatus === 200) world.stash.restatement = world.response.body;
   }
 );
@@ -186,7 +169,10 @@ When(
 When(
   'the client requests a restatement for an order that does not exist',
   async ({ authedApi, world }) => {
-    world.response = await authedApi.locate({ cliOrdId: newUnknownId() });
+    world.response = await authedApi.locate({
+      cliOrdId: newUnknownId(),
+      locateId: Number.MAX_SAFE_INTEGER,
+    });
   }
 );
 
@@ -223,13 +209,7 @@ Then('the order should echo back the requested cliOrdId', async ({ world }) => {
 Then('the order should carry a locateId', async ({ world }) => {
   const res = requireResponse(world);
   const locateId = res.body?.data?.locateId;
-  expect(String(locateId || '').length, 'locateId was empty').toBeGreaterThan(0);
-  // Spec 1.4 unified locateId to string. A number here is the mixed-type
-  // regression the spec note warns about, so surface it rather than coerce.
-  expect(
-    typeof locateId,
-    'spec 1.4 unified locateId to string on both request and response'
-  ).toBe('string');
+  expect(Number.isFinite(locateId), 'locateId should be numeric per spec section 5').toBe(true);
   world.ids.locateId = locateId;
 });
 
@@ -263,9 +243,8 @@ Then('the order status should be a fill', async ({ world }) => {
 });
 
 Then('the order response should indicate no error', async ({ world }) => {
-  // Spec 1.9: on order responses, code 0 means "no error" only when the order
-  // filled; code 0 on an unfilled order means No Inventory. Never read a bare
-  // code 0 as success here.
+  // Specification 1.5 makes orderStatus authoritative; fills use code 0 and
+  // booked overnights use code -1.
   const res = requireResponse(world);
   const { code } = res.body?.status || {};
   const orderStatus = res.body?.data?.orderStatus;
@@ -275,6 +254,12 @@ Then('the order response should indicate no error', async ({ world }) => {
     `order response is not a success: ${verdict.meaning} ` +
       `(status.code ${code}, orderStatus ${orderStatus} - ${describeOrdStatus(orderStatus)})`
   ).toBe(true);
+});
+
+Then('the overnight order should be booked', async ({ world }) => {
+  const res = requireResponse(world);
+  expect(Number(res.body?.data?.orderStatus)).toBe(ORD_STATUS.FILLED);
+  expect(Number(res.body?.status?.code)).toBe(-1);
 });
 
 Then('the order response should indicate No Inventory', async ({ world }) => {
@@ -302,31 +287,30 @@ Then('the executed quantity should equal the ordered quantity', async ({ world }
 });
 
 Then('the executed price should not exceed the limit price', async ({ world }) => {
-  // Spec 1.6: a limit-locate-order "guarantees the requested price or is lower".
+  // Section 5: a limit order fills at the current rate, never above the limit.
   const res = requireResponse(world);
   const execPx = Number(res.body?.data?.execPx);
   const orderPx = Number(world.stash.orderPx);
   expect(
     execPx,
     `execPx ${execPx} is above the limit price ${orderPx}, which breaks the ` +
-      'price guarantee in spec 1.6'
+      'price guarantee in spec section 5'
   ).toBeLessThanOrEqual(orderPx);
 });
 
-Then('the order type should be overnight', async ({ world }) => {
+Then('the overnight response should have a null cliOrdId', async ({ world }) => {
   const res = requireResponse(world);
   expect(
-    res.body?.data?.orderType,
-    'spec 1.8: overnight-locate-orders come back with orderType "5"'
-  ).toBe(ORDER_TYPE_OVERNIGHT);
+    res.body?.data?.cliOrdId,
+    'spec section 7: overnight responses do not return cliOrdId'
+  ).toBeNull();
+  expect(
+    Object.prototype.hasOwnProperty.call(res.body?.data || {}, 'orderType'),
+    'Specification 1.5 removes orderType from order responses'
+  ).toBe(false);
 });
 
-Then('the order type should not be overnight', async ({ world }) => {
-  const res = requireResponse(world);
-  expect(res.body?.data?.orderType).not.toBe(ORDER_TYPE_OVERNIGHT);
-});
-
-/** Maps the human names used in feature files onto spec 1.7 OrdStatus values. */
+/** Maps the human names used in feature files onto section 10 OrdStatus values. */
 function resolveOrdStatusName(name) {
   const key = String(name).trim().toUpperCase().replace(/[\s-]+/g, '_');
   if (key in ORD_STATUS) return ORD_STATUS[key];

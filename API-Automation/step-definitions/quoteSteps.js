@@ -1,5 +1,5 @@
 /**
- * Steps for spec 1.5 Quote Request and 1.10 Quote List Snapshot.
+ * Steps for sections 4 (Quote Request) and 6 (Quote List Snapshot).
  */
 import { createBdd } from 'playwright-bdd';
 import { test, expect } from './fixtures.js';
@@ -12,7 +12,7 @@ import { extractSnapshotEntries, snapshotPrice } from '../utils/snapshot.js';
 
 const { When, Then } = createBdd(test);
 
-// --- 1.5 Quote Request -----------------------------------------------------
+// --- 4 Quote Request -------------------------------------------------------
 
 When(
   'the client requests a quote for the test symbol',
@@ -44,17 +44,35 @@ When(
 );
 
 When(
-  'the client requests a quote for {string} without a quantity',
-  async ({ authedApi, party, world }, symbol) => {
-    // orderQty is optional in spec 1.5 - omitting it asks "what is available".
+  'the client requests a quote for the test symbol with quantity 150',
+  async ({ authedApi, party, world }) => {
     const quoteReqId = newQuoteReqId();
     world.ids.quoteReqId = quoteReqId;
-    world.stash.symbol = symbol;
-    world.stash.orderQty = undefined;
-    world.response = await authedApi.quote({ symbol, quoteReqId, ...party });
+    world.stash.symbol = SYMBOLS.liquid;
+    world.stash.orderQty = 150;
+    world.response = await authedApi.quote({
+      symbol: SYMBOLS.liquid,
+      orderQty: 150,
+      quoteReqId,
+      ...party,
+    });
     if (world.response.httpStatus === 200) world.quote = world.response.body;
   }
 );
+
+When('the client requests a quote below one round lot', async ({ authedApi, party, world }) => {
+  const quoteReqId = newQuoteReqId();
+  world.ids.quoteReqId = quoteReqId;
+  world.stash.symbol = SYMBOLS.liquid;
+  world.stash.orderQty = 50;
+  world.response = await authedApi.quote({
+    symbol: SYMBOLS.liquid,
+    orderQty: 50,
+    quoteReqId,
+    ...party,
+  });
+  if (world.response.httpStatus === 200) world.quote = world.response.body;
+});
 
 When(
   'the client requests a quote for the unknown symbol',
@@ -71,20 +89,22 @@ When(
 When(
   'the client requests {int} quotes for the test symbol',
   async ({ authedApi, party, world }, count) => {
-    // Spec 1.2: "repeat as many times as necessary". This proves repeat quoting
-    // is allowed and that each one gets its own server-assigned id.
     const responses = [];
+    const quoteReqIds = [];
     for (let i = 0; i < count; i += 1) {
+      const quoteReqId = newQuoteReqId();
+      quoteReqIds.push(quoteReqId);
       responses.push(
         await authedApi.quote({
           symbol: SYMBOLS.liquid,
           orderQty: QUANTITIES.standard,
-          quoteReqId: newQuoteReqId(),
+          quoteReqId,
           ...party,
         })
       );
     }
     world.stash.quoteBatch = responses;
+    world.stash.quoteBatchIds = quoteReqIds;
     world.response = responses[responses.length - 1];
     world.quote = world.response.body;
   }
@@ -113,11 +133,17 @@ Then('the quote should echo back the requesting mpid and trader', async ({ party
   expect(res.body?.data?.trader).toBe(party.trader);
 });
 
-Then('the quote should carry a server-assigned id', async ({ world }) => {
+Then('the quote should report the rounded requested quantity', async ({ world }) => {
+  const res = requireResponse(world);
+  const requested = Number(world.stash.orderQty);
+  const expected = requested < 100 ? 0 : Math.floor(requested / 100) * 100;
+  expect(Number(res.body?.data?.orderQty)).toBe(expected);
+});
+
+Then('the quote id should be -1', async ({ world }) => {
   const res = requireResponse(world);
   const id = res.body?.data?.id;
-  expect(typeof id, 'data.id should be a number per spec 1.5').toBe('number');
-  expect(id, 'a server-assigned quote id should be non-zero').toBeGreaterThan(0);
+  expect(id, 'Specification 1.5 says quote data.id is always -1').toBe(-1);
 });
 
 Then('the quote should offer a positive price', async ({ world }) => {
@@ -141,14 +167,21 @@ Then(
   }
 );
 
-Then('every quote in the batch should have a distinct id', async ({ world }) => {
+Then('the quote should apply the under-lot rounding rule', async ({ world }) => {
+  const res = requireResponse(world);
+  expect(Number(res.body?.data?.orderQty)).toBe(0);
+  expect([0, 1]).toContain(Number(res.body?.data?.offerSize));
+});
+
+Then('every quote in the batch should echo its request id', async ({ world }) => {
   const batch = world.stash.quoteBatch || [];
   expect(batch.length, 'no quote batch was captured').toBeGreaterThan(1);
-  const ids = batch.map((r) => r.body?.data?.id);
+  const expectedIds = world.stash.quoteBatchIds || [];
+  const echoedIds = batch.map((r) => r.body?.data?.quoteReqId);
   expect(
-    new Set(ids).size,
-    `server-assigned quote ids repeated across a batch: ${JSON.stringify(ids)}`
-  ).toBe(ids.length);
+    echoedIds,
+    'each quote response should echo the quoteReqId sent with that request'
+  ).toEqual(expectedIds);
 });
 
 Then('the quoted price should be remembered for the locate request', async ({ world }) => {
@@ -158,12 +191,16 @@ Then('the quoted price should be remembered for the locate request', async ({ wo
   expect(world.stash.quotedPx).toBeGreaterThan(0);
 });
 
-// --- 1.10 Quote List Snapshot ---------------------------------------------
+// --- 6 Quote List Snapshot ------------------------------------------------
 
 When('the client requests a quote list snapshot', async ({ authedApi, party, world }) => {
   const quoteReqId = newQuoteReqId();
   world.ids.quoteReqId = quoteReqId;
-  world.response = await authedApi.snapshot({ mpid: party.mpid, quoteReqId });
+  world.stash.snapshotSymbol = SYMBOLS.snapshot;
+  world.response = await authedApi.snapshot({
+    mpid: party.mpid,
+    quoteReqId,
+  });
   if (world.response.httpStatus === 200) world.snapshot = world.response.body;
 });
 
@@ -172,15 +209,17 @@ Then('the response should match the snapshot schema', async ({ world }) => {
   assertShape(res.body, SNAPSHOT_RESPONSE, 'snapshot response');
 });
 
-Then('the snapshot should echo back the symbol {string}', async ({ world }, expected) => {
+Then('the snapshot should echo back the requested symbol', async ({ world }) => {
   const res = requireResponse(world);
-  expect(res.body?.data?.symbol).toBe(expected);
+  expect(String(res.body?.data?.symbol).toUpperCase()).toBe(
+    String(world.stash.snapshotSymbol).toUpperCase()
+  );
 });
 
 Then('the snapshot should contain a price list', async ({ world }) => {
   const res = requireResponse(world);
   const { entries, shape, key } = extractSnapshotEntries(res.body);
-  // Spec 1.10 confirmed key is data.items (see utils/snapshot.js). Failing
+  // Section 6 defines data.items (see utils/snapshot.js). Failing
   // here means the live response used some other key - report what arrived
   // rather than asserting on a guessed one.
   expect(
@@ -208,7 +247,7 @@ Then('the snapshot should include the test symbol', async ({ world }) => {
   const price = snapshotPrice(res.body, SYMBOLS.liquid);
   expect(
     price,
-    `${SYMBOLS.liquid} is not in the snapshot. Spec 1.10: a symbol absent from ` +
+    `${SYMBOLS.liquid} is not in the snapshot. Section 6: a symbol absent from ` +
       `inventory simply does not appear, so either inventory is genuinely empty ` +
       `for it or VELOCITY_TEST_SYMBOL needs changing for this environment.`
   ).not.toBeNull();
