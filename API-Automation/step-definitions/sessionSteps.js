@@ -1,5 +1,5 @@
 /**
- * Steps for spec 1.3 Logon and 1.4 Logout.
+ * Steps for section 3 Logon and Logout.
  *
  * These drive the unauthenticated `api` client, because the whole point is to
  * control the token by hand.
@@ -14,7 +14,7 @@ import { SYMBOLS, QUANTITIES, apiParty } from '../testdata/apiTestData.js';
 
 const { When, Then } = createBdd(test);
 
-// --- 1.3 Logon -------------------------------------------------------------
+// --- 3 Logon ---------------------------------------------------------------
 
 When('the client logs on with valid credentials', async ({ api, world }) => {
   world.response = await api.logon(apiCredentials());
@@ -33,7 +33,7 @@ When('the client logs on with a callbackUrl', async ({ api, world }) => {
   const creds = apiCredentials();
   world.response = await api.logon({
     ...creds,
-    // Optional field, spec 1.3: "reserved for server-pushed messages".
+    // Optional field, spec section 3: "reserved for server-pushed messages".
     callbackUrl: creds.callbackUrl || 'https://example.invalid/velocity-callback',
   });
 });
@@ -72,7 +72,7 @@ Then('the new token should differ from the previous token', async ({ world }) =>
   expect(res.body?.token).not.toBe(world.stash.previousToken);
 });
 
-// --- 1.4 Logout ------------------------------------------------------------
+// --- 3 Logout --------------------------------------------------------------
 
 When('the client logs out', async ({ api, world }) => {
   // Keep the token around: the follow-up step proves it no longer works.
@@ -95,11 +95,21 @@ Then('the response should match the logout schema', async ({ world }) => {
 
 Then('the logout response should not carry a token', async ({ world }) => {
   const res = requireResponse(world);
-  // Spec 1.4 omits `token` from the logout response entirely.
+  // Section 3 omits `token` from the logout response entirely.
   expect(
     Object.prototype.hasOwnProperty.call(res.body || {}, 'token'),
-    'spec 1.4 defines no token field on the logout response'
+    'section 3 defines no token field on the logout response'
   ).toBe(false);
+});
+
+Then('the logout response should not carry a timestamp', async ({ world }) => {
+  const res = requireResponse(world);
+  for (const field of ['time', 'transactTime']) {
+    expect(
+      Object.prototype.hasOwnProperty.call(res.body || {}, field),
+      `Specification 1.5 omits ${field} from the logout response`
+    ).toBe(false);
+  }
 });
 
 Then(
@@ -116,15 +126,16 @@ Then(
     });
     world.response = res;
 
-    // The spec says logout "invalidates all subsequent requests" but does not
-    // say which layer reports it. Both readings are acceptable: HTTP 401, or
-    // HTTP 200 carrying a non-zero application status code.
-    const rejectedAtHttp = res.httpStatus === 401;
-    const rejectedAtStatus = res.httpStatus === 200 && Number(res.body?.status?.code) !== 0;
+    const statusCode = Number(res.body?.status?.code);
+    const filterStatus = Number(res.body?.Status);
     expect(
-      rejectedAtHttp || rejectedAtStatus,
-      `expected the invalidated token to be rejected, got HTTP ${res.httpStatus} ` +
-        `with status ${JSON.stringify(res.body?.status)}`
+      res.httpStatus,
+      `expected HTTP 401 after logout, got HTTP ${res.httpStatus} with body ${res.text}`
+    ).toBe(401);
+    expect(
+      (statusCode === 11 && typeof res.body?.status?.message === 'string') ||
+        (filterStatus === 401 && typeof res.body?.message === 'string'),
+      `expected a Specification 1.5 authentication error envelope, got ${res.text}`
     ).toBe(true);
   }
 );

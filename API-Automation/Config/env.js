@@ -3,11 +3,11 @@
  *
  * This suite targets the Dev/Test environment only.
  *
- * Spec 1.4, section 1.1 lists two base URLs. We deliberately automate just the
- * first. The production host is recorded below so nobody has to go back to the
- * PDF to recognise it, but it is not selectable: the suite fires real locate
- * orders, and an accidental run against production would place them for real.
- * PRODUCTION_HOST exists so the guard can refuse it by name.
+ * Specification 1.5, section 1.1 lists two base URLs. We deliberately
+ * automate just the first. The production host is recorded below so nobody has
+ * to go back to the PDF to recognise it, but it is not selectable: the suite
+ * fires real locate orders, and an accidental run against production would
+ * place them for real.
  *
  * Note the two environments use different domains AND different TLDs
  * (velocitycapitalllc.com vs velocityclearing.llc), so neither can be derived
@@ -16,7 +16,6 @@
  * Override the host only to reach a different dev/test deployment:
  *   API_BASE_URL=https://some-other-dev-host/json
  */
-
 const DEV_BASE_URL = 'https://betapi.velocitycapitalllc.com/json';
 
 /** Not a target. Named only so assertProductionIsNotTargeted can reject it. */

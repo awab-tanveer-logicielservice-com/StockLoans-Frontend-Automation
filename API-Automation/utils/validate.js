@@ -79,7 +79,7 @@ export function assertShape(actual, schema, label = 'response') {
   const problems = checkShape(actual, schema);
   if (problems.length) {
     throw new Error(
-      `${label} does not match the JSON API Specification 1.4 shape:\n` +
+      `${label} does not match the JSON API Specification 1.5 shape:\n` +
         problems.map((p) => `  - ${p}`).join('\n') +
         `\nActual body:\n${JSON.stringify(actual, null, 2)}`
     );

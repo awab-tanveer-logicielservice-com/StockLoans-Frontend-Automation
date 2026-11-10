@@ -1,5 +1,5 @@
 /**
- * Response shapes transcribed from the Velocity JSON API Specification 1.4.
+ * Response shapes transcribed from the Velocity JSON API Specification 1.5.
  *
  * These describe the envelope only - field presence and primitive type. Business
  * rules (echo-back of the request, status code meaning, fill quantities) are
@@ -8,28 +8,27 @@
  * See utils/validate.js for the schema notation ('number?' marks optional).
  */
 
-/** Shared by every response, spec 1.9 "Status Object". */
+/** Shared by every response, spec section 10 "Status Object". */
 export const STATUS_SCHEMA = {
   code: 'number',
   message: 'string',
 };
 
-/** 1.3 Logon. */
+/** Section 3 Logon. */
 export const LOGON_RESPONSE = {
   user: 'string',
   token: 'string',
-  transactTime: 'string',
+  time: 'string',
   status: STATUS_SCHEMA,
 };
 
-/** 1.4 Logout. Same as logon minus the token. */
+/** Section 3 Logout. The response omits both token and time. */
 export const LOGOUT_RESPONSE = {
   user: 'string',
-  transactTime: 'string',
   status: STATUS_SCHEMA,
 };
 
-/** 1.5 Quote Request. `id` is the server-assigned quote id. */
+/** Section 4 Quote Request. Quotes are not individually retrievable; id is always -1. */
 export const QUOTE_RESPONSE = {
   data: {
     id: 'number',
@@ -46,21 +45,17 @@ export const QUOTE_RESPONSE = {
 };
 
 /**
- * 1.6 Limit-Locate-Order.
+ * Section 5 Limit-Locate-Order.
  *
- * 1.8 Overnight-Locate-Order and 1.9 Locate-Order Restatement return this same
+ * Sections 7 Overnight-Locate-Order and 8 Locate-Order Restatement return this same
  * shape - the spec says so explicitly for both - so all three reuse it. The
- * overnight-specific rule (orderType === "5") is asserted separately.
- *
- * Spec note on locateId: the type was unified to string across requests and
- * responses in 1.4 after previously being mixed string/number. If a server
- * returns it as a number the shape check will fail loudly here, which is the
- * intended signal - confirm the intended type rather than loosening this.
+ * Overnight responses may return a null cliOrdId. Every order, including a
+ * rejected order, has a numeric locateId. The response's tif is numeric.
  */
 export const ORDER_RESPONSE = {
   data: {
-    cliOrdId: 'string',
-    locateId: 'string',
+    cliOrdId: 'string?',
+    locateId: 'number',
     mpid: 'string',
     trader: 'string',
     symbol: 'string',
@@ -70,20 +65,21 @@ export const ORDER_RESPONSE = {
     execPx: 'number',
     transactTime: 'string',
     orderStatus: 'number',
-    orderType: 'string',
+    tif: 'number',
   },
   status: STATUS_SCHEMA,
 };
 
 /**
- * 1.10 Quote List Snapshot.
+ * Section 6 Quote List Snapshot.
  *
- * The spec's printed sample shows an unnamed `{ symbol, offerPx }` object
- * nested inside `data` with no key, which cannot be literal JSON. The two
- * plausible readings are a named array of quotes, or the quotes inlined
- * alongside the header fields. Only the header fields are asserted here; the
- * quote list itself is located at runtime by utils/snapshot.js, which accepts
- * either reading and reports which one the server actually uses.
+ * Confirmed 2026-10-14 against the full spec PDF: `data.items` is a named
+ * array of `{ symbol, offerPx }` entries. An earlier partial read of the
+ * printed sample made this look like unnamed/ambiguous JSON - it is not; the
+ * document prints valid JSON with `items` as the key. Per-entry shape is
+ * still checked separately via SNAPSHOT_ENTRY (items can be large, and a
+ * malformed entry should be reported by index, not fail the whole shape
+ * check at once).
  */
 export const SNAPSHOT_RESPONSE = {
   data: {
@@ -91,6 +87,7 @@ export const SNAPSHOT_RESPONSE = {
     mpid: 'string',
     transactTime: 'string',
     symbol: 'string',
+    items: 'array',
   },
   status: STATUS_SCHEMA,
 };
@@ -99,4 +96,10 @@ export const SNAPSHOT_RESPONSE = {
 export const SNAPSHOT_ENTRY = {
   symbol: 'string',
   offerPx: 'number',
+};
+
+/** Early authentication failures use this capitalized HTTP 401 envelope. */
+export const AUTH_ERROR_RESPONSE = {
+  Status: 'number',
+  message: 'string',
 };

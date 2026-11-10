@@ -1,23 +1,19 @@
-Feature: Velocity JSON API - Quote List Snapshot (spec 1.10)
+Feature: Velocity JSON API - Quote List Snapshot (spec section 6)
   As a client of the Velocity Locate Services JSON API
   I want a price list of everything currently in inventory
   So that I can pick symbols and prices without quoting them one at a time
 
   # Entity URL: /snapshot
-  # The literal string "snapshot" is sent as the symbol. A symbol that is not
-  # in inventory simply does not appear in the list - its absence is not an
-  # error.
+  # The literal string "snapshot" is sent as the symbol and echoed uppercase.
   #
-  # Shape caveat: the spec's printed response sample shows an unnamed
-  # { symbol, offerPx } object inside `data`, which is not valid JSON, so the
-  # real key is unknown until a live response is seen. The steps locate the
-  # price list by structure and report which shape the server actually uses -
-  # see API-Automation/utils/snapshot.js.
+  # Shape: confirmed against specification 1.5. The price list is
+  # data.items, an array of { symbol, offerPx } entries - see
+  # API-Automation/utils/snapshot.js.
   # Environment: Dev/Test only - see API-Automation/Config/env.js
 
   # --- Happy Path ---
 
-  @Smoke @Regression @API @Snapshot
+  @Smoke @Regression @API @Snapshot @SLL-C1687
   Scenario: The snapshot returns the current inventory price list
     Given the client has a valid session token
     When the client requests a quote list snapshot
@@ -26,7 +22,7 @@ Feature: Velocity JSON API - Quote List Snapshot (spec 1.10)
     And the response should match the snapshot schema
     And the snapshot should contain a price list
 
-  @Regression @API @Snapshot
+  @Regression @API @Snapshot @SLL-C1688
   Scenario: Every entry in the snapshot is a symbol with a positive price
     Given the client has a valid session token
     When the client requests a quote list snapshot
@@ -34,14 +30,14 @@ Feature: Velocity JSON API - Quote List Snapshot (spec 1.10)
     And the snapshot should contain a price list
     And every snapshot entry should have a symbol and a price
 
-  @Regression @API @Snapshot
+  @Regression @API @Snapshot @SLL-C1689
   Scenario: The snapshot echoes back the request header fields
     Given the client has a valid session token
     When the client requests a quote list snapshot
     Then the HTTP response status should be 200
-    And the snapshot should echo back the symbol "snapshot"
+    And the snapshot should echo back the requested symbol
 
-  @Regression @API @Snapshot
+  @Regression @API @Snapshot @SLL-C1690
   Scenario: A symbol held in inventory appears in the snapshot
     Given the client has a valid session token
     When the client requests a quote list snapshot
@@ -49,9 +45,9 @@ Feature: Velocity JSON API - Quote List Snapshot (spec 1.10)
     And the snapshot should contain a price list
     And the snapshot should include the test symbol
 
-  # --- Cross-endpoint: the spec 1.10 workflow, snapshot then locate ---
+  # --- Cross-endpoint: the section 6 snapshot then limit workflow ---
 
-  @Regression @API @Snapshot
+  @Regression @API @Snapshot @SLL-C1691
   Scenario: A price taken from the snapshot is usable for a limit-locate-order
     Given the client has a valid session token
     When the client requests a quote list snapshot
@@ -64,12 +60,13 @@ Feature: Velocity JSON API - Quote List Snapshot (spec 1.10)
 
   # --- Negative Path ---
 
-  @Regression @API @Snapshot @Negative
+  @Regression @API @Snapshot @Negative @SLL-C1692
   Scenario: A snapshot document missing required fields is rejected
-    When the client POSTs an empty document to "/snapshot"
+    Given the client has a valid session token
+    When the client POSTs a document with only the session token to "/snapshot"
     Then the HTTP response status should be 400
 
-  @Regression @API @Snapshot @Negative
+  @Regression @API @Snapshot @Negative @SLL-C1693
   Scenario: A snapshot request with an invalid token is refused
     Given the client has an invalid session token "not-a-real-token-0000"
     When the client POSTs the following document to "/snapshot":

@@ -4,7 +4,7 @@ import { API_ENV } from '../Config/env.js';
 import { newQuoteReqId, newCliOrdId } from '../utils/ids.js';
 
 /**
- * One method per entity URL in the Velocity JSON API Specification 1.4.
+ * One method per entity URL in the Velocity JSON API Specification 1.5.
  *
  * Every method returns the raw HttpClient envelope (see HttpClient.ApiResponse)
  * and never throws on an error status - the steps assert on what came back.
@@ -40,7 +40,7 @@ export class LocateApiClient {
     return this.http.lastCall;
   }
 
-  // --- 1.3 Logon -----------------------------------------------------------
+  // --- 3 Logon -------------------------------------------------------------
 
   /**
    * Acquires a session token. On success the token is stored on the client and
@@ -51,7 +51,7 @@ export class LocateApiClient {
    */
   async logon({ user, password, callbackUrl }, options = {}) {
     const payload = { user, password };
-    // Optional, "reserved for server-pushed messages" (spec 1.3).
+    // Optional, "reserved for server-pushed messages" (spec section 3).
     if (callbackUrl !== undefined) payload.callbackUrl = callbackUrl;
 
     const res = await this.http.post(ENDPOINTS.LOGON, payload);
@@ -64,7 +64,7 @@ export class LocateApiClient {
     return res;
   }
 
-  // --- 1.4 Logout ----------------------------------------------------------
+  // --- 3 Logout ------------------------------------------------------------
 
   /**
    * Removes the server-side token, invalidating all subsequent requests.
@@ -72,7 +72,11 @@ export class LocateApiClient {
    * cannot accidentally keep using a dead token.
    */
   async logout({ user = this.user, token = this.token } = {}, options = {}) {
-    const res = await this.http.post(ENDPOINTS.LOGOUT, { user, token });
+    const res = await this.http.post(
+      ENDPOINTS.LOGOUT,
+      { user, token },
+      { params: { token } }
+    );
     if (options.store !== false) {
       this.token = null;
       this.user = null;
@@ -80,14 +84,14 @@ export class LocateApiClient {
     return res;
   }
 
-  // --- 1.5 Quote Request ---------------------------------------------------
+  // --- 4 Quote Request -----------------------------------------------------
 
   /**
    * Determines cost per share and inventory availability. The price from the
    * response feeds a limit-locate-order.
    *
    * @param {{ symbol: string, mpid: string, trader: string,
-   *           orderQty?: number, quoteReqId?: string, token?: string }} params
+   *           orderQty: number, quoteReqId?: string, token?: string }} params
    */
   async quote({ symbol, mpid, trader, orderQty, quoteReqId, token = this.token } = {}) {
     const payload = {
@@ -97,22 +101,24 @@ export class LocateApiClient {
       trader,
       symbol,
     };
-    // orderQty is optional in the spec; omitted means "how much is there".
-    if (orderQty !== undefined) payload.orderQty = orderQty;
+    if (orderQty === undefined) {
+      throw new Error('orderQty is required for /quote by Specification 1.5.');
+    }
+    payload.orderQty = orderQty;
 
     return this.http.post(ENDPOINTS.QUOTE, payload);
   }
 
-  // --- 1.6 Limit-Locate-Order ----------------------------------------------
+  // --- 5 Limit-Locate-Order ------------------------------------------------
 
   /**
    * Requests a locate at a guaranteed-or-better price.
    *
    * @param {{ symbol: string, mpid: string, trader: string, orderQty: number,
-   *           orderPx: number, cliOrdId?: string, token?: string }} params
+   *           orderPx: number, cliOrdId?: string, tif?: string, token?: string }} params
    */
-  async limit({ symbol, mpid, trader, orderQty, orderPx, cliOrdId, token = this.token } = {}) {
-    return this.http.post(ENDPOINTS.LIMIT, {
+  async limit({ symbol, mpid, trader, orderQty, orderPx, cliOrdId, tif, token = this.token } = {}) {
+    const payload = {
       token,
       cliOrdId: cliOrdId ?? newCliOrdId(),
       mpid,
@@ -120,14 +126,16 @@ export class LocateApiClient {
       symbol,
       orderQty,
       orderPx,
-    });
+    };
+    if (tif !== undefined) payload.tif = tif;
+    return this.http.post(ENDPOINTS.LIMIT, payload);
   }
 
-  // --- 1.8 Overnight-Locate-Order ------------------------------------------
+  // --- 7 Overnight-Locate-Order -------------------------------------------
 
   /**
-   * Same request as /limit minus orderPx - overnight orders are not priced by
-   * the client. The response comes back with orderType "5".
+   * Same required identity/quantity fields as /limit minus orderPx; overnight
+   * orders are priced by the service.
    *
    * @param {{ symbol: string, mpid: string, trader: string, orderQty: number,
    *           cliOrdId?: string, token?: string }} params
@@ -143,37 +151,36 @@ export class LocateApiClient {
     });
   }
 
-  // --- 1.9 Locate-Order Restatement ----------------------------------------
+  // --- 8 Locate-Order Restatement -----------------------------------------
 
   /**
    * Re-reads an existing order. Response shape is identical to /limit.
    *
-   * @param {{ cliOrdId?: string, locateId?: string, token?: string }} params
+   * @param {{ cliOrdId: string, locateId: number|string, token?: string }} params
    */
   async locate({ cliOrdId, locateId, token = this.token } = {}) {
     return this.http.post(ENDPOINTS.LOCATE, {
       token,
       cliOrdId,
-      // Spec 1.4 unified this to string on both request and response.
-      locateId: locateId === undefined ? undefined : String(locateId),
+      locateId,
     });
   }
 
-  // --- 1.10 Quote List Snapshot --------------------------------------------
+  // --- 6 Quote List Snapshot -----------------------------------------------
 
   /**
    * Price list of everything in inventory at the time of the request. The
    * literal string "snapshot" is the symbol, per the spec's request sample;
    * symbols absent from inventory simply do not appear in the list.
    *
-   * @param {{ mpid: string, quoteReqId?: string, symbol?: string, token?: string }} params
+   * @param {{ mpid: string, quoteReqId?: string, token?: string }} params
    */
-  async snapshot({ mpid, quoteReqId, symbol = 'snapshot', token = this.token } = {}) {
+  async snapshot({ mpid, quoteReqId, token = this.token } = {}) {
     return this.http.post(ENDPOINTS.SNAPSHOT, {
       token,
       quoteReqId: quoteReqId ?? newQuoteReqId(),
       mpid,
-      symbol,
+      symbol: 'snapshot',
     });
   }
 

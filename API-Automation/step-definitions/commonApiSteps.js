@@ -12,7 +12,7 @@ import {
   describeStatusCode,
 } from '../schemas/statusCodes.js';
 import { assertShape } from '../utils/validate.js';
-import { STATUS_SCHEMA } from '../schemas/responseSchemas.js';
+import { AUTH_ERROR_RESPONSE, STATUS_SCHEMA } from '../schemas/responseSchemas.js';
 
 const { Given, When, Then } = createBdd(test);
 
@@ -58,17 +58,20 @@ Then(
   async ({ world }, expectedType) => {
     const res = requireResponse(world);
     const actual = res.headers['content-type'] || '';
-    // Spec 1.1: the server sends application/json "without any media type
-    // parameters", so a charset suffix is itself a finding, not noise.
+    // Specification 1.5 requires the response charset suffix.
     expect(
       actual,
-      `spec 1.1 requires Content-Type without media type parameters, got "${actual}"`
+      `spec 1.5 response Content-Type mismatch: "${actual}"`
     ).toBe(expectedType);
   }
 );
 
 Then('the response should carry a status object', async ({ world }) => {
   const res = requireResponse(world);
+  if (res.httpStatus === 401 && res.body?.Status !== undefined) {
+    assertShape(res.body, AUTH_ERROR_RESPONSE, `${res.entityUrl} authentication error`);
+    return;
+  }
   assertShape(res.body?.status, STATUS_SCHEMA, `${res.entityUrl} status object`);
 });
 
@@ -105,7 +108,7 @@ Then('the status code should be {string}', async ({ world }, name) => {
 
 Then('the status message should not be empty', async ({ world }) => {
   const res = requireResponse(world);
-  expect(String(res.body?.status?.message ?? '').trim().length).toBeGreaterThan(0);
+  expect(String(res.body?.status?.message ?? res.body?.message ?? '').trim().length).toBeGreaterThan(0);
 });
 
 Then('the status message should contain {string}', async ({ world }, fragment) => {
@@ -132,6 +135,16 @@ When(
   'the client POSTs an empty document to {string}',
   async ({ api, world }, entityUrl) => {
     world.response = await api.raw(entityUrl, {});
+  }
+);
+
+When(
+  'the client POSTs a document with only the session token to {string}',
+  async ({ api, world }, entityUrl) => {
+    const token = world.stash.token;
+    expect(token, 'a valid session token is required for this request').toBeTruthy();
+    const options = entityUrl === '/logout' ? { params: { token } } : undefined;
+    world.response = await api.raw(entityUrl, { token }, options);
   }
 );
 

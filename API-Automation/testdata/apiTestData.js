@@ -10,8 +10,8 @@
  * Set them in your shell, in CI secrets, or in a local .env file (.env is
  * already gitignored):
  *
- *   VELOCITY_API_USER      preassigned UserID   (spec 1.3)
- *   VELOCITY_API_PASSWORD  preassigned password (spec 1.3)
+ *   VELOCITY_API_USER      preassigned UserID   (spec section 3)
+ *   VELOCITY_API_PASSWORD  preassigned password (spec section 3)
  *   VELOCITY_MPID          market participant id sent on quote/order requests
  *   VELOCITY_TRADER        trader id sent on quote/order requests
  *
@@ -64,11 +64,14 @@ export const SYMBOLS = {
   get liquid() {
     return process.env.VELOCITY_TEST_SYMBOL || 'AAPL';
   },
+  get snapshot() {
+    return 'snapshot';
+  },
   /** Expected to be a real symbol with no inventory - drives the code 0 path. */
   get illiquid() {
     return process.env.VELOCITY_ILLIQUID_SYMBOL || '';
   },
-  /** Not a real symbol - drives status code 1, Unknown Symbol. */
+  /** Unrecognized symbol; order endpoints report this as No Inventory. */
   get unknown() {
     return process.env.VELOCITY_UNKNOWN_SYMBOL || 'ZZZZQQ';
   },
