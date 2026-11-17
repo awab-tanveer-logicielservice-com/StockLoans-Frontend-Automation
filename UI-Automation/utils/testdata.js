@@ -1,10 +1,10 @@
 // QA account (https://qa-sls-v2.web.app). Used for any BASE_URL that isn't a
 // 'dev' URL - see the switch in fixtures.js / auth.setup.js.
-// The previous default here (awab.tanveer@vcttechnologiesllc.com) no longer
-// authenticates on QA: login stays on /login until the 60s timeout.
+// The logicielservice.com account was reported disabled on QA (2026-11-17), so the
+// default is the vcttechnologiesllc.com account again.
 export const users = {
-  username: process.env.E2E_USER || 'awab.tanveer@logicielservice.com',
-  password: process.env.E2E_PWD || 'Testing@123@!',
+  username: process.env.E2E_USER || 'awab.tanveer@vcttechnologiesllc.com',
+  password: process.env.E2E_PWD || 'Testing@1234@!',
 };
 
 export const devUsers = {
@@ -27,8 +27,8 @@ export const devUsers = {
 const ACCESS_REVIEW_ACCOUNTS = {
   awab: {
     displayName: 'Awab',
-    username: process.env.AR_AWAB_USER || 'awab.tanveer@logicielservice.com',
-    password: process.env.AR_AWAB_PWD || 'Testing@123@!',
+    username: process.env.AR_AWAB_USER || 'awab.tanveer@vcttechnologiesllc.com',
+    password: process.env.AR_AWAB_PWD || 'Testing@1234@!',
   },
   myadmin: {
     displayName: 'Myadmin',
